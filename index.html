@@ -4593,14 +4593,27 @@
             
             mainImg.dataset.cropped = "false";
             mainImg.onerror = function() {
-                if (fallback) this.src = fallback;
+                if (fallback && !this.src.includes(fallback)) this.src = fallback;
                 this.onerror = null;
             };
             
             var newImg = thumbEl.querySelector('img').src;
+            if (newImg.includes('wsrv.nl')) {
+                // Si la miniatura está usando proxy, extraer el url original
+                try {
+                    var urlParam = new URL(newImg).searchParams.get('url');
+                    if (urlParam) newImg = decodeURIComponent(urlParam);
+                }catch(e){}
+            }
+
             mainImg.onload = function() {
                 window.autoCrop && autoCrop(this);
             };
+            
+            // LIMPIEZA VITAL: Remover crossOrigin contaminado por autoCrop anterior
+            mainImg.removeAttribute('crossorigin');
+            mainImg.crossOrigin = null;
+            
             mainImg.src = newImg;
             mainImg.onclick = function() { openLightbox(newImg); };
             
