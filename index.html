@@ -4457,7 +4457,7 @@
 
             var thumbs = displayImgs.map(function (img, ii) {
                 var fallbackThumb = flb[ii] || '';
-                return '<div class="thumb ' + (ii === 0 ? 'active' : '') + '" onclick="changeImage(' + idx + ',' + ii + ',\'' + fallbackThumb + '\')"><img src="' + img + '" onerror="if(this.dataset.tried!=\'1\'){this.dataset.tried=\'1\';this.src=\''+fallbackThumb+'\'}else{this.parentElement.style.display=\'none\'}"></div>';
+                return '<div class="thumb ' + (ii === 0 ? 'active' : '') + '" onclick="changeImage(' + idx + ',' + ii + ',\'' + fallbackThumb + '\', this)"><img src="' + img + '" onerror="if(this.dataset.tried!=\'1\'){this.dataset.tried=\'1\';this.src=\''+fallbackThumb+'\'}else{this.parentElement.style.display=\'none\'}"></div>';
             }).join('');
 
             var features = (p.caracteristicas || []).map(function (c) { return '<li>' + esc(c) + '</li>'; }).join('');
@@ -4585,25 +4585,27 @@
             document.getElementById('tab-' + name).classList.add('active');
         }
 
-         function changeImage(idx, ii, fallback) {
-            var card = document.querySelector('.product-card');
+         function changeImage(idx, ii, fallback, thumbEl) {
             var mainImg = document.getElementById('mainImageImg-' + idx);
-            var thumbs = card.querySelectorAll('.thumb');
-            if (mainImg && thumbs[ii]) {
-                mainImg.dataset.cropped = "false";
-                mainImg.style.opacity = '0.3';
-                mainImg.onerror = function() {
-                    if (fallback) this.src = fallback;
-                    this.onerror = null;
-                };
-                var newImg = thumbs[ii].querySelector('img').src;
-                mainImg.src = newImg;
-                mainImg.onclick = function() { openLightbox(newImg); };
-                mainImg.onload = function() {
-                    this.style.opacity = '1';
-                    window.autoCrop && autoCrop(this);
-                };
-            }
+            if (!mainImg || !thumbEl) return;
+            
+            var thumbs = thumbEl.parentElement.querySelectorAll('.thumb');
+            
+            mainImg.dataset.cropped = "false";
+            mainImg.style.opacity = '0.3';
+            mainImg.onerror = function() {
+                if (fallback) this.src = fallback;
+                this.onerror = null;
+            };
+            
+            var newImg = thumbEl.querySelector('img').src;
+            mainImg.src = newImg;
+            mainImg.onclick = function() { openLightbox(newImg); };
+            mainImg.onload = function() {
+                this.style.opacity = '1';
+                window.autoCrop && autoCrop(this);
+            };
+            
             thumbs.forEach(function (t, j) { 
                 t.classList.toggle('active', j === ii); 
             });
