@@ -4592,19 +4592,17 @@
             var thumbs = thumbEl.parentElement.querySelectorAll('.thumb');
             
             mainImg.dataset.cropped = "false";
-            mainImg.style.opacity = '0.3';
             mainImg.onerror = function() {
                 if (fallback) this.src = fallback;
                 this.onerror = null;
             };
             
             var newImg = thumbEl.querySelector('img').src;
-            mainImg.src = newImg;
-            mainImg.onclick = function() { openLightbox(newImg); };
             mainImg.onload = function() {
-                this.style.opacity = '1';
                 window.autoCrop && autoCrop(this);
             };
+            mainImg.src = newImg;
+            mainImg.onclick = function() { openLightbox(newImg); };
             
             thumbs.forEach(function (t, j) { 
                 t.classList.toggle('active', j === ii); 
