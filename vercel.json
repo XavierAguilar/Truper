@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/data",
+      "destination": "https://www.dropbox.com/scl/fi/hjjd48rjha33dwbccp1py/productos_truper.json?rlkey=8oux6z90py6ih9passa253ynv&raw=1"
+    }
+  ]
+}

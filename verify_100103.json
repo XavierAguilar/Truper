@@ -1,0 +1,44 @@
+{
+  "nombre": "Disco sierra 7-1/4\" p/madera, 24 dientes centro 5/8\", EXPERT",
+  "marca": "Truper Expert",
+  "marca_logo": "YES",
+  "familia": true,
+  "hermanos": [
+    {
+      "codigo": "100103",
+      "texto": "100103 | ST-724X | 24"
+    },
+    {
+      "codigo": "100104",
+      "texto": "100104 | ST-740X | 40"
+    }
+  ],
+  "specs": {
+    "Diámetro exterior": "7 1/4\" (184 mm)",
+    "Velocidad máxima": "8,200 rpm",
+    "Espesor de corte": "2.4 mm",
+    "Diámetro interior": "5/8\" (16 mm)",
+    "Número de dientes": "24"
+  },
+  "empaque": {
+    "Individual": "Blíster",
+    "Inner": "3",
+    "Master": "12",
+    "Pallet": "1536"
+  },
+  "imagenes": [
+    "ST-724X.jpg",
+    "ST-724X+FC1.jpg",
+    "ST-724X+FC2.jpg",
+    "ST-724X+E1.jpg"
+  ],
+  "vinetas": [
+    "Dientes de carburo",
+    "Ranuras anti-vibración",
+    "Para sierra circular",
+    "Madera",
+    "Biselado alterno"
+  ],
+  "pdf": "YES",
+  "fab": "Fabricado en China bajo las estrictas especificaciones de GRUPO TRUPER"
+}

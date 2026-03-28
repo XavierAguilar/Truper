@@ -1,0 +1,29 @@
+{
+  "script": "extract_related",
+  "metodo": "HTTP fetch (rápido)",
+  "estado": "completado",
+  "salud": "healthy",
+  "total": 8358,
+  "total_catalogo": 15382,
+  "total_productos": 15382,
+  "procesados": 8358,
+  "pendientes": 0,
+  "ya_tenia": 7024,
+  "con_relaciones": 6219,
+  "sin_relaciones": 2139,
+  "relaciones_encontradas": 79017,
+  "pct_global": 100,
+  "errores": 0,
+  "tiempo_s": "794",
+  "prod_por_min": "631.9",
+  "eta_min": 0,
+  "ultima_actualizacion": "2026-03-02T09:11:40.319Z",
+  "ultimo_producto": {
+    "codigo": "41031",
+    "clave": "EESQ-1 1/2",
+    "nombre": "Bolsa con 24 escuadras esquineras 1-1/2\" x 1-1/2\", FIERO",
+    "relacionados": 6
+  },
+  "errores_detalle": [],
+  "problemas": []
+}

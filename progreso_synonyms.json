@@ -1,0 +1,15 @@
+{
+  "script": "generate_synonyms",
+  "estado": "completado",
+  "salud": "healthy",
+  "total": 15382,
+  "procesados": 15382,
+  "pendientes": 0,
+  "aliases_generados": 186537,
+  "promedio": 12,
+  "tiempo_s": "1",
+  "prod_por_min": "783463.5",
+  "ultima_actualizacion": "2026-03-02T07:02:28.763Z",
+  "errores": 0,
+  "problemas": []
+}

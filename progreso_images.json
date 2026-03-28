@@ -1,0 +1,170 @@
+{
+  "script": "download_images",
+  "metodo": "HTTP descarga directa",
+  "estado": "completado",
+  "salud": "healthy",
+  "total": 55841,
+  "total_catalogo": 55841,
+  "procesados": 55841,
+  "pendientes": 0,
+  "descargados": 55837,
+  "existentes": 0,
+  "errores": 4,
+  "espacio_mb": "15340.5",
+  "tiempo_s": "2213",
+  "prod_por_min": "1514.2",
+  "eta_min": 0,
+  "ultima_actualizacion": "2026-03-02T09:53:08.581Z",
+  "ultimo_producto": {
+    "codigo": "41033",
+    "clave": "EESQ- 2-1/2",
+    "nombre": "EESQ-2-1-2+E1.jpg",
+    "tamaño_kb": "371.8",
+    "relacionados": 1
+  },
+  "errores_detalle": [
+    {
+      "codigo": "17175",
+      "error": "HTTP 404",
+      "fecha": "2026-03-02T09:22:30.409Z"
+    },
+    {
+      "codigo": "27076",
+      "error": "HTTP 404",
+      "fecha": "2026-03-02T09:25:02.341Z"
+    },
+    {
+      "codigo": "102639",
+      "error": "HTTP 404",
+      "fecha": "2026-03-02T09:37:10.299Z"
+    },
+    {
+      "codigo": "40247",
+      "error": "HTTP 404",
+      "fecha": "2026-03-02T09:45:00.646Z"
+    }
+  ],
+  "marcas": {
+    "Truper": {
+      "total": 21529,
+      "descargados": 21527,
+      "pendientes": 2
+    },
+    "Sin marca": {
+      "total": 721,
+      "descargados": 721,
+      "pendientes": 0
+    },
+    "Truper Expert": {
+      "total": 3343,
+      "descargados": 3343,
+      "pendientes": 0
+    },
+    "Truper_pro": {
+      "total": 222,
+      "descargados": 222,
+      "pendientes": 0
+    },
+    "Truper_industrial": {
+      "total": 74,
+      "descargados": 74,
+      "pendientes": 0
+    },
+    "Trupermax": {
+      "total": 95,
+      "descargados": 95,
+      "pendientes": 0
+    },
+    "Pretul": {
+      "total": 4513,
+      "descargados": 4513,
+      "pendientes": 0
+    },
+    "Hermex Basic": {
+      "total": 906,
+      "descargados": 905,
+      "pendientes": 1
+    },
+    "Volteck Basic": {
+      "total": 500,
+      "descargados": 500,
+      "pendientes": 0
+    },
+    "Klintek": {
+      "total": 280,
+      "descargados": 280,
+      "pendientes": 0
+    },
+    "Volteck": {
+      "total": 5556,
+      "descargados": 5555,
+      "pendientes": 1
+    },
+    "Foset Basic": {
+      "total": 1123,
+      "descargados": 1123,
+      "pendientes": 0
+    },
+    "Hermex": {
+      "total": 3344,
+      "descargados": 3344,
+      "pendientes": 0
+    },
+    "Foset": {
+      "total": 4823,
+      "descargados": 4823,
+      "pendientes": 0
+    },
+    "Fiero": {
+      "total": 5209,
+      "descargados": 5209,
+      "pendientes": 0
+    },
+    "Ultracraft": {
+      "total": 55,
+      "descargados": 55,
+      "pendientes": 0
+    },
+    "Volteck Lait": {
+      "total": 1038,
+      "descargados": 1038,
+      "pendientes": 0
+    },
+    "Foset Riviera": {
+      "total": 601,
+      "descargados": 601,
+      "pendientes": 0
+    },
+    "Foset Aqua": {
+      "total": 797,
+      "descargados": 797,
+      "pendientes": 0
+    },
+    "Foset Element": {
+      "total": 379,
+      "descargados": 379,
+      "pendientes": 0
+    },
+    "Foset Aero": {
+      "total": 212,
+      "descargados": 212,
+      "pendientes": 0
+    },
+    "Foset Tubig": {
+      "total": 512,
+      "descargados": 512,
+      "pendientes": 0
+    },
+    "Truper Velocity": {
+      "total": 6,
+      "descargados": 6,
+      "pendientes": 0
+    },
+    "Volteck Kids": {
+      "total": 3,
+      "descargados": 3,
+      "pendientes": 0
+    }
+  },
+  "problemas": []
+}

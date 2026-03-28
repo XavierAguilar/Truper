@@ -1,0 +1,26 @@
+{
+  "estado": "completado",
+  "salud": "healthy",
+  "total_catalogo": 15382,
+  "rango": {
+    "start": 0,
+    "end": 15382
+  },
+  "procesados": 15382,
+  "nuevos_en_lote": 15377,
+  "total_lote": 15377,
+  "pct_lote": 100,
+  "errores": 0,
+  "reintentando": 0,
+  "pendientes": 0,
+  "tiempo_s": "2930",
+  "prod_por_min": "314.9",
+  "ultima_actualizacion": "2026-03-02T06:58:26.206Z",
+  "ultimo_producto": {
+    "codigo": "41033",
+    "clave": "EESQ- 2-1/2",
+    "nombre": "Bolsa con 24 escuadras esquineras 2-1/2\" x 2-1/2\", FIERO"
+  },
+  "errores_detalle": [],
+  "problemas": []
+}
