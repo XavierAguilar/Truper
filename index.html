@@ -2445,49 +2445,99 @@
             return variants;
         }
 
+        // ===== IndexedDB Cache Helper =====
+        function getDb() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('TruperCatalogoDB', 1);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if(!db.objectStoreNames.contains('catalogo')) db.createObjectStore('catalogo');
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+        async function getCachedData() {
+            try {
+                const db = await getDb();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction('catalogo', 'readonly');
+                    const req = tx.objectStore('catalogo').get('productos');
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            } catch(e) { return null; }
+        }
+        async function setCachedData(data) {
+            try {
+                const db = await getDb();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction('catalogo', 'readwrite');
+                    const req = tx.objectStore('catalogo').put(data, 'productos');
+                    req.onsuccess = () => resolve();
+                    req.onerror = () => reject(req.error);
+                });
+            } catch(e) {}
+        }
+
         // ===== Inicializar =====
         async function init() {
             try {
                 const isCloud = window.location.hostname !== '127.0.0.1' && window.location.hostname !== 'localhost';
-                
+                let loadedFromCache = false;
+
                 if (isCloud) {
-                    const proxyUrl = 'https://dl.dropboxusercontent.com/scl/fi/hjjd48rjha33dwbccp1py/productos_truper.json?rlkey=8oux6z90py6ih9passa253ynv';
-                    
-                    document.getElementById('p-container').style.display = 'block';
-                    document.getElementById('loader-msg').innerText = "Cargando base de datos (116MB)...";
-                    
-                    const response = await fetch(proxyUrl);
-                    if (!response.ok) throw new Error("Fallo");
-
-                    const reader = response.body.getReader();
-                    const contentLength = 122000000;
-                    let receivedLength = 0; 
-                    let chunks = []; 
-
-                    while(true) {
-                        const {done, value} = await reader.read();
-                        if (done) break;
-                        chunks.push(value);
-                        receivedLength += value.length;
-                        const pct = Math.min(((receivedLength / contentLength) * 100), 100).toFixed(0);
-                        const mb = (receivedLength / 1024 / 1024).toFixed(1);
-                        document.getElementById('p-bar').style.width = pct + '%';
-                        document.getElementById('progress-text').innerText = `${pct}% — ${mb}MB descargados`;
+                    document.getElementById('loader-msg').innerText = "Verificando caché ultrarrápido...";
+                    const cached = await getCachedData();
+                    if (cached && Array.isArray(cached) && cached.length > 1000) {
+                        productos = cached;
+                        loadedFromCache = true;
                     }
+                }
+                
+                if (!loadedFromCache) {
+                    if (isCloud) {
+                        const proxyUrl = 'https://dl.dropboxusercontent.com/scl/fi/hjjd48rjha33dwbccp1py/productos_truper.json?rlkey=8oux6z90py6ih9passa253ynv';
+                        
+                        document.getElementById('p-container').style.display = 'block';
+                        document.getElementById('loader-msg').innerText = "Cargando base de datos (116MB)...";
+                        
+                        const response = await fetch(proxyUrl);
+                        if (!response.ok) throw new Error("Fallo");
 
-                    document.getElementById('loader-msg').innerText = "Procesando...";
-                    let allChunks = new Uint8Array(receivedLength);
-                    let position = 0;
-                    for(let chunk of chunks) {
-                        allChunks.set(chunk, position);
-                        position += chunk.length;
+                        const reader = response.body.getReader();
+                        const contentLength = 122000000;
+                        let receivedLength = 0; 
+                        let chunks = []; 
+
+                        while(true) {
+                            const {done, value} = await reader.read();
+                            if (done) break;
+                            chunks.push(value);
+                            receivedLength += value.length;
+                            const pct = Math.min(((receivedLength / contentLength) * 100), 100).toFixed(0);
+                            const mb = (receivedLength / 1024 / 1024).toFixed(1);
+                            document.getElementById('p-bar').style.width = pct + '%';
+                            document.getElementById('progress-text').innerText = `${pct}% — ${mb}MB descargados`;
+                        }
+
+                        document.getElementById('loader-msg').innerText = "Procesando...";
+                        let allChunks = new Uint8Array(receivedLength);
+                        let position = 0;
+                        for(let chunk of chunks) {
+                            allChunks.set(chunk, position);
+                            position += chunk.length;
+                        }
+                        productos = JSON.parse(new TextDecoder("utf-8").decode(allChunks));
+                        
+                        document.getElementById('loader-msg').innerText = "Guardando en caché (esto tomará solo unos segundos)...";
+                        await setCachedData(productos);
+                    } else {
+                        document.getElementById('loader-msg').innerText = "Cargando catálogo local...";
+                        const resp = await fetch('productos_truper.json?v=' + Date.now());
+                        if (!resp.ok) throw new Error("No existe json local");
+                        productos = await resp.json();
                     }
-                    productos = JSON.parse(new TextDecoder("utf-8").decode(allChunks));
-                } else {
-                    document.getElementById('loader-msg').innerText = "Cargando catálogo local...";
-                    const resp = await fetch('productos_truper.json?v=' + Date.now());
-                    if (!resp.ok) throw new Error("No existe json local");
-                    productos = await resp.json();
                 }
 
                 buildSearchIndex();
