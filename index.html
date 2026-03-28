@@ -2287,11 +2287,22 @@
         .style-magazine:hover .carousel-card-img {
             transform: scale(1.2) translateY(-10px);
         }
-        .style-magazine .carousel-card-category { font-size: 28px; opacity: 0.04; position: absolute; top: 10px; left: 10px; white-space: nowrap; font-weight: 900; letter-spacing: -1px; margin-bottom:0; z-index:0; }
+         .style-magazine .carousel-card-category { font-size: 28px; opacity: 0.04; position: absolute; top: 10px; left: 10px; white-space: nowrap; font-weight: 900; letter-spacing: -1px; margin-bottom:0; z-index:0; }
 
         @media (max-width: 900px) {
             .carousel-card { flex: 0 0 calc(33.333% - 14px); }
         }
+
+        .page-loader {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.5s;
+        }
+        .spinner {
+            width: 50px; height: 50px; border: 4px solid var(--secondary);
+            border-top-color: var(--primary); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
         }
     </style>
 </head>
@@ -2440,7 +2451,7 @@
                 const isCloud = window.location.hostname !== '127.0.0.1' && window.location.hostname !== 'localhost';
                 
                 if (isCloud) {
-                    const proxyUrl = '/api/data';
+                    const proxyUrl = '/data.json';
                     
                     document.getElementById('p-container').style.display = 'block';
                     document.getElementById('loader-msg').innerText = "Cargando base de datos (116MB)...";
