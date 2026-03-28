@@ -437,7 +437,7 @@
                 if (isCloud) {
                     document.getElementById('loader-msg').innerText = "Cargando catálogo desde Dropbox...";
                     // BYPASS DE CORS PROFESIONAL
-                    const dropboxUrl = 'https://www.dropbox.com/scl/fi/hjjd48rjha33dwbccp1py/productos_truper.json?rlkey=8oux6z90py6ih9passa253ynv&st=y812fkow&dl=1';
+                    const dropboxUrl = 'https://www.dropbox.com/scl/fi/hjjd48rjha33dwbccp1py/productos_truper.json?rlkey=8oux6z90py6ih9passa253ynv&st=vixvw4mb&dl=1';
                     const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(dropboxUrl);
                     
                     const resp = await fetch(proxyUrl);
