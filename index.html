@@ -485,14 +485,14 @@
         }
 
         .main-image img {
-            max-width: 85%;
-            max-height: 85%;
+            max-width: 100%;
+            max-height: 100%;
             object-fit: contain;
             transition: transform 0.4s;
         }
 
         .main-image:hover img {
-            transform: scale(1.08);
+            transform: scale(1.35) !important;
         }
 
         .thumbnails {
@@ -4727,10 +4727,10 @@
                 img.dataset.cropped = "true";
                 img.style.opacity = '1';
             } catch(e) {
-                console.warn("SmartCrop CORS Error:", e);
-                // Si falla por CORS en nube, cargar sin recorte pero visible
+                // Zoom por fallback de seguridad cuando CORS de Canvas estricto falla en Vercel
+                var isProductSheetFallback = !!img.closest('.images-panel');
                 img.style.opacity = '1';
-                img.style.transform = 'scale(1)';
+                img.style.transform = isProductSheetFallback ? 'scale(1.25)' : 'scale(1.08)';
             }
         };
 
