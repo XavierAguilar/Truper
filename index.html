@@ -4451,7 +4451,7 @@
             var flb = localImgs.length > 0 ? imgs : [];
             
             var mainImg = displayImgs.length > 0
-                ? '<img id="mainImageImg-' + idx + '" src="' + displayImgs[0] + '" alt="' + esc(p.nombre) + '" onmouseover="window.autoCrop&&autoCrop(this)" onload="window.autoCrop&&autoCrop(this)" onclick="openLightbox(\'' + displayImgs[0] + '\')" onerror="if(this.dataset.triedFallback!=\'true\'){this.dataset.triedFallback=\'true\';this.src=\'' + (flb[0] || '') + '\';}else{this.parentElement.innerHTML=\'<i class=fas fa-image no-image></i>\'}">'
+                ? '<img id="mainImageImg-' + idx + '" src="' + displayImgs[0] + '" alt="' + esc(p.nombre) + '" onload="window.autoCrop&&autoCrop(this)" onclick="openLightbox(this.src)" onerror="if(this.dataset.triedFallback!=\'true\'){this.dataset.triedFallback=\'true\';this.src=\'' + (flb[0] || '') + '\';}else{this.parentElement.innerHTML=\'<i class=fas fa-image no-image></i>\'}">'
                 : '<i class="fas fa-image no-image"></i>';
             currentMainImg[idx] = 0;
 
@@ -4487,7 +4487,7 @@
                 : '<div class="empty-state"><i class="fas fa-box-open"></i>Sin empaque</div>';
 
             var allImgs = imgs.length > 0
-                ? '<div class="images-tab-grid">' + imgs.map(function (img) { return '<div class="img-card" onclick="openLightbox(\'' + img + '\')"><img src="' + img + '" onerror="this.parentElement.style.display=\'none\'"></div>'; }).join('') + '</div>'
+                ? '<div class="images-tab-grid">' + imgs.map(function (img) { return '<div class="img-card" onclick="openLightbox(this.querySelector(\'img\').src)"><img src="' + img + '" onerror="this.parentElement.style.display=\'none\'"></div>'; }).join('') + '</div>'
                 : '<div class="empty-state"><i class="fas fa-images"></i>Sin imágenes</div>';
 
             var related = p.productos_relacionados || [];
