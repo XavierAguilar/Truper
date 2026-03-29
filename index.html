@@ -4668,18 +4668,10 @@
             if (img.dataset.cropped === "true" || !img.complete) return;
             if (img.src.includes('logo-truper.svg')) return; 
 
-            // Detectar si estamos en la nube (Vercel) para usar Proxy de imágenes
-            var isCloud = window.location.hostname !== '127.0.0.1' && window.location.hostname !== 'localhost';
-            
-            // Si es nube y la imagen es de Truper.com, necesitamos Anonymous para leer píxeles (Smart Crop)
-            if (isCloud && img.src.includes('truper.com') && !img.src.includes('wsrv.nl')) {
-                // Reintentar con Proxy de permisos
-                img.dataset.cropped = "restarting"; // Evitar bucle
-                var originalSrc = img.src;
-                img.crossOrigin = "anonymous";
-                img.src = 'https://wsrv.nl/?url=' + encodeURIComponent(originalSrc) + '&output=png';
-                return;
-            }
+            // Hemos removido el uso del proxy 'wsrv.nl'. 
+            // Esto provocaba cuelgues al cargar la imagen principal o el lightbox por rate limits del proxy gratuito.
+            // Si el canvas no puede leer los pixeles por CORS nativo, fallará rápidamente, 
+            // lo atrapará el bloque `catch` abajo, y dejará la imagen mostrándose intacta e instantáneamente.
 
             try {
                 var canvas = document.createElement('canvas');
