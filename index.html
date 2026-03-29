@@ -4727,10 +4727,13 @@
                 img.dataset.cropped = "true";
                 img.style.opacity = '1';
             } catch(e) {
-                // Zoom por fallback de seguridad cuando CORS de Canvas estricto falla en Vercel
-                var isProductSheetFallback = !!img.closest('.images-panel');
+                // Zoom por fallback exacto cuando CORS de Canvas estricto falla en Vercel
+                var isCarouselImg = !!img.closest('.welcome-carousel-container');
+                var isProductSheet = !!img.closest('.images-panel');
+                var fbScale = isProductSheet ? 1.05 : (isCarouselImg ? 0.875 : 0.975);
+                
                 img.style.opacity = '1';
-                img.style.transform = isProductSheetFallback ? 'scale(1.25)' : 'scale(1.08)';
+                img.style.transform = 'scale(' + fbScale + ')';
             }
         };
 
