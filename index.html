@@ -2333,23 +2333,22 @@
         }
         .bktag-redhead {
             background: #ff0000;
-            height: 1.4cm;
+            height: 1.8cm;
             width: 100%;
             color: #fff;
             text-align: center;
             font-weight: 800;
-            font-size: 11.5px;
+            font-size: 13.5px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0 4px;
+            padding: 2px 6px;
             box-sizing: border-box;
             line-height: 1.1;
-            border-bottom: 2px solid #000;
         }
         .bktag-clave {
             position: absolute;
-            top: 1.45cm;
+            top: 1.85cm;
             right: 4px;
             color: #ff0000;
             font-weight: 900;
@@ -2359,10 +2358,10 @@
         }
         .bktag-img {
             position: absolute;
-            top: 1.6cm;
+            top: 1.85cm;
             left: 0;
             right: 0;
-            height: 4.8cm;
+            height: 4.5cm;
             width: 100%;
             display: flex;
             align-items: center;
@@ -2414,6 +2413,7 @@
             right: -8px;
             height: 3.8cm;
             z-index: 5;
+            mix-blend-mode: multiply;
         }
 
         @media print {
@@ -5517,7 +5517,7 @@
                     let ean = item.p.ean ? item.p.ean : ('10' + item.p.codigo);
                     let idBarcode = 'barcode-' + Math.random().toString(36).substr(2, 9);
                     
-                    let tigreSrc = 'imagenes/tigre1.png';
+                    let tigreSrc = 'images/tigre_esquina_inferiror_derecha.jpg';
                     
                     let cardHtml = `
                     <div class="bktag">
