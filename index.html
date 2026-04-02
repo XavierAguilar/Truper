@@ -2308,23 +2308,25 @@
         .bt-scanner-box input { flex:1; font-size: 24px; padding: 14px 20px; border: 2px solid var(--border); border-radius: 8px; font-family: monospace; font-weight: 700; text-align: center; letter-spacing: 2px; }
         .bt-scanner-box input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(242, 101, 34, 0.15); }
         .bt-scanner-box button { font-size: 16px; padding: 16px 32px; border-radius: 8px; font-weight: 800; }
-        .bt-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
-        .bt-item { background: linear-gradient(145deg, #1e1e2d, #151521); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); transition: transform 0.2s, box-shadow 0.2s; }
-        .bt-item:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.1); }
-        .bt-item-header { display: flex; gap: 14px; align-items: center; }
-        .bt-item-header img { width: 50px; height: 50px; object-fit: contain; background: #fff; border-radius: 10px; padding: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .bt-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; padding-bottom: 40px; }
+        .bt-item { position: relative; overflow: hidden; background: linear-gradient(145deg, #1e1e2d, #151521); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: center; min-height: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s, box-shadow 0.2s; }
+        .bt-item:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.1); }
+        .bt-badge-qty { position: absolute; top: 12px; right: 12px; background: #10b981; color: #fff; font-size: 13px; font-weight: 800; padding: 2px 8px; border-radius: 12px; box-shadow: 0 2px 8px rgba(16,185,129,0.3); z-index: 2; pointer-events: none; }
+        .bt-item-header { display: flex; gap: 14px; align-items: center; width: 100%; transition: opacity 0.2s; }
+        .bt-item-header img { width: 50px; height: 50px; object-fit: contain; background: #fff; border-radius: 8px; padding: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .bt-item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
-        .bt-item-title { font-size: 15px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; letter-spacing: 0.3px; }
+        .bt-item-title { font-size: 14px; font-weight: 700; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px; line-height: 1.3; }
         .bt-item-code { font-size: 12px; color: #a1a1aa; font-family: monospace; letter-spacing: 0.5px; }
         .bt-item-code strong { color: #f26522; font-weight: 800; margin-right: 8px; }
-        .bt-item-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px; margin-top: auto; }
-        .qty-controls { display: flex; align-items: center; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
-        .qty-btn { background: transparent; border: none; color: #d4d4d8; padding: 8px 14px; cursor: pointer; font-weight: 900; transition: all 0.2s; font-size: 14px; }
-        .qty-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-        .bt-item-qty { width: 45px; padding: 8px 0; background: transparent; color: #e4e4e7; border: none; text-align: center; font-size: 15px; font-weight: 700; -moz-appearance: textfield; }
+        .bt-item-hover-overlay { position: absolute; inset: 0; background: rgba(21, 21, 33, 0.95); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; gap: 15px; opacity: 0; transition: opacity 0.2s; z-index: 3; }
+        .bt-item:hover .bt-item-hover-overlay { opacity: 1; }
+        .qty-controls { display: flex; align-items: center; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden; }
+        .qty-btn { background: transparent; border: none; color: #fff; padding: 8px 14px; cursor: pointer; font-weight: 900; transition: all 0.2s; font-size: 14px; }
+        .qty-btn:hover { background: rgba(255,255,255,0.2); color: #10b981; }
+        .bt-item-qty { width: 45px; padding: 8px 0; background: transparent; color: #fff; border: none; text-align: center; font-size: 16px; font-weight: 700; -moz-appearance: textfield; }
         .bt-item-qty::-webkit-outer-spin-button, .bt-item-qty::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .bt-item-qty:focus { outline: none; }
-        .bt-item-remove { color: #f87171; cursor: pointer; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); font-size: 15px; width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .bt-item-remove { color: #f87171; cursor: pointer; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); font-size: 16px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .bt-item-remove:hover { background: #ef4444; color: white; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); border-color: transparent; transform: scale(1.05); }
         .bt-btn-print {
             padding: 10px 20px; font-weight: 700; border-radius: 8px; border: none; cursor: pointer;
@@ -5595,6 +5597,7 @@
 
                 list.insertAdjacentHTML('beforeend', `
                     <div class="bt-item">
+                        <div class="bt-badge-qty">x${item.qty}</div>
                         <div class="bt-item-header">
                             <img src="${img}" onerror="this.src='${flb}'">
                             <div class="bt-item-info">
@@ -5602,7 +5605,7 @@
                                 <div class="bt-item-code">Cód: <strong>${item.p.codigo}</strong> | Clv: <strong>${item.p.clave}</strong></div>
                             </div>
                         </div>
-                        <div class="bt-item-footer">
+                        <div class="bt-item-hover-overlay">
                             <div class="qty-controls">
                                 <button class="qty-btn" onclick="changeBtQtyBtn(${i}, -1)"><i class="fas fa-minus"></i></button>
                                 <input type="number" class="bt-item-qty" value="${item.qty}" min="1" onchange="changeBtQty(${i}, this.value)">
