@@ -5309,6 +5309,51 @@
 
         // ===== LÓGICA DEL BACK TAG GENERATOR =====
         let btList = [];
+        try {
+            const saved = localStorage.getItem('truper_btList');
+            if(saved) btList = JSON.parse(saved);
+        } catch(e) {}
+
+        window.saveBtList = function() {
+            localStorage.setItem('truper_btList', JSON.stringify(btList));
+        };
+
+        window.playBeep = function(type) {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.connect(g);
+                g.connect(ctx.destination);
+                if (type === 'success') {
+                    o.type = 'sine'; o.frequency.value = 880;
+                    g.gain.setValueAtTime(0.1, ctx.currentTime);
+                    g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.1);
+                    o.start(); o.stop(ctx.currentTime + 0.1);
+                } else {
+                    o.type = 'square'; o.frequency.value = 150;
+                    g.gain.setValueAtTime(0.2, ctx.currentTime);
+                    g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.3);
+                    o.start(); o.stop(ctx.currentTime + 0.3);
+                }
+            } catch(e) {}
+        };
+
+        window.showBtToast = function(msg, color) {
+            let t = document.getElementById('btToast');
+            if(!t) {
+                t = document.createElement('div'); t.id = 'btToast';
+                t.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:12px 20px; color:#fff; font-weight:bold; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.3); z-index:9999; opacity:0; transition:opacity 0.3s, transform 0.3s; transform:translateY(20px); pointer-events:none;';
+                document.body.appendChild(t);
+            }
+            t.style.background = color || '#10b981';
+            t.innerHTML = msg;
+            t.style.opacity = '1'; t.style.transform = 'translateY(0)';
+            if(window.btToastTimeout) clearTimeout(window.btToastTimeout);
+            window.btToastTimeout = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(20px)'; }, 2500);
+        };
 
         function toggleBackTagsView() {
             const btView = document.getElementById('backtagsView');
@@ -5371,8 +5416,10 @@
                     addMatchedBt(btSuggestions[0]);
                     suggBox.classList.remove('show');
                 } else {
-                    alert('Producto no encontrado: ' + val);
-                    input.select();
+                    window.playBeep('error');
+                    showBtToast('❌ Código no encontrado', '#ef4444');
+                    input.value = '';
+                    input.focus();
                 }
                 return;
             }
@@ -5454,6 +5501,9 @@
             } else {
                 btList.unshift({ p: p, qty: 1 });
             }
+            window.playBeep('success');
+            showBtToast('✅ ' + esc(p.clave || p.codigo) + ' agregado', '#10b981');
+            saveBtList();
             renderBtList();
             const input = document.getElementById('btScannerInput');
             input.value = '';
@@ -5474,10 +5524,26 @@
 
         window.changeBtQty = function(index, qty) {
             btList[index].qty = parseInt(qty) || 1;
+            saveBtList();
+        };
+
+        window.changeBtQtyBtn = function(idx, mod) {
+            let n = parseInt(btList[idx].qty) + mod;
+            if(n < 1) n = 1;
+            btList[idx].qty = n;
+            saveBtList();
+            renderBtList();
         };
 
         window.removeBt = function(index) {
             btList.splice(index, 1);
+            saveBtList();
+            renderBtList();
+        };
+
+        window.clearAllBt = function() {
+            btList = [];
+            saveBtList();
             renderBtList();
         };
 
