@@ -4678,7 +4678,7 @@
             var isCarouselImg = !!img.closest('.welcome-carousel-container');
             var isProductSheet = !!img.closest('.images-panel');
             var isResultCard = !!img.closest('.result-card-img') || !!img.closest('.result-list-thumb');
-            var fillFactor = isProductSheet ? 1.05 : (isCarouselImg ? 0.875 : 1.025);
+            var fillFactor = isProductSheet ? 0.95 : (isCarouselImg ? 0.875 : 1.025);
             
             // Inyectar pre-escala inicial sin delay para que no espere al proxy
             img.style.opacity = '1';
