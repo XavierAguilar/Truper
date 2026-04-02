@@ -1112,7 +1112,7 @@
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
-            transition: opacity 0.25s;
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s;
         }
 
 
@@ -4669,79 +4669,117 @@
         });
 
         // Algoritmo Smart Crop
-        // Algoritmo Smart Crop (Con soporte para Nube/Vercel)
+        // Algoritmo Smart Crop (Con soporte para Nube/Vercel mediante Shadow Proxy de alto rendimiento)
         window.autoCrop = function (img) {
             if (img.dataset.cropped === "true" || !img.complete) return;
-            if (img.src.includes('logo-truper.svg')) return; 
+            if (img.src.includes('logo-truper.svg')) return;
+            img.dataset.cropped = "true";
+            
+            var isCarouselImg = !!img.closest('.welcome-carousel-container');
+            var isProductSheet = !!img.closest('.images-panel');
+            var isResultCard = !!img.closest('.result-card-img') || !!img.closest('.result-list-thumb');
+            var fillFactor = isProductSheet ? 1.05 : (isCarouselImg ? 0.875 : 1.025);
+            
+            // Inyectar pre-escala inicial sin delay para que no espere al proxy
+            img.style.opacity = '1';
+            img.style.transform = 'scale(' + fillFactor + ')';
+            
+            var baseSrc = img.src;
+            if (!baseSrc || baseSrc.indexOf('http') !== 0) return;
 
-            // Hemos removido el uso del proxy 'wsrv.nl'. 
-            // Esto provocaba cuelgues al cargar la imagen principal o el lightbox por rate limits del proxy gratuito.
-            // Si el canvas no puede leer los pixeles por CORS nativo, fallará rápidamente, 
-            // lo atrapará el bloque `catch` abajo, y dejará la imagen mostrándose intacta e instantáneamente.
+            // Intentar proceso Canvas local veloz o asíncrono fantasma por Proxy si es remoto
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                if (baseSrc.indexOf('localhost') === -1 && baseSrc.indexOf('127.0.0.1') === -1) {
+                    processCropShadow('https://wsrv.nl/?url=' + encodeURIComponent(baseSrc) + '&w=400', img, fillFactor);
+                } else {
+                    processCropDirect(img, fillFactor);
+                }
+            } else {
+                processCropShadow('https://wsrv.nl/?url=' + encodeURIComponent(baseSrc) + '&w=400', img, fillFactor);
+            }
+        };
 
+        function processCropDirect(img, fillFactor) {
             try {
                 var canvas = document.createElement('canvas');
                 var ctx = canvas.getContext('2d', { willReadFrequently: true });
                 canvas.width = img.naturalWidth || img.width;
                 canvas.height = img.naturalHeight || img.height;
                 if (!canvas.width) return;
-                
                 ctx.drawImage(img, 0, 0);
-                var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                var data = imgData.data;
-                var minX = canvas.width, minY = canvas.height, maxX = 0, maxY = 0;
-                
-                for (var y = 0; y < canvas.height; y+=4) { // Optimizar salto a 4px para velocidad en nube
-                    for (var x = 0; x < canvas.width; x+=4) {
-                        var index = (y * canvas.width + x) * 4;
-                        if (data[index] < 252 || data[index+1] < 252 || data[index+2] < 252) {
-                            if (data[index+3] > 20) {
-                                if (x < minX) minX = x;
-                                if (x > maxX) maxX = x;
-                                if (y < minY) minY = y;
-                                if (y > maxY) maxY = y;
-                            }
+                analyzeAndScaleCrop(ctx, canvas, img, fillFactor);
+            } catch (e) {}
+        }
+
+        function processCropShadow(proxyUrl, realImg, fillFactor) {
+            var shadow = new Image();
+            shadow.crossOrigin = "anonymous";
+            shadow.onload = function() {
+                try {
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d', { willReadFrequently: true });
+                    canvas.width = shadow.width;
+                    canvas.height = shadow.height;
+                    if (!canvas.width) return;
+                    ctx.drawImage(shadow, 0, 0);
+                    analyzeAndScaleCrop(ctx, canvas, realImg, fillFactor);
+                } catch(e) {}
+            };
+            shadow.onerror = function() {};
+            shadow.src = proxyUrl;
+        }
+
+        function analyzeAndScaleCrop(ctx, canvas, realImg, fillFactor) {
+            var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            var data = imgData.data;
+            var minX = canvas.width, minY = canvas.height, maxX = 0, maxY = 0;
+            
+            var ignoreX = canvas.width * 0.12;
+            var ignoreY = canvas.height * 0.12;
+
+            for (var y = 0; y < canvas.height; y += 4) {
+                for (var x = 0; x < canvas.width; x += 4) {
+                    if (
+                        (x < ignoreX && y < ignoreY) || 
+                        (x > canvas.width - ignoreX && y < ignoreY) || 
+                        (x < ignoreX && y > canvas.height - ignoreY) || 
+                        (x > canvas.width - ignoreX && y > canvas.height - ignoreY)
+                    ) continue;
+
+                    var index = (y * canvas.width + x) * 4;
+                    if (data[index] < 240 || data[index+1] < 240 || data[index+2] < 240) {
+                        if (data[index+3] > 20) {
+                            if (x < minX) minX = x;
+                            if (x > maxX) maxX = x;
+                            if (y < minY) minY = y;
+                            if (y > maxY) maxY = y;
                         }
                     }
                 }
-                if (maxX <= minX || maxY <= minY) return;
-
-                var rect = img.getBoundingClientRect();
-                if (rect.width === 0 || rect.height === 0) return;
-                
-                var bScale = Math.min(rect.width / canvas.width, rect.height / canvas.height);
-                var cW = maxX - minX;
-                var cH = maxY - minY;
-                var cX = minX + cW / 2;
-                var cY = minY + cH / 2;
-                
-                var dx_screen = ((canvas.width / 2) - cX) * bScale;
-                var dy_screen = ((canvas.height / 2) - cY) * bScale;
-                
-                var isCarouselImg = !!img.closest('.welcome-carousel-container');
-                var isProductSheet = !!img.closest('.images-panel');
-                var fillFactor = isProductSheet ? 1.05 : (isCarouselImg ? 0.875 : 1.025);
-                
-                var S_X = (rect.width * fillFactor) / (cW * bScale);
-                var S_Y = (rect.height * fillFactor) / (cH * bScale);
-                var scale = Math.min(S_X, S_Y);
-                
-                if (scale < 1) scale = 1; 
-                if (scale > 4.5) scale = 4.5;
-                
-                img.style.transform = 'scale(' + scale.toFixed(3) + ') translate(' + (dx_screen/scale).toFixed(1) + 'px,' + (dy_screen/scale).toFixed(1) + 'px)';
-                img.dataset.cropped = "true";
-                img.style.opacity = '1';
-            } catch(e) {
-                // Zoom por fallback exacto cuando CORS de Canvas estricto falla en Vercel
-                var isCarouselImg = !!img.closest('.welcome-carousel-container');
-                var isProductSheet = !!img.closest('.images-panel');
-                var fbScale = isProductSheet ? 1.05 : (isCarouselImg ? 0.875 : 1.025);
-                
-                img.style.opacity = '1';
-                img.style.transform = 'scale(' + fbScale + ')';
             }
-        };
+            if (maxX <= minX || maxY <= minY) return;
+
+            var rect = realImg.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) return;
+            
+            var bScale = Math.min(rect.width / canvas.width, rect.height / canvas.height);
+            var cW = maxX - minX;
+            var cH = maxY - minY;
+            var cX = minX + cW / 2;
+            var cY = minY + cH / 2;
+            
+            var dx_screen = ((canvas.width / 2) - cX) * bScale;
+            var dy_screen = ((canvas.height / 2) - cY) * bScale;
+            
+            var S_X = (rect.width * fillFactor) / (cW * bScale);
+            var S_Y = (rect.height * fillFactor) / (cH * bScale);
+            var scale = Math.min(S_X, S_Y);
+            
+            if (scale < 1) scale = 1; 
+            if (scale > 4.5) scale = 4.5;
+            
+            realImg.style.transform = 'scale(' + scale.toFixed(3) + ') translate(' + (dx_screen/scale).toFixed(1) + 'px,' + (dy_screen/scale).toFixed(1) + 'px)';
+        }
 
         // Carrusel de imágenes estilo Amazon
         function cardSlide(btn, dir) {
