@@ -2694,49 +2694,17 @@
                 }
                 
                 if (!loadedFromCache) {
-                    if (isCloud) {
-                        const proxyUrl = 'https://dl.dropboxusercontent.com/scl/fi/hjjd48rjha33dwbccp1py/productos_truper.json?rlkey=8oux6z90py6ih9passa253ynv';
-                        
-                        document.getElementById('p-container').style.display = 'block';
-                        document.getElementById('loader-msg').innerText = "Cargando base de datos (116MB)...";
-                        
-                        const response = await fetch(proxyUrl);
-                        if (!response.ok) throw new Error("Fallo");
+                    document.getElementById('loader-msg').innerText = "Descargando catálogo ultrarrápido desde Vercel...";
+                    document.getElementById('p-container').style.display = 'none';
 
-                        const reader = response.body.getReader();
-                        const contentLength = 122000000;
-                        let receivedLength = 0; 
-                        let chunks = []; 
-
-                        while(true) {
-                            const {done, value} = await reader.read();
-                            if (done) break;
-                            chunks.push(value);
-                            receivedLength += value.length;
-                            const pct = Math.min(((receivedLength / contentLength) * 100), 100).toFixed(0);
-                            const mb = (receivedLength / 1024 / 1024).toFixed(1);
-                            document.getElementById('p-bar').style.width = pct + '%';
-                            document.getElementById('progress-text').innerText = `${pct}% — ${mb}MB descargados`;
-                        }
-
-                        document.getElementById('loader-msg').innerText = "Procesando...";
-                        let allChunks = new Uint8Array(receivedLength);
-                        let position = 0;
-                        for(let chunk of chunks) {
-                            allChunks.set(chunk, position);
-                            position += chunk.length;
-                        }
-                        productos = JSON.parse(new TextDecoder("utf-8").decode(allChunks));
-                        
-                        document.getElementById('loader-msg').innerText = "Guardando en caché (esto tomará solo unos segundos)...";
-                        await setCachedData(productos);
-                    } else {
-                        document.getElementById('loader-msg').innerText = "Cargando catálogo local...";
-                        // Cargamos la versión minificada que Github sí admite
-                        const resp = await fetch('productos_truper_min.json?v=' + Date.now());
-                        if (!resp.ok) throw new Error("No existe json local");
-                        productos = await resp.json();
-                    }
+                    const resp = await fetch('productos_truper_min.json?v=' + Date.now());
+                    if (!resp.ok) throw new Error("Fallo la descarga de la DB");
+                    
+                    document.getElementById('loader-msg').innerText = "Procesando productos...";
+                    productos = await resp.json();
+                    
+                    document.getElementById('loader-msg').innerText = "Guardando en caché offline (tomará unos segundos)...";
+                    await setCachedData(productos);
                 }
 
                 buildSearchIndex();

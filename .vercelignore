@@ -1,0 +1,5 @@
+images/
+node_modules/
+modulos/
+*.json
+!productos_truper_min.json
