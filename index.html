@@ -5679,13 +5679,14 @@
                 }
             });
 
-            const oldText = document.querySelector('.backtags-header .primary-btn').innerHTML;
-            document.querySelector('.backtags-header .primary-btn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando Impresión...';
+            const printBtn = document.querySelector('.bt-btn-print');
+            const oldText = printBtn ? printBtn.innerHTML : 'Imprimir PDF';
+            if(printBtn) printBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando...';
             
             // Asignamos 3.5 segundos de render para que la red alcance a descargar las 20-30 fotos wsrv compiladas
             // Recordar Sweet Alert Post Impresión
             setTimeout(() => {
-                document.querySelector('.backtags-header .primary-btn').innerHTML = oldText;
+                if(printBtn) printBtn.innerHTML = oldText;
                 window.print();
                 
                 // Mostrar alerta después de cerrar la cola de impresión
