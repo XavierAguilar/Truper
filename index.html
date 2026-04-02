@@ -5528,11 +5528,17 @@
                     
                     let tigreSrc = 'images/tigre_esquina_inferiror_derecha.jpg';
                     
+                    let baseSrc = img;
+                    let imgSrc = baseSrc;
+                    if(baseSrc && baseSrc.indexOf('http') === 0) {
+                        imgSrc = 'https://wsrv.nl/?url=' + encodeURIComponent(baseSrc) + '&w=400&trim=12';
+                    }
+                    
                     let cardHtml = `
                     <div class="bktag">
                         <div class="bktag-redhead"><span>${esc(headerText)}</span></div>
                         <div class="bktag-clave">${item.p.clave}</div>
-                        <div class="bktag-img"><img src="${img}" data-idx="0" onload="window.autoCrop&&autoCrop(this)" onerror="this.src='${flb}'"></div>
+                        <div class="bktag-img"><img src="${imgSrc}" style="transform: scale(1.05);" onerror="this.src='${flb}'"></div>
                         <div class="bktag-codigo">Código: <span>${item.p.codigo}</span></div>
                         <div class="bktag-barcode"><svg id="${idBarcode}"></svg></div>
                         <img class="bktag-tigre" src="${tigreSrc}" onerror="this.src='imagenes/tigre3.png'">
@@ -5560,13 +5566,13 @@
             });
 
             const oldText = document.querySelector('.backtags-header .primary-btn').innerHTML;
-            document.querySelector('.backtags-header .primary-btn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Renderizando Recortes...';
+            document.querySelector('.backtags-header .primary-btn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando Impresión...';
             
-            // Dar tiempo a generar SVG e importar imagenes para autoCrop (Asíncrono Proxy wsrv 2.5s)
+            // Asignamos 3.5 segundos de render para que la red alcance a descargar las 20-30 fotos wsrv compiladas
             setTimeout(() => {
                 document.querySelector('.backtags-header .primary-btn').innerHTML = oldText;
                 window.print();
-            }, 2500);
+            }, 3500);
         };
 
         init();
