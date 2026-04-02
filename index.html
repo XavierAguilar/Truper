@@ -2301,18 +2301,27 @@
         }
         /* ===== GENERADOR DE BACK TAGS ===== */
         .backtags-view { display: none; padding: 32px; max-width: 1400px; margin: 0 auto; min-height: 80vh; animation: fadeIn 0.4s ease; }
-        .backtags-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
-        .backtags-header h2 { font-size: 28px; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 12px; }
+        .backtags-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 20px; }
+        .backtags-header h1 { margin: 0; font-size: 24px; display: flex; align-items: center; gap: 10px; color: var(--primary); }
+        .backtags-header-actions { display: flex; gap: 12px; align-items: center; }
         .bt-scanner-box { display: flex; gap: 16px; margin-bottom: 32px; align-items: center; background: var(--bg-card); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 2px dashed var(--border); }
         .bt-scanner-box input { flex:1; font-size: 24px; padding: 14px 20px; border: 2px solid var(--border); border-radius: 8px; font-family: monospace; font-weight: 700; text-align: center; letter-spacing: 2px; }
         .bt-scanner-box input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(242, 101, 34, 0.15); }
         .bt-scanner-box button { font-size: 16px; padding: 16px 32px; border-radius: 8px; font-weight: 800; }
-        .bt-list { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
-        .bt-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; display: flex; align-items: center; gap: 16px; position: relative; animation: fadeIn 0.3s ease; }
-        .bt-item img { width: 60px; height: 60px; object-fit: contain; }
-        .bt-item-info { flex: 1; min-width: 0; }
-        .bt-item-title { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
-        .bt-item-code { font-size: 13px; color: var(--text-muted); font-family: monospace; }
+        .bt-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
+        .bt-item { 
+            background: var(--surface); border: 1px solid var(--border); 
+            border-radius: 12px; padding: 15px; 
+            display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .bt-item:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.25); border-color: rgba(255,255,255,0.1); }
+        .bt-item img { width: 45px; height: 45px; object-fit: contain; background: #fff; border-radius: 8px; padding: 2px; }
+        .bt-item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+        .bt-item-title { font-size: 14px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+        .bt-item-code { font-size: 12px; color: #aaa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bt-item-code strong { color: #fff; margin-right: 6px; }
         .qty-controls { display: flex; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-right: 8px; }
         .qty-btn { background: transparent; border: none; color: var(--text); padding: 8px 12px; cursor: pointer; font-weight: 900; transition: background 0.2s; }
         .qty-btn:hover { background: rgba(255,255,255,0.1); }
@@ -2321,6 +2330,20 @@
         .bt-item-qty:focus { outline: none; }
         .bt-item-remove { color: #f43f5e; cursor: pointer; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); font-size: 16px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
         .bt-item-remove:hover { background: #f43f5e; color: white; box-shadow: 0 0 10px rgba(244,63,94,0.4); border-color: transparent; transform: scale(1.05); }
+        .bt-btn-print {
+            padding: 10px 20px; font-weight: 700; border-radius: 8px; border: none; cursor: pointer;
+            background: linear-gradient(135deg, #10b981, #059669); color: #fff;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); transition: all 0.2s;
+            display: flex; align-items: center; gap: 8px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .bt-btn-print:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5); }
+        .bt-btn-print:active { transform: translateY(0); }
+        .bt-btn-clear {
+            padding: 10px 16px; font-weight: 600; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.5); cursor: pointer;
+            background: rgba(239, 68, 68, 0.1); color: #ef4444;
+            transition: all 0.2s; display: flex; align-items: center; gap: 6px; font-size: 13px;
+        }
+        .bt-btn-clear:hover { background: #ef4444; color: #fff; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
         #btToast { position: fixed; bottom: 20px; right: 20px; background: #10b981; color: #fff; padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; z-index: 9999; transform: translateY(100px); opacity: 0; transition: all 0.3s; box-shadow: 0 4px 12px rgba(16,185,129,0.3); pointer-events: none; }
         .bktag-total-badge { color: var(--text-muted); font-size: 14px; font-weight: 600; flex: 1; margin-left: 20px; }
 
@@ -2542,12 +2565,13 @@
     </main>
 
     <!-- ===== BACK TAGS VISTA ===== -->
-    <div class="backtags-view" id="backtagsView">
+    <div class="view-container" id="backtagsView" style="display:none; max-width: 1400px;">
         <div class="backtags-header">
-            <h2><i class="fas fa-tags"></i> Generador de Back Tags</h2>
-            <div>
-                <button class="primary-btn" onclick="printBackTags()" style="margin-right: 12px; font-weight: 800;"><i class="fas fa-print"></i> IMPRIMIR PDF</button>
-                <button class="secondary-btn" onclick="btList=[];renderBtList();"><i class="fas fa-trash"></i> Vaciar Todas</button>
+            <h1><i class="fas fa-tags"></i> Generador de Back Tags</h1>
+            <div class="bktag-total-badge"></div>
+            <div class="backtags-header-actions">
+                <button class="bt-btn-print" onclick="printBackTags()"><i class="fas fa-print"></i> Imprimir PDF</button>
+                <button class="bt-btn-clear" onclick="clearAllBt()"><i class="fas fa-trash-alt"></i> Vaciar</button>
             </div>
         </div>
         
@@ -5505,9 +5529,13 @@
             showBtToast('✅ ' + esc(p.clave || p.codigo) + ' agregado', '#10b981');
             saveBtList();
             renderBtList();
-            const input = document.getElementById('btScannerInput');
-            input.value = '';
-            input.focus();
+            setTimeout(() => {
+                const input = document.getElementById('btScannerInput');
+                if(input) {
+                    input.value = '';
+                    input.focus();
+                }
+            }, 50);
         }
 
         function getProductByClaveOrCodigo(val) {
@@ -5578,14 +5606,10 @@
                         </div>
                         <div class="qty-controls">
                             <button class="qty-btn" onclick="changeBtQtyBtn(${i}, -1)"><i class="fas fa-minus"></i></button>
-                            <div class="qty-controls">
-                            <button class="qty-btn" onclick="changeBtQtyBtn(${i}, -1)"><i class="fas fa-minus"></i></button>
                             <input type="number" class="bt-item-qty" value="${item.qty}" min="1" onchange="changeBtQty(${i}, this.value)">
                             <button class="qty-btn" onclick="changeBtQtyBtn(${i}, 1)"><i class="fas fa-plus"></i></button>
                         </div>
-                            <button class="qty-btn" onclick="changeBtQtyBtn(${i}, 1)"><i class="fas fa-plus"></i></button>
-                        </div>
-                        <button class="bt-item-remove" onclick="removeBt(${i})"><i class="fas fa-trash"></i></button>
+                        <button class="bt-item-remove" onclick="removeBt(${i})"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 `);
             });
