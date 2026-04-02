@@ -2313,10 +2313,16 @@
         .bt-item-info { flex: 1; min-width: 0; }
         .bt-item-title { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
         .bt-item-code { font-size: 13px; color: var(--text-muted); font-family: monospace; }
-        .bt-item-qty { width: 60px; font-size: 16px; text-align: center; border: 2px solid var(--border); border-radius: 6px; padding: 6px; font-weight: 700; margin-right: 8px;}
-        .bt-item-qty:focus { border-color: var(--primary); outline: none; }
-        .bt-item-remove { color: #ef4444; cursor: pointer; background: rgba(239, 68, 68, 0.1); border: none; font-size: 18px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .bt-item-remove:hover { background: #ef4444; color: white; }
+        .qty-controls { display: flex; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-right: 8px; }
+        .qty-btn { background: transparent; border: none; color: var(--text); padding: 8px 12px; cursor: pointer; font-weight: 900; transition: background 0.2s; }
+        .qty-btn:hover { background: rgba(255,255,255,0.1); }
+        .bt-item-qty { width: 40px; text-align: center; background: transparent; border: none; color: var(--text); font-weight: 700; font-size: 15px; -moz-appearance: textfield; }
+        .bt-item-qty::-webkit-outer-spin-button, .bt-item-qty::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .bt-item-qty:focus { outline: none; }
+        .bt-item-remove { color: #f43f5e; cursor: pointer; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); font-size: 16px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+        .bt-item-remove:hover { background: #f43f5e; color: white; box-shadow: 0 0 10px rgba(244,63,94,0.4); border-color: transparent; transform: scale(1.05); }
+        #btToast { position: fixed; bottom: 20px; right: 20px; background: #10b981; color: #fff; padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; z-index: 9999; transform: translateY(100px); opacity: 0; transition: all 0.3s; box-shadow: 0 4px 12px rgba(16,185,129,0.3); pointer-events: none; }
+        .bktag-total-badge { color: var(--text-muted); font-size: 14px; font-weight: 600; flex: 1; margin-left: 20px; }
 
         /* Maqueta CSS del Back Tag Real para Impresión */
         .bt-print-area { display: none; }
@@ -5496,7 +5502,15 @@
                             <div class="bt-item-title" title="${esc(item.p.nombre)}">${esc(item.p.nombre)}</div>
                             <div class="bt-item-code">Código: <strong>${item.p.codigo}</strong> | Clave: <strong>${item.p.clave}</strong></div>
                         </div>
-                        <input type="number" class="bt-item-qty" value="${item.qty}" min="1" onchange="changeBtQty(${i}, this.value)">
+                        <div class="qty-controls">
+                            <button class="qty-btn" onclick="changeBtQtyBtn(${i}, -1)"><i class="fas fa-minus"></i></button>
+                            <div class="qty-controls">
+                            <button class="qty-btn" onclick="changeBtQtyBtn(${i}, -1)"><i class="fas fa-minus"></i></button>
+                            <input type="number" class="bt-item-qty" value="${item.qty}" min="1" onchange="changeBtQty(${i}, this.value)">
+                            <button class="qty-btn" onclick="changeBtQtyBtn(${i}, 1)"><i class="fas fa-plus"></i></button>
+                        </div>
+                            <button class="qty-btn" onclick="changeBtQtyBtn(${i}, 1)"><i class="fas fa-plus"></i></button>
+                        </div>
                         <button class="bt-item-remove" onclick="removeBt(${i})"><i class="fas fa-trash"></i></button>
                     </div>
                 `);
@@ -5519,7 +5533,15 @@
                     
                     let nombre = (item.p.nombre || '').toUpperCase();
                     let marca = (item.p.marca || 'TRUPER').toUpperCase();
-                    let headerText = nombre;
+                    // Render Counts
+            setTimeout(() => {
+                let totalTags = btList.reduce((acc, it) => acc + (parseInt(it.qty) || 0), 0);
+                let totalPages = Math.ceil(totalTags / 12);
+                let badge = document.querySelector('.bktag-total-badge');
+                if(badge) badge.innerHTML = `📦 Total: <span style="color:#fff">${totalTags}</span> Gafetes &nbsp;|&nbsp; 🖨️ Hojas estimadas: <span style="color:#fff">${totalPages}</span>`;
+            }, 10);
+            
+            let headerText = nombre;
                     if(headerText.indexOf(marca) === -1) headerText += ', ' + marca;
                     
                     let ean = item.p.ean ? item.p.ean : ('10' + item.p.codigo);
@@ -5568,9 +5590,30 @@
             document.querySelector('.backtags-header .primary-btn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando Impresión...';
             
             // Asignamos 3.5 segundos de render para que la red alcance a descargar las 20-30 fotos wsrv compiladas
+            // Recordar Sweet Alert Post Impresión
             setTimeout(() => {
                 document.querySelector('.backtags-header .primary-btn').innerHTML = oldText;
                 window.print();
+                
+                // Mostrar alerta después de cerrar la cola de impresión
+                setTimeout(() => {
+                    if (window.Swal) {
+                        Swal.fire({
+                            title: '¿Impresión procesada?',
+                            text: "¿Deseas vaciar la mesa de trabajo para escanear nuevos productos?",
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#10b981',
+                            cancelButtonColor: '#475569',
+                            confirmButtonText: 'Sí, vaciar mesa',
+                            cancelButtonText: 'No, conservarlos'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                clearAllBt();
+                            }
+                        });
+                    }
+                }, 1000);
             }, 3500);
         };
 
