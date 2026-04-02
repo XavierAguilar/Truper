@@ -2335,12 +2335,17 @@
             background: #ff0000;
             height: 1.25cm;
             width: 100%;
+            padding: 4px 6px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .bktag-redhead span {
             color: #fff;
             text-align: center;
             font-weight: 800;
             font-size: 13.5px;
-            padding: 4px 6px;
-            box-sizing: border-box;
             line-height: 1.15;
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -4850,7 +4855,8 @@
             var isCarouselImg = !!img.closest('.welcome-carousel-container');
             var isProductSheet = !!img.closest('.images-panel');
             var isResultCard = !!img.closest('.result-card-img') || !!img.closest('.result-list-thumb');
-            var fillFactor = isProductSheet ? 0.95 : (isCarouselImg ? 0.875 : 1.025);
+            var isBackTag = !!img.closest('.bktag');
+            var fillFactor = isBackTag ? 1.05 : (isProductSheet ? 0.95 : (isCarouselImg ? 0.875 : 1.025));
             
             // Inyectar pre-escala inicial sin delay para que no espere al proxy
             img.style.opacity = '1';
@@ -5524,7 +5530,7 @@
                     
                     let cardHtml = `
                     <div class="bktag">
-                        <div class="bktag-redhead">${esc(headerText)}</div>
+                        <div class="bktag-redhead"><span>${esc(headerText)}</span></div>
                         <div class="bktag-clave">${item.p.clave}</div>
                         <div class="bktag-img"><img src="${img}" data-idx="0" onload="window.autoCrop&&autoCrop(this)" onerror="this.src='${flb}'"></div>
                         <div class="bktag-codigo">Código: <span>${item.p.codigo}</span></div>
@@ -5553,10 +5559,14 @@
                 }
             });
 
-            // Dar tiempo a generar SVG e importar imagenes para autoCrop
+            const oldText = document.querySelector('.backtags-header .primary-btn').innerHTML;
+            document.querySelector('.backtags-header .primary-btn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Renderizando Recortes...';
+            
+            // Dar tiempo a generar SVG e importar imagenes para autoCrop (Asíncrono Proxy wsrv 2.5s)
             setTimeout(() => {
+                document.querySelector('.backtags-header .primary-btn').innerHTML = oldText;
                 window.print();
-            }, 1200);
+            }, 2500);
         };
 
         init();
