@@ -11,7 +11,16 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "canvas": "^3.2.3",
     "node-html-parser": "^7.0.2",
     "puppeteer": "^24.37.5"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XavierAguilar/Truper.git"
+  },
+  "bugs": {
+    "url": "https://github.com/XavierAguilar/Truper/issues"
+  },
+  "homepage": "https://github.com/XavierAguilar/Truper#readme"
 }
