@@ -2538,10 +2538,11 @@
             </div>
         </div>
         
-        <div class="bt-scanner-box">
+        <div class="bt-scanner-box" style="position: relative;">
             <i class="fas fa-barcode" style="font-size:32px; color:var(--primary);"></i>
-            <input type="text" id="btScannerInput" autocomplete="off" placeholder="Escanear Código, Clave o EAN (Presionar Enter)" onkeypress="handleBtScannerInput(event)">
-            <button class="primary-btn" onclick="handleBtScannerInput({key:'Enter', target:document.getElementById('btScannerInput')})">Agregar <i class="fas fa-plus"></i></button>
+            <input type="text" id="btScannerInput" autocomplete="off" placeholder="Escanear o Escribir Código/Clave/Nombre..." onkeyup="handleBtScannerInput(event)" onfocus="handleBtScannerInput(event)">
+            <button class="primary-btn" onclick="addBtManual()">Agregar <i class="fas fa-plus"></i></button>
+            <div class="search-results" id="btSuggestions" style="top:calc(100% + 6px); left:0; right:0; max-height:300px;"></div>
         </div>
 
         <div class="bt-list" id="btList">
@@ -5316,22 +5317,134 @@
             }
         }
 
+        let btSuggestions = [];
+        let btSugActiveIdx = -1;
+
         window.handleBtScannerInput = function(e) {
+            const input = e.target;
+            const val = input.value.trim();
+            const suggBox = document.getElementById('btSuggestions');
+
+            if (!val) {
+                suggBox.classList.remove('show');
+                return;
+            }
+
+            if (e.key === 'ArrowDown') {
+                btSugActiveIdx++;
+                if(btSugActiveIdx >= btSuggestions.length) btSugActiveIdx = btSuggestions.length - 1;
+                highlightBtSug();
+                return;
+            } else if (e.key === 'ArrowUp') {
+                btSugActiveIdx--;
+                if(btSugActiveIdx < 0) btSugActiveIdx = 0;
+                highlightBtSug();
+                return;
+            }
+
             if (e.key === 'Enter') {
-                const val = e.target.value.trim();
-                if(!val) return;
-                
+                if(e.preventDefault) e.preventDefault();
+                if(btSugActiveIdx >= 0 && btSuggestions[btSugActiveIdx]) {
+                    addMatchedBt(btSuggestions[btSugActiveIdx]);
+                    suggBox.classList.remove('show');
+                    return;
+                }
                 const p = getProductByClaveOrCodigo(val);
                 if(p) {
-                    btList.unshift({ p: p, qty: 1 });
-                    renderBtList();
-                    e.target.value = '';
+                    addMatchedBt(p);
+                    suggBox.classList.remove('show');
+                } else if(btSuggestions.length > 0) {
+                    addMatchedBt(btSuggestions[0]);
+                    suggBox.classList.remove('show');
                 } else {
-                    alert('Producto no encontrado (Código/Clave): ' + val);
-                    e.target.select();
+                    alert('Producto no encontrado: ' + val);
+                    input.select();
                 }
+                return;
+            }
+
+            // Hacer búsqueda asíncrona limpia
+            const results = searchProductsPredictive(val);
+            btSuggestions = results.slice(0, 10);
+            btSugActiveIdx = -1;
+
+            if (btSuggestions.length > 0) {
+                suggBox.innerHTML = '';
+                btSuggestions.forEach((p, i) => {
+                    let img = p.imagenes && p.imagenes.length ? p.imagenes[0] : (p.imagenes_local && p.imagenes_local.length ? p.imagenes_local[0] : '');
+                    var flb = "https://www.truper.com/media/import/imagenes/" + p.clave + ".jpg";
+                    suggBox.insertAdjacentHTML('beforeend', `
+                        <div class="result-item bt-sug-item" id="btsug-${i}" onmousedown="addMatchedBtByIdx(${i})">
+                            <div class="result-thumb"><img src="${img}" onerror="this.src='${flb}'"></div>
+                            <div class="result-info">
+                                <div class="result-list-name" style="font-size:13px; font-weight:700; color:#333; max-width:100%; white-space:normal;">${esc(p.descripcion)}</div>
+                                <div class="result-list-code">Código: <span style="font-weight:900;color:#dc2626;">${p.codigo}</span> | Clave: <b>${p.clave}</b></div>
+                            </div>
+                        </div>
+                    `);
+                });
+                suggBox.classList.add('show');
+            } else {
+                suggBox.classList.remove('show');
+                suggBox.innerHTML = '<div style="padding:15px; color:#666; text-align:center;">No hay coincidencias...</div>';
+                suggBox.classList.add('show');
             }
         };
+
+        function highlightBtSug() {
+            document.querySelectorAll('.bt-sug-item').forEach(el => el.classList.remove('selected'));
+            if(btSugActiveIdx >= 0) {
+                const active = document.getElementById('btsug-' + btSugActiveIdx);
+                if(active) {
+                    active.classList.add('selected');
+                    active.scrollIntoView({block: "nearest"});
+                }
+            }
+        }
+
+        window.addMatchedBtByIdx = function(i) {
+            addMatchedBt(btSuggestions[i]);
+            document.getElementById('btSuggestions').classList.remove('show');
+        }
+
+        window.addBtManual = function() {
+            const input = document.getElementById('btScannerInput');
+            window.handleBtScannerInput({key:'Enter', target:input, preventDefault:()=>{}});
+        };
+
+        function searchProductsPredictive(val) {
+            var v = String(val).toLowerCase();
+            var prods = window.DB_PRODUCTOS || [];
+            var exactly = [];
+            var partial = [];
+            for(var i=0; i<prods.length; i++) {
+                let p = prods[i];
+                let c1 = String(p.codigo).toLowerCase();
+                let c2 = String(p.clave).toLowerCase();
+                let c3 = p.ean ? String(p.ean).toLowerCase() : "";
+                
+                if(c1 === v || c2 === v || c3 === v) {
+                    exactly.push(p);
+                } else if(c1.includes(v) || c2.includes(v) || String(p.descripcion).toLowerCase().includes(v)) {
+                    partial.push(p);
+                }
+            }
+            return exactly.concat(partial);
+        }
+
+        function addMatchedBt(p) {
+            // Verificar si ya existe para incrementar
+            const existIdx = btList.findIndex(x => x.p.codigo === p.codigo);
+            if(existIdx >= 0) {
+                btList[existIdx].qty += 1;
+            } else {
+                btList.unshift({ p: p, qty: 1 });
+            }
+            renderBtList();
+            const input = document.getElementById('btScannerInput');
+            input.value = '';
+            input.focus();
+        }
 
         function getProductByClaveOrCodigo(val) {
             var v = String(val).toUpperCase();
