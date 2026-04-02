@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 </head>
 <style>
         :root {
@@ -2298,6 +2299,146 @@
             border-top-color: var(--primary); border-radius: 50%;
             animation: spin 1s linear infinite; margin-bottom: 20px;
         }
+        /* ===== GENERADOR DE BACK TAGS ===== */
+        .backtags-view { display: none; padding: 32px; max-width: 1400px; margin: 0 auto; min-height: 80vh; animation: fadeIn 0.4s ease; }
+        .backtags-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+        .backtags-header h2 { font-size: 28px; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 12px; }
+        .bt-scanner-box { display: flex; gap: 16px; margin-bottom: 32px; align-items: center; background: var(--bg-card); padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 2px dashed var(--border); }
+        .bt-scanner-box input { flex:1; font-size: 24px; padding: 14px 20px; border: 2px solid var(--border); border-radius: 8px; font-family: monospace; font-weight: 700; text-align: center; letter-spacing: 2px; }
+        .bt-scanner-box input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(242, 101, 34, 0.15); }
+        .bt-scanner-box button { font-size: 16px; padding: 16px 32px; border-radius: 8px; font-weight: 800; }
+        .bt-list { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+        .bt-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; display: flex; align-items: center; gap: 16px; position: relative; animation: fadeIn 0.3s ease; }
+        .bt-item img { width: 60px; height: 60px; object-fit: contain; }
+        .bt-item-info { flex: 1; min-width: 0; }
+        .bt-item-title { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+        .bt-item-code { font-size: 13px; color: var(--text-muted); font-family: monospace; }
+        .bt-item-qty { width: 60px; font-size: 16px; text-align: center; border: 2px solid var(--border); border-radius: 6px; padding: 6px; font-weight: 700; margin-right: 8px;}
+        .bt-item-qty:focus { border-color: var(--primary); outline: none; }
+        .bt-item-remove { color: #ef4444; cursor: pointer; background: rgba(239, 68, 68, 0.1); border: none; font-size: 18px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .bt-item-remove:hover { background: #ef4444; color: white; }
+
+        /* Maqueta CSS del Back Tag Real para Impresión */
+        .bt-print-area { display: none; }
+        .bktag {
+            width: 5cm;
+            height: 8cm;
+            border: 2px solid #000;
+            box-sizing: border-box;
+            position: relative;
+            background: #fff;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            color: #000;
+        }
+        .bktag-redhead {
+            background: #ff0000;
+            height: 1.4cm;
+            width: 100%;
+            color: #fff;
+            text-align: center;
+            font-weight: 800;
+            font-size: 11.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            box-sizing: border-box;
+            line-height: 1.1;
+            border-bottom: 2px solid #000;
+        }
+        .bktag-clave {
+            position: absolute;
+            top: 1.45cm;
+            right: 4px;
+            color: #ff0000;
+            font-weight: 900;
+            font-size: 15px;
+            z-index: 10;
+            text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+        }
+        .bktag-img {
+            position: absolute;
+            top: 1.6cm;
+            left: 0;
+            right: 0;
+            height: 4.8cm;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .bktag-img img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            transform-origin: center center;
+        }
+        .bktag-codigo {
+            position: absolute;
+            bottom: 1.3cm;
+            left: 4px;
+            border: 1.5px solid #000;
+            border-radius: 4px;
+            background: #fff;
+            padding: 2px 5px;
+            font-size: 13px;
+            font-weight: 800;
+            z-index: 10;
+            color: #000;
+        }
+        .bktag-codigo span { color: #ff0000; }
+        .bktag-barcode {
+            position: absolute;
+            bottom: 4px;
+            left: 4px;
+            border: 1.5px solid #000;
+            border-radius: 4px;
+            background: #fff;
+            padding: 2px;
+            z-index: 10;
+            height: 1.1cm;
+            width: 3.4cm;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .bktag-barcode svg {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+        }
+        .bktag-tigre {
+            position: absolute;
+            bottom: -5px;
+            right: -8px;
+            height: 3.8cm;
+            z-index: 5;
+        }
+
+        @media print {
+            body * { visibility: hidden !important; }
+            body, html { width: 100%; height: 100%; margin: 0; padding: 0; background: #fff !important; }
+            .header, .nav-actions, .dash-overlay, .dashboard-panel, .main, .backtags-view { display: none !important; }
+            .bt-print-area, .bt-print-area * { visibility: visible !important; }
+            .bt-print-area {
+                display: grid !important;
+                grid-template-columns: repeat(4, 5cm);
+                grid-auto-rows: 8cm;
+                gap: 0;
+                row-gap: 0.2cm;
+                column-gap: 0.3cm;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                justify-content: center;
+            }
+            @page { size: letter portrait; margin: 0.5cm; }
+            .bktag { page-break-inside: avoid; }
+        }
     </style>
 </head>
 
@@ -2328,6 +2469,9 @@
                 <div class="search-results" id="searchResults"></div>
             </div>
             <div class="header-stats" id="headerStats"></div>
+            <button class="dashboard-btn" onclick="toggleBackTagsView()" title="Generar Back Tags" style="background:#dc2626; color:white;">
+                <i class="fas fa-tags"></i> Back Tags
+            </button>
             <button class="dashboard-btn" onclick="toggleDashboard()" title="Monitor de Progreso">
                 <span class="pulse"></span> Monitor
             </button>
@@ -2383,6 +2527,30 @@
             </div>
         </div>
     </main>
+
+    <!-- ===== BACK TAGS VISTA ===== -->
+    <div class="backtags-view" id="backtagsView">
+        <div class="backtags-header">
+            <h2><i class="fas fa-tags"></i> Generador de Back Tags</h2>
+            <div>
+                <button class="primary-btn" onclick="printBackTags()" style="margin-right: 12px; font-weight: 800;"><i class="fas fa-print"></i> IMPRIMIR PDF</button>
+                <button class="secondary-btn" onclick="btList=[];renderBtList();"><i class="fas fa-trash"></i> Vaciar Todas</button>
+            </div>
+        </div>
+        
+        <div class="bt-scanner-box">
+            <i class="fas fa-barcode" style="font-size:32px; color:var(--primary);"></i>
+            <input type="text" id="btScannerInput" autocomplete="off" placeholder="Escanear Código, Clave o EAN (Presionar Enter)" onkeypress="handleBtScannerInput(event)">
+            <button class="primary-btn" onclick="handleBtScannerInput({key:'Enter', target:document.getElementById('btScannerInput')})">Agregar <i class="fas fa-plus"></i></button>
+        </div>
+
+        <div class="bt-list" id="btList">
+            <!-- Lista inyectada por JS -->
+        </div>
+    </div>
+
+    <div class="bt-print-area" id="btPrintArea"></div>
+
     <div class="lightbox" id="lightbox" onclick="closeLightbox()"><button class="close-lb"><i
                 class="fas fa-times"></i></button><img id="lightboxImg" src=""></div>
 
@@ -5123,6 +5291,157 @@
 
             body.innerHTML = html;
         }
+
+        // ===== LÓGICA DEL BACK TAG GENERATOR =====
+        let btList = [];
+
+        function toggleBackTagsView() {
+            const btView = document.getElementById('backtagsView');
+            const mainView = document.getElementById('mainContent');
+            const searchRes = document.getElementById('searchResults');
+            const doverlay = document.getElementById('dashOverlay');
+            const dpanel = document.getElementById('dashPanel');
+            if(doverlay) doverlay.classList.remove('show');
+            if(dpanel) dpanel.classList.remove('show');
+            
+            if (btView.style.display === 'block') {
+                btView.style.display = 'none';
+                mainView.style.display = 'block';
+            } else {
+                btView.style.display = 'block';
+                mainView.style.display = 'none';
+                searchRes.classList.remove('show');
+                setTimeout(() => document.getElementById('btScannerInput').focus(), 100);
+                renderBtList();
+            }
+        }
+
+        window.handleBtScannerInput = function(e) {
+            if (e.key === 'Enter') {
+                const val = e.target.value.trim();
+                if(!val) return;
+                
+                const p = getProductByClaveOrCodigo(val);
+                if(p) {
+                    btList.unshift({ p: p, qty: 1 });
+                    renderBtList();
+                    e.target.value = '';
+                } else {
+                    alert('Producto no encontrado (Código/Clave): ' + val);
+                    e.target.select();
+                }
+            }
+        };
+
+        function getProductByClaveOrCodigo(val) {
+            var v = String(val).toUpperCase();
+            var prods = window.DB_PRODUCTOS || [];
+            for(var i=0; i<prods.length; i++) {
+                var c1 = String(prods[i].codigo).toUpperCase();
+                var c2 = String(prods[i].clave).toUpperCase();
+                var c3 = prods[i].ean ? String(prods[i].ean).toUpperCase() : null;
+                if(c1 === v || c2 === v || c3 === v) return prods[i];
+            }
+            return null;
+        }
+
+        window.changeBtQty = function(index, qty) {
+            btList[index].qty = parseInt(qty) || 1;
+        };
+
+        window.removeBt = function(index) {
+            btList.splice(index, 1);
+            renderBtList();
+        };
+
+        function renderBtList() {
+            const list = document.getElementById('btList');
+            list.innerHTML = '';
+            
+            if(btList.length === 0) {
+                list.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px; border: 2px dashed var(--border); border-radius: 12px;">Aún no has escaneado ningún producto. Hazlo usando el campo de arriba.</div>';
+                return;
+            }
+
+            btList.forEach((item, i) => {
+                let img = item.p.imagenes && item.p.imagenes.length ? item.p.imagenes[0] : '';
+                if(!img) img = item.p.imagenes_local && item.p.imagenes_local.length ? item.p.imagenes_local[0] : '';
+                var flb = "https://www.truper.com/media/import/imagenes/" + item.p.clave + ".jpg";
+
+                list.insertAdjacentHTML('beforeend', `
+                    <div class="bt-item">
+                        <img src="${img}" onerror="this.src='${flb}'">
+                        <div class="bt-item-info">
+                            <div class="bt-item-title" title="${esc(item.p.descripcion)}">${esc(item.p.descripcion)}</div>
+                            <div class="bt-item-code">Código: <strong>${item.p.codigo}</strong> | Clave: <strong>${item.p.clave}</strong></div>
+                        </div>
+                        <input type="number" class="bt-item-qty" value="${item.qty}" min="1" onchange="changeBtQty(${i}, this.value)">
+                        <button class="bt-item-remove" onclick="removeBt(${i})"><i class="fas fa-trash"></i></button>
+                    </div>
+                `);
+            });
+        }
+
+        window.printBackTags = function() {
+            if(!btList.length) {
+                alert("Agrega productos primero.");
+                return;
+            }
+            const printArea = document.getElementById('btPrintArea');
+            printArea.innerHTML = '';
+            
+            btList.forEach(item => {
+                for(let i=0; i<item.qty; i++) {
+                    let img = item.p.imagenes && item.p.imagenes.length ? item.p.imagenes[0] : '';
+                    if(!img) img = item.p.imagenes_local && item.p.imagenes_local.length ? item.p.imagenes_local[0] : '';
+                    var flb = "https://www.truper.com/media/import/imagenes/" + item.p.clave + ".jpg";
+                    
+                    let nombre = (item.p.descripcion || '').toUpperCase();
+                    let marca = (item.p.marca || 'TRUPER').toUpperCase();
+                    let headerText = nombre;
+                    if(headerText.indexOf(marca) === -1) headerText += ', ' + marca;
+                    
+                    let ean = item.p.ean ? item.p.ean : ('10' + item.p.codigo);
+                    let idBarcode = 'barcode-' + Math.random().toString(36).substr(2, 9);
+                    
+                    let tigreSrc = 'imagenes/tigre1.png';
+                    
+                    let cardHtml = `
+                    <div class="bktag">
+                        <div class="bktag-redhead">${esc(headerText)}</div>
+                        <div class="bktag-clave">${item.p.clave}</div>
+                        <div class="bktag-img"><img src="${img}" data-idx="0" onload="window.autoCrop&&autoCrop(this)" onerror="this.src='${flb}'"></div>
+                        <div class="bktag-codigo">Código: <span>${item.p.codigo}</span></div>
+                        <div class="bktag-barcode"><svg id="${idBarcode}"></svg></div>
+                        <img class="bktag-tigre" src="${tigreSrc}" onerror="this.src='imagenes/tigre3.png'">
+                    </div>
+                    `;
+                    printArea.insertAdjacentHTML('beforeend', cardHtml);
+                    
+                    setTimeout(() => {
+                        if(window.JsBarcode) {
+                            JsBarcode("#"+idBarcode, ean, {
+                                format: "CODE128", 
+                                displayValue: true, 
+                                fontSize: 13, 
+                                fontOptions: "bold",
+                                textMargin: 1,
+                                textPosition: "bottom",
+                                textAlign: "center",
+                                margin: 0, 
+                                height: 26,
+                                width: 1.5
+                            });
+                        }
+                    }, 50);
+                }
+            });
+
+            // Dar tiempo a generar SVG e importar imagenes para autoCrop
+            setTimeout(() => {
+                window.print();
+            }, 1200);
+        };
 
         init();
     </script>
