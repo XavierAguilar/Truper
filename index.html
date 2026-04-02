@@ -4754,7 +4754,7 @@
             var imgs;
             try { imgs = JSON.parse(imgsStr); } catch (e) { return; }
             
-            var fbStr = leftBtn.getAttribute('data-fb');
+            var fbStr = leftBtn.getAttribute('data-fb') || leftBtn.getAttribute('data-fallbacks');
             var fallbacks = [];
             if (fbStr) try { fallbacks = JSON.parse(fbStr); } catch (e) {}
 
