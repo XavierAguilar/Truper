@@ -5414,7 +5414,7 @@
 
         function searchProductsPredictive(val) {
             var v = String(val).toLowerCase();
-            var prods = window.DB_PRODUCTOS || [];
+            var prods = window.productos || [];
             var exactly = [];
             var partial = [];
             for(var i=0; i<prods.length; i++) {
@@ -5448,7 +5448,7 @@
 
         function getProductByClaveOrCodigo(val) {
             var v = String(val).toUpperCase();
-            var prods = window.DB_PRODUCTOS || [];
+            var prods = window.productos || [];
             for(var i=0; i<prods.length; i++) {
                 var c1 = String(prods[i].codigo).toUpperCase();
                 var c2 = String(prods[i].clave).toUpperCase();
