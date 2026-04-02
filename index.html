@@ -5482,15 +5482,6 @@
         };
 
         function renderBtList() {
-            setTimeout(() => {
-                let badge = document.querySelector('.bktag-total-badge');
-                if(badge) {
-                    let totalTags = btList.reduce((acc, it) => acc + (parseInt(it.qty) || 0), 0);
-                    let totalPages = Math.ceil(totalTags / 12);
-                    badge.innerHTML = ?? Total: <span style="color:#fff"></span> Gafetes &nbsp;|&nbsp; ??? Hojas estimadas: <span style="color:#fff"></span>;
-                }
-            }, 10);
-
             const list = document.getElementById('btList');
             list.innerHTML = '';
             
