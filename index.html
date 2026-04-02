@@ -2732,7 +2732,8 @@
                         await setCachedData(productos);
                     } else {
                         document.getElementById('loader-msg').innerText = "Cargando catálogo local...";
-                        const resp = await fetch('productos_truper.json?v=' + Date.now());
+                        // Cargamos la versión minificada que Github sí admite
+                        const resp = await fetch('productos_truper_min.json?v=' + Date.now());
                         if (!resp.ok) throw new Error("No existe json local");
                         productos = await resp.json();
                     }
