@@ -3180,12 +3180,24 @@
                 if (allWordsMatch && totalScore > 0) {
                     var nameWhole = false;
                     var w0 = words[0];
-                    var np = entry.nombre.indexOf(w0);
-                    if (np !== -1 && isWholeWord(entry.nombre, np, w0.length)) nameWhole = true;
-                    if (!nameWhole) {
-                        var cp = entry.clave.indexOf(w0);
-                        if (cp !== -1 && isWholeWord(entry.clave, cp, w0.length)) nameWhole = true;
+                    
+                    // Permitir que variaciones singulares/plurales cuenten como "palabra completa" exacta 
+                    // para evitar que el filtro de limpieza borre plurales válidos.
+                    var w0Vars = getStemVariants(w0);
+                    w0Vars.push(w0);
+                    
+                    for (var vIdx = 0; vIdx < w0Vars.length; vIdx++) {
+                        var vWord = w0Vars[vIdx];
+                        var np = entry.nombre.indexOf(vWord);
+                        if (np !== -1 && isWholeWord(entry.nombre, np, vWord.length)) {
+                            nameWhole = true; break;
+                        }
+                        var cp = entry.clave.indexOf(vWord);
+                        if (cp !== -1 && isWholeWord(entry.clave, cp, vWord.length)) {
+                            nameWhole = true; break;
+                        }
                     }
+                    
                     scored.push({ product: productos[i], index: i, score: totalScore, wholeWord: nameWhole });
                     if (scored.length >= SEARCH_LIMIT) break;
                 }
