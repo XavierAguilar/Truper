@@ -2417,6 +2417,7 @@
         }
 
         @media print {
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             body * { visibility: hidden !important; }
             body, html { width: 100%; height: 100%; margin: 0; padding: 0; background: #fff !important; }
             .header, .nav-actions, .dash-overlay, .dashboard-panel, .main, .backtags-view { display: none !important; }
@@ -5425,7 +5426,7 @@
                 
                 if(c1 === v || c2 === v || c3 === v) {
                     exactly.push(p);
-                } else if(c1.includes(v) || c2.includes(v) || String(p.descripcion).toLowerCase().includes(v)) {
+                } else if(c1.includes(v) || c2.includes(v) || String(p.nombre).toLowerCase().includes(v)) {
                     partial.push(p);
                 }
             }
@@ -5485,7 +5486,7 @@
                     <div class="bt-item">
                         <img src="${img}" onerror="this.src='${flb}'">
                         <div class="bt-item-info">
-                            <div class="bt-item-title" title="${esc(item.p.descripcion)}">${esc(item.p.descripcion)}</div>
+                            <div class="bt-item-title" title="${esc(item.p.nombre)}">${esc(item.p.nombre)}</div>
                             <div class="bt-item-code">Código: <strong>${item.p.codigo}</strong> | Clave: <strong>${item.p.clave}</strong></div>
                         </div>
                         <input type="number" class="bt-item-qty" value="${item.qty}" min="1" onchange="changeBtQty(${i}, this.value)">
@@ -5509,7 +5510,7 @@
                     if(!img) img = item.p.imagenes_local && item.p.imagenes_local.length ? item.p.imagenes_local[0] : '';
                     var flb = "https://www.truper.com/media/import/imagenes/" + item.p.clave + ".jpg";
                     
-                    let nombre = (item.p.descripcion || '').toUpperCase();
+                    let nombre = (item.p.nombre || '').toUpperCase();
                     let marca = (item.p.marca || 'TRUPER').toUpperCase();
                     let headerText = nombre;
                     if(headerText.indexOf(marca) === -1) headerText += ', ' + marca;
