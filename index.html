@@ -4720,7 +4720,7 @@
                 
                 var isCarouselImg = !!img.closest('.welcome-carousel-container');
                 var isProductSheet = !!img.closest('.images-panel');
-                var fillFactor = isProductSheet ? 1.05 : (isCarouselImg ? 0.875 : 0.975);
+                var fillFactor = isProductSheet ? 1.05 : (isCarouselImg ? 0.875 : 1.025);
                 
                 var S_X = (rect.width * fillFactor) / (cW * bScale);
                 var S_Y = (rect.height * fillFactor) / (cH * bScale);
@@ -4736,7 +4736,7 @@
                 // Zoom por fallback exacto cuando CORS de Canvas estricto falla en Vercel
                 var isCarouselImg = !!img.closest('.welcome-carousel-container');
                 var isProductSheet = !!img.closest('.images-panel');
-                var fbScale = isProductSheet ? 1.05 : (isCarouselImg ? 0.875 : 0.975);
+                var fbScale = isProductSheet ? 1.05 : (isCarouselImg ? 0.875 : 1.025);
                 
                 img.style.opacity = '1';
                 img.style.transform = 'scale(' + fbScale + ')';
