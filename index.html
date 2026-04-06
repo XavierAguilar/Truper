@@ -5815,12 +5815,38 @@
     </footer>
     
     <script>
-        // Registrar Web App (PWA)
+        // ======= INSTALACIÓN PWA EXPLÍCITA =======
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            if (localStorage.getItem('hideInstallPWA') === 'true') return;
+            
+            deferredPrompt = e;
+            const pwaContainer = document.getElementById('pwa-install-container');
+            if (pwaContainer) pwaContainer.style.display = 'flex';
+        });
+
+        function installPWA() {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('Catálogo Casa Vazquez instalado en el sistema!');
+                    document.getElementById('pwa-install-container').style.display = 'none';
+                }
+                deferredPrompt = null;
+            });
+        }
+        
+        function dismissPWA() {
+            localStorage.setItem('hideInstallPWA', 'true');
+            document.getElementById('pwa-install-container').style.display = 'none';
+        }
+
+        // Registrar Web App (PWA ServiceWorker base)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js').catch(function(err) {
-                    console.log('Error en SW:', err);
-                });
+                navigator.serviceWorker.register('sw.js').catch(function(err) {});
             });
         }
     </script>
