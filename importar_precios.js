@@ -51,6 +51,20 @@ function encontrarCSVReciente() {
     }
 
     console.log(`📄 CSV encontrado: ${archivos[0].nombre}`);
+    
+    // Generar version.json para invalidación de caché Frontend
+    const safeName = archivos[0].nombre.toLowerCase().replace(/catalogo|archivo/g, '').replace('.csv', '');
+    const match = safeName.match(/([a-z]+)(\d+)/);
+    const vName = match ? `${match[1]} ${match[2]}` : safeName;
+    const versionStr = vName.charAt(0).toUpperCase() + vName.slice(1);
+    
+    const versionData = {
+        version: versionStr,
+        timestamp: Date.now()
+    };
+    fs.writeFileSync(path.join(__dirname, 'version.json'), JSON.stringify(versionData, null, 2));
+    console.log(`🏷️ Archivo version.json emitido para control de caché: ${versionStr}`);
+    
     return archivos[0].ruta;
 }
 

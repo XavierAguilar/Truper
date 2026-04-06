@@ -5,6 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo Casa Vazquez — Fichas Técnicas</title>
+
+    <!-- PWA Settings -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0f19">
+    <link rel="icon" type="image/svg+xml" href="app_icon.svg">
+    <link rel="apple-touch-icon" href="app_icon.svg">
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -2473,11 +2480,47 @@
             @page { size: letter portrait; margin: 0.5cm; }
             .bktag { page-break-inside: avoid; }
         }
+        
+        /* ===== STATIC FOOTER ===== */
+        .app-footer {
+            margin-top: 80px;
+            background: rgba(255, 255, 255, 0.4);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px;
+            color: var(--text-muted);
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        
+        .app-footer:hover {
+            opacity: 1;
+        }
+        
+        .footer-badge {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+
+        .main {
+            padding-bottom: 20px; 
+        }
+
+        @media print {
+            .app-footer { display: none !important; }
+        }
     </style>
 </head>
 
 <body>
-    <div class="page-loader" id="page-loader">
+    <div class="page-loader" id="page-loader" style="display: none; background: rgba(10,15,25,0.9); backdrop-filter: blur(10px);">
         <div class="spinner"></div>
         <p style="font-weight: 700; font-size: 1.2rem; color: var(--text);" id="loader-msg">Iniciando sistema Truper...</p>
         <div class="progress-container" id="p-container" style="display: none;">
@@ -2487,28 +2530,21 @@
     </div>
 
     <header class="header">
-        <div class="header-inner">
+        <div class="header-inner" style="justify-content: center; gap: 40px;">
             <div class="header-brand">
                 <div>
                     <a href="/" style="text-decoration:none;color:inherit;cursor:pointer;"><h1>CASA VAZQUEZ</h1></a>
-                    <div class="subtitle">Catálogo de Fichas Técnicas</div>
+                    <div class="subtitle" style="margin-top:2px;">Catálogo de Fichas Técnicas</div>
                 </div>
             </div>
-            <div class="search-container">
-                <div class="search-box">
+            <div class="search-container" style="max-width: 650px; flex: 1; margin: 0;">
+                <div class="search-box" style="box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
                     <input type="text" id="searchInput" placeholder="Busca por código, clave o descripción... (Ctrl+K)"
                         autocomplete="off">
                     <button onclick="doSearch()"><i class="fas fa-search"></i></button>
                 </div>
                 <div class="search-results" id="searchResults"></div>
             </div>
-            <div class="header-stats" id="headerStats"></div>
-            <button class="dashboard-btn" onclick="toggleBackTagsView()" title="Generar Back Tags" style="background:#dc2626; color:white;">
-                <i class="fas fa-tags"></i> Back Tags
-            </button>
-            <button class="dashboard-btn" onclick="toggleDashboard()" title="Monitor de Progreso">
-                <span class="pulse"></span> Monitor
-            </button>
         </div>
     </header>
 
@@ -2681,11 +2717,35 @@
         // ===== Inicializar =====
         async function init() {
             try {
-                const isCloud = window.location.hostname !== '127.0.0.1' && window.location.hostname !== 'localhost';
                 let loadedFromCache = false;
+                let forceDownload = false;
+                let fetchParam = Date.now();
 
-                if (isCloud) {
-                    document.getElementById('loader-msg').innerText = "Verificando caché ultrarrápido...";
+                // 1. Verificador de Versión (Anti-Caché)
+                try {
+                    const vResp = await fetch('version.json?_t=' + Date.now());
+                    if (vResp.ok) {
+                        const remoteV = await vResp.json();
+                        const localV = JSON.parse(localStorage.getItem('truper_catalog_version') || '{}');
+                        
+                        // Evaluar si es una versión estrictamente nueva y obligar descarga
+                        if (!localV.timestamp || remoteV.timestamp > localV.timestamp) {
+                            forceDownload = true;
+                            fetchParam = remoteV.timestamp;
+                            localStorage.setItem('truper_catalog_version', JSON.stringify(remoteV));
+                            console.log("¡Nueva versión de catálogo detectada! Forzando limpieza de caché...");
+                        } else {
+                            fetchParam = localV.timestamp; // Para que si lo baja, respete la versión
+                        }
+                        
+                        const vBadge = document.getElementById('catalog-version-badge');
+                        if (vBadge) vBadge.innerHTML = `🏷️ Catálogo: ${remoteV.version}`;
+                    }
+                } catch (e) {
+                    console.warn("No se pudo verificar la versión en Vercel:", e);
+                }
+
+                if (!forceDownload) {
                     const cached = await getCachedData();
                     if (cached && Array.isArray(cached) && cached.length > 1000) {
                         productos = cached;
@@ -2694,10 +2754,11 @@
                 }
                 
                 if (!loadedFromCache) {
-                    document.getElementById('loader-msg').innerText = "Descargando catálogo ultrarrápido desde Vercel...";
-                    document.getElementById('p-container').style.display = 'none';
+                    document.getElementById('page-loader').style.display = 'flex';
+                    document.getElementById('loader-msg').innerText = "Descargando catálogo ultrarrápido de última generación...";
+                    document.getElementById('p-container').style.display = 'block';
 
-                    const resp = await fetch('productos_truper_min.json?v=' + Date.now());
+                    const resp = await fetch('productos_truper_min.json?v=' + fetchParam);
                     if (!resp.ok) throw new Error("Fallo la descarga de la DB");
                     
                     document.getElementById('loader-msg').innerText = "Procesando productos...";
@@ -2712,6 +2773,17 @@
                 renderHints();
                 renderNuevosCarousel();
                 setupSearch();
+
+                // === ENRUTAMIENTO DIRECTO (URL PARAMS) ===
+                var urlParams = new URLSearchParams(window.location.search);
+                var directCodigo = urlParams.get('p');
+                if (directCodigo) {
+                    var targetIdx = productos.findIndex(function(p) { return p.codigo === directCodigo; });
+                    if (targetIdx >= 0) {
+                        showProduct(targetIdx, true); // true = omitir pushState redundante
+                    }
+                }
+
                 setTimeout(() => document.getElementById('page-loader').style.display = 'none', 600);
             } catch (err) {
                 console.error(err);
@@ -4576,9 +4648,14 @@
         }
 
         // ===== PRODUCTO =====
-        function showProduct(idx) {
+        function showProduct(idx, noPushState) {
             selectedIdx = idx;
             var p = productos[idx];
+            
+            if (!noPushState) {
+                history.pushState({view: 'product', idx: idx}, '', '?p=' + p.codigo);
+            }
+            
             var welcome = document.getElementById('welcomeState');
             if (welcome) welcome.style.display = 'none';
 
@@ -4714,6 +4791,7 @@
                 ? '<img src="' + p.marca_logo_url + '" class="brand-logo" alt="' + esc(p.marca) + '" onerror="this.style.display=\'none\'">' : '';
 
             return '<div class="product-card">' +
+                '<button onclick="goBack()" class="primary-btn" style="background:#334155; color:white; border-radius:20px; padding:8px 18px; margin-bottom:16px; cursor:pointer; display:inline-flex; align-items:center; box-shadow:0 4px 15px rgba(0,0,0,0.1); border:none; transition:transform 0.2s; font-weight:600;"><i class="fas fa-arrow-left" style="margin-right:8px;"></i>Volver Atrás</button>' +
                 '<div class="card-header"><div>' +
                 '<h2>' + (esc(p.nombre) || 'Producto') + '</h2>' +
                 '<div class="meta">' +
@@ -4753,6 +4831,42 @@
                 '<div class="tab-content" id="tab-related">' + relatedHtml + '</div>' +
                 '</div></div>';
         }
+
+        function closeProductCard(noPushState) {
+            var existing = document.querySelector('.product-card');
+            if (existing) existing.remove();
+            
+            var gridContainer = document.querySelector('.results-grid-container');
+            if (gridContainer) {
+                gridContainer.style.display = 'block';
+            } else {
+                var welcome = document.getElementById('welcomeState');
+                if (welcome) welcome.style.display = 'block';
+            }
+            window.scrollTo({top: 0, behavior: 'smooth'});
+
+            if (!noPushState && history.state && history.state.view === 'product') {
+                history.pushState({view: 'home'}, '', window.location.pathname);
+            }
+        }
+
+        function goBack() {
+            if (history.state && history.state.view === 'product') {
+                history.back();
+            } else {
+                closeProductCard();
+            }
+        }
+
+        window.addEventListener('popstate', function(e) {
+            if (e.state && e.state.view === 'product') {
+                // Restauramos la vista de producto sin hacer otro pushState
+                showProduct(e.state.idx, true);
+            } else {
+                // Volvimos al inicio
+                closeProductCard(true);
+            }
+        });
 
         function switchTab(name) {
             var card = document.querySelector('.product-card');
@@ -4908,17 +5022,22 @@
             var data = imgData.data;
             var minX = canvas.width, minY = canvas.height, maxX = 0, maxY = 0;
             
-            var ignoreX = canvas.width * 0.12;
-            var ignoreY = canvas.height * 0.12;
+            // Zonas Muertas Avanzadas: Truper Tags & Legal Texts
+            var ignoreTopZone = canvas.height * 0.14; // Ignorar el 14% superior por completo
+            var ignoreBottomZone = canvas.height * 0.14; // Ignorar el 14% inferior por textos gigantes
 
             for (var y = 0; y < canvas.height; y += 4) {
                 for (var x = 0; x < canvas.width; x += 4) {
-                    if (
-                        (x < ignoreX && y < ignoreY) || 
-                        (x > canvas.width - ignoreX && y < ignoreY) || 
-                        (x < ignoreX && y > canvas.height - ignoreY) || 
-                        (x > canvas.width - ignoreX && y > canvas.height - ignoreY)
-                    ) continue;
+                    
+                    // 1. Ignorar franja superior incondicional (Atrapa "Producto mejorado" cruzado)
+                    if (y < ignoreTopZone) {
+                        continue;
+                    }
+                    
+                    // 2. Ignorar franja inferior horizontal completa (Textos Legales / Fechas dobles)
+                    if (y > canvas.height - ignoreBottomZone) {
+                        continue;
+                    }
 
                     var index = (y * canvas.width + x) * 4;
                     if (data[index] < 240 || data[index+1] < 240 || data[index+2] < 240) {
@@ -5681,6 +5800,29 @@
         };
 
         init();
+    </script>
+    <footer class="app-footer">
+        <div id="catalog-version-badge" class="footer-badge">🏷️ Versión: --</div>
+        <div class="header-stats" id="headerStats" style="margin: 0;"></div>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <button class="dashboard-btn" onclick="toggleBackTagsView()" title="Generar Back Tags" style="background:#dc2626; color:white;">
+                <i class="fas fa-tags"></i> Back Tags
+            </button>
+            <button class="dashboard-btn" onclick="toggleDashboard()" title="Monitor de Progreso">
+                <span class="pulse"></span> Monitor
+            </button>
+        </div>
+    </footer>
+    
+    <script>
+        // Registrar Web App (PWA)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js').catch(function(err) {
+                    console.log('Error en SW:', err);
+                });
+            });
+        }
     </script>
 </body>
 

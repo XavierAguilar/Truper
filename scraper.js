@@ -1,4 +1,4 @@
-﻿const fs = require('fs');
+const fs = require('fs');
 const { parse } = require('node-html-parser');
 
 // ============================================================================
@@ -469,16 +469,23 @@ async function main() {
 
   if (catalogProducts.length === 0) { console.log('❌ No hay productos en el rango'); return; }
 
-  // Resume: cargar existentes y filtrar
   let existingResults = [];
-  const processedCodes = new Set();
-  if (RESUME && fs.existsSync(OUTPUT_PATH)) {
+  if (fs.existsSync(OUTPUT_PATH)) {
     existingResults = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf-8'));
-    existingResults.forEach(p => processedCodes.add(p.codigo));
-    console.log(`♻️  Resume: ${existingResults.length} productos ya procesados, se saltarán\n`);
   }
 
-  const toProcess = catalogProducts.filter(p => !processedCodes.has(p.codigo));
+  // Si missingImages está activo, procesamos los del JSON que no tengan fotos.
+  const missingImages = getArg('missing-images', 0);
+  
+  let toProcess = [];
+  if (missingImages) {
+      console.log('🔍 Modo rescate activo: Escaneando toda la base instalada...');
+      toProcess = existingResults.filter(p => !p.imagenes || p.imagenes.length === 0);
+  } else {
+      // Flujo normal CSV -> JSON
+      const processedCodes = new Set(existingResults.map(r => r.codigo));
+      toProcess = catalogProducts.filter(p => !processedCodes.has(p.codigo));
+  }
   console.log(`🔄 ${toProcess.length} productos nuevos por procesar\n`);
   if (toProcess.length === 0) { console.log('✅ Todos ya procesados'); return; }
 
@@ -549,7 +556,12 @@ async function main() {
     await sem.acquire();
     try {
       const { productData, usedApi } = await processProduct(product);
-      results.push(productData);
+      const existingIdx = results.findIndex(r => r.codigo === productData.codigo);
+      if (existingIdx >= 0) {
+          results[existingIdx] = productData;
+      } else {
+          results.push(productData);
+      }
       completed++;
 
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(0);
@@ -607,9 +619,9 @@ async function main() {
   console.log(`   ♻️  Reintentados: ${retryQueue.length}`);
   console.log(`   🔄 Via API: ${results.filter(r => r.es_producto_familia).length}`);
   console.log(`   📖 Con catálogo: ${results.filter(r => r.pagina_catalogo).length}`);
-  console.log(`   📐 Specs: ${results.reduce((a, r) => a + Object.keys(r.especificaciones).length, 0)}`);
-  console.log(`   📷 Imágenes: ${results.reduce((a, r) => a + r.imagenes.length, 0)}`);
-  console.log(`   🏅 Certificaciones: ${results.reduce((a, r) => a + r.certificaciones.length, 0)}`);
+  console.log(`   📐 Specs: ${results.reduce((a, r) => a + (r.especificaciones ? Object.keys(r.especificaciones).length : 0), 0)}`);
+  console.log(`   📷 Imágenes: ${results.reduce((a, r) => a + (r.imagenes ? r.imagenes.length : 0), 0)}`);
+  console.log(`   🏅 Certificaciones: ${results.reduce((a, r) => a + (r.certificaciones ? r.certificaciones.length : 0), 0)}`);
 
   if (errors.length > 0) {
     console.log('\n   Con error:');
