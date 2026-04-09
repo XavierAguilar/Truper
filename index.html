@@ -5668,23 +5668,136 @@
         };
 
         function searchProductsPredictive(val) {
-            var v = String(val).toLowerCase();
+            var v = String(val).trim();
+            if(!v || v.length < 2) return [];
+            var vLow = v.toLowerCase();
+            var vNorm = normalize(v);
             var prods = window.productos || [];
+            
+            // === FASE 1: Match exacto por código/clave/EAN ===
             var exactly = [];
+            for(var i=0; i<prods.length; i++) {
+                var p = prods[i];
+                var c1 = String(p.codigo).toLowerCase();
+                var c2 = String(p.clave).toLowerCase();
+                var c3 = p.ean ? String(p.ean).toLowerCase() : "";
+                if(c1 === vLow || c2 === vLow || c3 === vLow) {
+                    exactly.push(p);
+                }
+            }
+            if(exactly.length > 0) return exactly;
+            
+            // === FASE 2: Match parcial por código/clave/EAN/nombre ===
             var partial = [];
             for(var i=0; i<prods.length; i++) {
-                let p = prods[i];
-                let c1 = String(p.codigo).toLowerCase();
-                let c2 = String(p.clave).toLowerCase();
-                let c3 = p.ean ? String(p.ean).toLowerCase() : "";
-                
-                if(c1 === v || c2 === v || c3 === v) {
-                    exactly.push(p);
-                } else if(c1.includes(v) || c2.includes(v) || String(p.nombre).toLowerCase().includes(v)) {
+                var p = prods[i];
+                var c1 = String(p.codigo).toLowerCase();
+                var c2 = String(p.clave).toLowerCase();
+                var c3 = p.ean ? String(p.ean).toLowerCase() : "";
+                if(c1.includes(vLow) || c2.includes(vLow) || c3.includes(vLow)) {
                     partial.push(p);
                 }
             }
-            return exactly.concat(partial);
+            if(partial.length > 0) return partial.slice(0, 30);
+            
+            // === FASE 3: Búsqueda fuzzy inteligente por nombre/descripción ===
+            var queryWords = vNorm.split(/[\s,\-()\/.]+/).filter(function(w) { return w.length >= 2; });
+            if(queryWords.length === 0) return [];
+            
+            var queryPhonetics = queryWords.map(function(w) { return phoneticES(w); });
+            
+            var scored = [];
+            for(var i=0; i<prods.length; i++) {
+                var p = prods[i];
+                var nombre = normalize(p.nombre || '');
+                var clave = normalize(p.clave || '');
+                var codigo = normalize(String(p.codigo || ''));
+                var desc = normalize(p.descripcion_csv || '');
+                var fullText = nombre + ' ' + clave + ' ' + codigo + ' ' + desc;
+                var fullPhonetic = phoneticES(fullText);
+                var textWords = fullText.split(/[\s,\-()\/.]+/).filter(function(w) { return w.length >= 2; });
+                
+                var totalScore = 0;
+                var matchedWords = 0;
+                
+                for(var q=0; q<queryWords.length; q++) {
+                    var qw = queryWords[q];
+                    var qwPhon = queryPhonetics[q];
+                    var bestWordScore = 0;
+                    
+                    // Substring directo en texto completo
+                    if(fullText.includes(qw)) {
+                        bestWordScore = Math.max(bestWordScore, 0.95);
+                    }
+                    // Substring fonético
+                    if(fullPhonetic.includes(qwPhon)) {
+                        bestWordScore = Math.max(bestWordScore, 0.85);
+                    }
+                    
+                    // Comparar contra cada palabra del producto
+                    if(bestWordScore < 0.9) {
+                        for(var tw=0; tw<textWords.length; tw++) {
+                            var cand = textWords[tw];
+                            if(cand.length < 2) continue;
+                            
+                            // Prefijo match
+                            if(cand.indexOf(qw) === 0 || qw.indexOf(cand) === 0) {
+                                bestWordScore = Math.max(bestWordScore, 0.9);
+                                continue;
+                            }
+                            
+                            // Solo fuzzy si longitudes similares
+                            if(Math.abs(qw.length - cand.length) > 3) continue;
+                            
+                            var candPhon = phoneticES(cand);
+                            var dl = levenshtein(qw, cand);
+                            var dlNorm = 1 - (dl / Math.max(qw.length, cand.length, 1));
+                            var tgScore = trigramSimilarity(qw, cand);
+                            var phScore = 1 - (levenshtein(qwPhon, candPhon) / Math.max(qwPhon.length, candPhon.length, 1));
+                            var qwkScore = qwertyScore(qw, cand);
+                            
+                            // Score combinado (mismos pesos que motor principal)
+                            var combined = (dlNorm * 0.25) + (tgScore * 0.10) + (phScore * 0.20) + (qwkScore * 0.10);
+                            
+                            // Jaro-Winkler simplificado (prefijo común)
+                            var prefixLen = 0;
+                            for(var k=0; k<Math.min(qw.length, cand.length, 4); k++) {
+                                if(qw[k] === cand[k]) prefixLen++; else break;
+                            }
+                            combined += (prefixLen / 4) * 0.20;
+                            
+                            // Ratcliff/Obershelp (longest common substring)
+                            var lcs = 0;
+                            for(var len=Math.min(qw.length, cand.length); len>=2; len--) {
+                                var found = false;
+                                for(var start=0; start<=qw.length-len; start++) {
+                                    if(cand.includes(qw.substring(start, start+len))) { lcs = len; found = true; break; }
+                                }
+                                if(found) break;
+                            }
+                            combined += (lcs / Math.max(qw.length, cand.length, 1)) * 0.15;
+                            
+                            bestWordScore = Math.max(bestWordScore, combined);
+                        }
+                    }
+                    
+                    if(bestWordScore > 0.45) matchedWords++;
+                    totalScore += bestWordScore;
+                }
+                
+                if(matchedWords === queryWords.length && totalScore > 0) {
+                    var avgScore = totalScore / queryWords.length;
+                    if(nombre.includes(vNorm)) avgScore += 0.3;
+                    scored.push({ p: p, score: avgScore });
+                }
+            }
+            
+            scored.sort(function(a, b) { return b.score - a.score; });
+            var results = [];
+            for(var i=0; i<scored.length && i<30; i++) {
+                if(scored[i].score >= 0.50) results.push(scored[i].p);
+            }
+            return results;
         }
 
         function addMatchedBt(p) {
