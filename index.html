@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo Casa Vazquez — Fichas Técnicas</title>
+    <title>Catálogo Casa Vazquez â€” Fichas Técnicas</title>
 
     <!-- PWA Settings -->
     <link rel="manifest" href="manifest.json">
@@ -144,7 +144,7 @@
             padding: 11px 20px;
             font-size: 14px;
             font-family: inherit;
-            color: #333;
+            color: #fff;
             background: transparent;
         }
 
@@ -2639,15 +2639,15 @@
 
     <script>
         var productos = [], selectedIdx = -1, currentMainImg = {};
-        var searchIndex = []; // Índice pre-procesado para búsqueda rápida
+        var searchIndex = []; // Ãndice pre-procesado para búsqueda rápida
 
         // ===== NORMALIZACIÓN: quitar acentos y caracteres especiales =====
         function normalize(str) {
             if (!str) return '';
             return str.toLowerCase()
-                .replace(/[áàâä]/g, 'a').replace(/[éèêë]/g, 'e')
-                .replace(/[íìîï]/g, 'i').replace(/[óòôö]/g, 'o')
-                .replace(/[úùûü]/g, 'u').replace(/[ñ]/g, 'n')
+                .replace(/[áÃ Ã¢Ã¤]/g, 'a').replace(/[éÃ¨ÃªÃ«]/g, 'e')
+                .replace(/[íÃ¬Ã®Ã¯]/g, 'i').replace(/[óÃ²Ã´Ã¶]/g, 'o')
+                .replace(/[úÃ¹Ã»Ã¼]/g, 'u').replace(/[ñ]/g, 'n')
                 .replace(/[""]/g, '"').replace(/['']/g, "'");
         }
 
@@ -2655,35 +2655,35 @@
         function getStemVariants(word) {
             if (word.length < 3) return [];
             var variants = [];
-            // Si termina en 's' → posible plural, generar singular
+            // Si termina en 's' â†’ posible plural, generar singular
             if (word.endsWith('ces')) {
-                // luces → luz, lapices → lapiz
+                // luces â†’ luz, lapices â†’ lapiz
                 variants.push(word.slice(0, -3) + 'z');
             }
             if (word.endsWith('iones')) {
-                // conexiones → conexion
+                // conexiones â†’ conexion
                 variants.push(word.slice(0, -2));
             }
             if (word.endsWith('es') && word.length > 4) {
-                // cortadores → cortador, conexiones ya cubierto
+                // cortadores â†’ cortador, conexiones ya cubierto
                 variants.push(word.slice(0, -2));
-                // tambores → tambor (no agrega 'es' a vocal)
+                // tambores â†’ tambor (no agrega 'es' a vocal)
                 variants.push(word.slice(0, -1));
             }
             if (word.endsWith('s') && !word.endsWith('es')) {
-                // cajas → caja, herramientas → herramienta
+                // cajas â†’ caja, herramientas â†’ herramienta
                 variants.push(word.slice(0, -1));
             }
-            // Si NO termina en 's' → generar plural
+            // Si NO termina en 's' â†’ generar plural
             if (!word.endsWith('s')) {
                 if (word.endsWith('z')) {
-                    // luz → luces
+                    // luz â†’ luces
                     variants.push(word.slice(0, -1) + 'ces');
                 } else if (word.endsWith('n') || word.endsWith('r') || word.endsWith('l') || word.endsWith('d')) {
-                    // cortador → cortadores, conexion → conexiones
+                    // cortador â†’ cortadores, conexion â†’ conexiones
                     variants.push(word + 'es');
                 } else {
-                    // caja → cajas, herramienta → herramientas
+                    // caja â†’ cajas, herramienta â†’ herramientas
                     variants.push(word + 's');
                 }
             }
@@ -2750,7 +2750,7 @@
                         }
                         
                         const vBadge = document.getElementById('catalog-version-badge');
-                        if (vBadge) vBadge.innerHTML = `🏷️ Catálogo: ${remoteV.version}`;
+                        if (vBadge) vBadge.innerHTML = `&#127991;&#65039; Catálogo: ${remoteV.version}`;
                     }
                 } catch (e) {
                     console.warn("No se pudo verificar la versión en Vercel:", e);
@@ -2864,7 +2864,7 @@
                 .replace(/ce/g, 'se').replace(/ci/g, 'si') // ce/ci suenan como se/si
                 .replace(/z/g, 's')       // z = s
                 .replace(/ge/g, 'je').replace(/gi/g, 'ji') // ge/gi suenan como je/ji
-                .replace(/gü/g, 'gu')
+                .replace(/gÃ¼/g, 'gu')
                 .replace(/qu/g, 'k')      // qu = k
                 .replace(/ca/g, 'ka').replace(/co/g, 'ko').replace(/cu/g, 'ku')
                 .replace(/ll/g, 'y')      // ll = y
@@ -3253,7 +3253,7 @@
             doSearch();
         }
 
-        // ===== PRE-PROCESAR ÍNDICE DE BÚSQUEDA =====
+        // ===== PRE-PROCESAR ÃNDICE DE BÚSQUEDA =====
         var searchCache = {};
 
         function buildSearchIndex() {
@@ -3786,9 +3786,9 @@
             return Object.entries(brands).sort(function (a, b) { return b[1] - a[1]; });
         }
 
-        // Diccionario: sinónimos de especificaciones → nombre canónico del filtro
+        // Diccionario: sinónimos de especificaciones â†’ nombre canónico del filtro
         var SPEC_SYNONYMS = {
-            // MEDIDA / DIÁMETRO
+            // MEDIDA / DIÃMETRO
             'Medida': 'Medida', 'Diámetro': 'Medida', 'Diámetro nominal': 'Medida',
             'Diámetro interior': 'Medida', 'Diámetro interno': 'Medida',
             'Medida (Número)': 'Medida', 'Medidas': 'Medida', 'Tamaño': 'Medida',
@@ -4416,11 +4416,11 @@
                 '<button class="results-back-btn" onclick="clearResultsGrid()"><i class="fas fa-times" style="margin-right:4px;"></i>Limpiar</button>' +
                 '</div></div>';
 
-            // === FILTRO DE CATEGORÍA (auto-detectado por nombres) ===
+            // === FILTRO DE CATEGORÃA (auto-detectado por nombres) ===
             var categories = getResultCategories(catBase, words);
             if (categories.length >= 2) {
                 html += '<div class="filter-bar" style="padding-top:6px;padding-bottom:6px;">';
-                html += '<span style="color:#10b981;font-size:11px;font-weight:600;min-width:60px;padding-top:3px;">CATEGORÍA</span>';
+                html += '<span style="color:#10b981;font-size:11px;font-weight:600;min-width:60px;padding-top:3px;">CATEGORÃA</span>';
                 for (var ci = 0; ci < categories.length; ci++) {
                     var catName = categories[ci][0];
                     var catCount = categories[ci][1];
@@ -4452,7 +4452,7 @@
                 html += '</div>';
             }
 
-            // === FILTROS POR ATRIBUTOS DINÁMICOS (progresivos: 1 visible, +3, +5, +resto) ===
+            // === FILTROS POR ATRIBUTOS DINÃMICOS (progresivos: 1 visible, +3, +5, +resto) ===
             var attrKeys = Object.keys(attrFilters);
             filterRevealLevel = 0; // Reset on re-render
             function safeAttr(s) { return s.replace(/"/g, '&quot;').replace(/'/g, "\\'"); }
@@ -4463,7 +4463,7 @@
             for (var ak = 0; ak < attrKeys.length; ak++) {
                 var dimName = attrKeys[ak];
                 // Disjunctive faceting: recalcular conteos para esta dimensión
-                // usando resultados filtrados por todas las DEMÁS dimensiones
+                // usando resultados filtrados por todas las DEMÃS dimensiones
                 var dimBase = hasActiveFilters ? applyFiltersExcluding(results, dimName) : results;
                 var dimFaceted = getAttrFilters(dimBase);
                 var dimValues = dimFaceted[dimName] || attrFilters[dimName] || [];
@@ -4504,8 +4504,8 @@
             if (hasFilters) {
                 var filterTags = Object.entries(activeFilters).map(function (e) { var label = e[0] === '__cat__' ? 'Categoría' : e[0]; return '<strong>' + esc(label) + '</strong>: ' + esc(e[1]); }).join(' + ');
                 html += '<div style="padding:8px 20px;background:rgba(234,88,12,0.1);border-bottom:1px solid rgba(234,88,12,0.2);font-size:12px;color:var(--text-light);display:flex;align-items:center;gap:8px;">' +
-                    '<i class="fas fa-filter" style="color:var(--primary);"></i> Filtro: ' + filterTags + ' → <strong>' + filtered.length + '</strong> productos' +
-                    ' <button onclick="clearAllFilters()" style="margin-left:auto;background:none;border:1px solid var(--primary);color:var(--primary);padding:3px 10px;border-radius:12px;cursor:pointer;font-size:11px;font-family:inherit;">✕ Limpiar filtros</button>' +
+                    '<i class="fas fa-filter" style="color:var(--primary);"></i> Filtro: ' + filterTags + ' â†’ <strong>' + filtered.length + '</strong> productos' +
+                    ' <button onclick="clearAllFilters()" style="margin-left:auto;background:none;border:1px solid var(--primary);color:var(--primary);padding:3px 10px;border-radius:12px;cursor:pointer;font-size:11px;font-family:inherit;">âœ• Limpiar filtros</button>' +
                     '</div>';
             }
 
@@ -5204,7 +5204,7 @@
             var body = document.getElementById('dashBody');
 
             if (!data) {
-                body.innerHTML = '<div class="dash-status idle"><i class="fas fa-pause-circle"></i> Sin proceso activo — Ejecuta <code>node scraper.js --resume</code></div>' +
+                body.innerHTML = '<div class="dash-status idle"><i class="fas fa-pause-circle"></i> Sin proceso activo â€” Ejecuta <code>node scraper.js --resume</code></div>' +
                     '<div class="dash-section" style="margin-top:20px">' +
                     '<div class="dash-section-title">Datos cargados en la app</div>' +
                     '<div class="dash-stats-grid">' +
@@ -5261,7 +5261,7 @@
             // === ALERTAS / PROBLEMAS ===
             if (data.problemas && data.problemas.length > 0) {
                 html += '<div class="dash-section">' +
-                    '<div class="dash-section-title" style="color:#ef4444">⚠️ Problemas detectados</div>';
+                    '<div class="dash-section-title" style="color:#ef4444">âš ï¸ Problemas detectados</div>';
                 data.problemas.forEach(function (p) {
                     html += '<div style="padding:8px 12px;margin-bottom:4px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;font-size:12px;color:#fca5a5">' + p + '</div>';
                 });
@@ -5281,7 +5281,7 @@
                     ? data.nuevos_en_lote + ' de ' + (data.total_lote || 0) + ' en este lote'
                     : '';
                 html += '<div class="dash-section">' +
-                    '<div class="dash-section-title">Lote [' + data.rango.start + ' → ' + data.rango.end + '] — ' + loteLabel + '</div>' +
+                    '<div class="dash-section-title">Lote [' + data.rango.start + ' â†’ ' + data.rango.end + '] â€” ' + loteLabel + '</div>' +
                     '<div class="progress-bar-container">' +
                     '<div class="progress-bar-fill" style="width:' + Math.max(pctLote, 2) + '%;background:linear-gradient(90deg, #3b82f6, #60a5fa)">' + pctLote.toFixed(1) + '%</div>' +
                     '</div></div>';
@@ -5296,7 +5296,7 @@
                 '<div class="dash-stat"><div class="dash-stat-value" style="color:' + (errores > 0 ? '#ef4444' : '#4ade80') + '">' + errores + '</div><div class="dash-stat-label">Errores</div></div>' +
                 '<div class="dash-stat"><div class="dash-stat-value">' + rate + '</div><div class="dash-stat-label">Prod/min</div></div>' +
                 '<div class="dash-stat"><div class="dash-stat-value">' + formatTime(tiempo) + '</div><div class="dash-stat-label">Transcurrido</div></div>' +
-                '<div class="dash-stat"><div class="dash-stat-value">' + (isRunning && etaMin > 0 ? '~' + formatTime(etaMin * 60) : '—') + '</div><div class="dash-stat-label">ETA</div></div>';
+                '<div class="dash-stat"><div class="dash-stat-value">' + (isRunning && etaMin > 0 ? '~' + formatTime(etaMin * 60) : 'â€”') + '</div><div class="dash-stat-label">ETA</div></div>';
 
             // Script-specific extra stats
             if (data.aliases_generados !== undefined) {
@@ -5317,7 +5317,7 @@
 
             html += '</div></div>';
 
-            // === STATS ESPECÍFICAS DE IMÁGENES ===
+            // === STATS ESPECÃFICAS DE IMÃGENES ===
             if (data.espacio_mb !== undefined) {
                 html += '<div class="dash-section">' +
                     '<div class="dash-section-title"><i class="fas fa-hdd" style="margin-right:4px"></i>Almacenamiento</div>' +
@@ -5359,7 +5359,7 @@
             if (data.reintentando && data.reintentando > 0) {
                 html += '<div class="dash-section">' +
                     '<div style="padding:10px 14px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;font-size:12px;color:#fbbf24">' +
-                    '<i class="fas fa-redo"></i> ' + data.reintentando + ' productos en cola de reintento — se procesarán al final del lote' +
+                    '<i class="fas fa-redo"></i> ' + data.reintentando + ' productos en cola de reintento â€” se procesarán al final del lote' +
                     '</div></div>';
             }
 
@@ -5371,13 +5371,13 @@
                 if (u.relacionados === undefined || u.relacionados === null) {
                     relBadge = '';
                 } else if (u.relacionados === -1) {
-                    relBadge = '<span style="background:#ef4444;color:#fff;padding:2px 8px;border-radius:12px;font-size:10px;margin-left:8px">❌ Error</span>';
+                    relBadge = '<span style="background:#ef4444;color:#fff;padding:2px 8px;border-radius:12px;font-size:10px;margin-left:8px">âŒ Error</span>';
                     statusIcon = '<i class="fas fa-times-circle" style="color:#ef4444;margin-right:6px"></i>';
                 } else if (u.relacionados === 0) {
                     relBadge = '<span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:10px;margin-left:8px">Sin relaciones</span>';
                     statusIcon = '<i class="fas fa-minus-circle" style="color:#94a3b8;margin-right:6px"></i>';
                 } else {
-                    relBadge = '<span style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:12px;font-size:10px;margin-left:8px">✅ ' + u.relacionados + ' relaciones</span>';
+                    relBadge = '<span style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:12px;font-size:10px;margin-left:8px">&#9989; ' + u.relacionados + ' relaciones</span>';
                     statusIcon = '<i class="fas fa-check-circle" style="color:#4ade80;margin-right:6px"></i>';
                 }
                 html += '<div class="dash-section">' +
@@ -5399,9 +5399,9 @@
                     '<div class="dash-section-title" style="color:#ef4444">Últimos errores (' + errores + ' total)</div>' +
                     '<div class="dash-log" style="border-color:rgba(239,68,68,0.3)">';
                 data.errores_detalle.forEach(function (e) {
-                    var icon = e.tipo === 'timeout' ? '⏱️' : (e.tipo === 'http' ? '🌐' : (e.tipo === 'conexion' ? '🔌' : '❓'));
+                    var icon = e.tipo === 'timeout' ? 'â ±ï¸ ' : (e.tipo === 'http' ? 'GLB' : (e.tipo === 'conexion' ? '🔌' : 'â “'));
                     html += '<div class="dash-log-entry" style="color:#fca5a5">' +
-                        icon + ' <strong>' + e.codigo + '</strong> ' + e.clave + ' — ' + e.error.substring(0, 60) +
+                        icon + ' <strong>' + e.codigo + '</strong> ' + e.clave + ' â€” ' + e.error.substring(0, 60) +
                         '</div>';
                 });
                 html += '</div></div>';
@@ -5500,7 +5500,40 @@
         let btSuggestions = [];
         let btSugActiveIdx = -1;
 
-        window.handleBtScannerInput = function(e) {
+        
+          // Interceptor de Pegado Masivo (Batch-Scan Paste)
+          document.addEventListener('DOMContentLoaded', () => {
+              const btInput = document.getElementById('btScannerInput');
+              if(btInput) {
+                  btInput.addEventListener('paste', function(e) {
+                      let paste = (e.clipboardData || window.clipboardData).getData('text');
+                      if (paste.includes('\n') || paste.includes(',') || paste.includes('\t')) {
+                          e.preventDefault();
+                          // Separar por saltos de línea, comas o tabulaciones
+                          let tokens = paste.split(/[\n,\t]+/).map(t => t.trim()).filter(Boolean);
+                          if(tokens.length > 1) {
+                              let added = 0;
+                              tokens.forEach(tok => {
+                                  const p = getProductByClaveOrCodigo(tok);
+                                  if(p) { addMatchedBt(p); added++; }
+                              });
+                              if(added > 0) {
+                                  window.playBeep('success');
+                                  showBtToast('&#9989; Lote: ' + added + ' agregados masivamente', '#10b981');
+                              } else {
+                                  window.playBeep('error');
+                                  showBtToast('Ã¢ÂÅ’ Ninguno encontrado en lote', '#ef4444');
+                              }
+                              this.value = '';
+                          } else {
+                              this.value = paste; // comportamiento normal
+                          }
+                      }
+                  });
+              }
+          });
+
+          window.handleBtScannerInput = function(e) {
             const input = e.target;
             const val = input.value.trim();
             const suggBox = document.getElementById('btSuggestions');
@@ -5523,8 +5556,48 @@
             }
 
             if (e.key === 'Enter') {
-                if(e.preventDefault) e.preventDefault();
-                if(btSugActiveIdx >= 0 && btSuggestions[btSugActiveIdx]) {
+                  if(e.preventDefault) e.preventDefault();
+                  
+                  // Extractor Automático por Módulo / Página
+                  const moduloMatch = val.match(/^(?:página|pagina|pag|p)\s*(\d+)$/i);
+                  if (moduloMatch) {
+                      const pageNum = parseInt(moduloMatch[1], 10);
+                      const modProducts = (window.productos || []).filter(p => p.pagina_catalogo === pageNum);
+                      if (modProducts.length > 0) {
+                          let added = 0;
+                          modProducts.forEach(p => { addMatchedBt(p); added++; });
+                          window.playBeep('success');
+                          showBtToast('&#9989; PÃ¡gina ' + pageNum + ' extraÃ­da: ' + added + ' gafetes', '#10b981');
+                          suggBox.classList.remove('show');
+                          input.value = '';
+                      } else {
+                          window.playBeep('error');
+                          showBtToast('Ã¢ÂÅ’ Vacío: NingÃºn artÃ­culo en PÃ¡gina ' + pageNum, '#ef4444');
+                      }
+                      return;
+                  }
+
+                  // Inyección Masiva por comas desde tipeo manual
+                  if (val.includes(',')) {
+                      let tokens = val.split(',').map(t => t.trim()).filter(Boolean);
+                      let added = 0;
+                      tokens.forEach(tok => {
+                          const p = getProductByClaveOrCodigo(tok);
+                          if(p) { addMatchedBt(p); added++; }
+                      });
+                      if(added > 0) {
+                          suggBox.classList.remove('show');
+                          input.value = '';
+                          window.playBeep('success');
+                          showBtToast('&#9989; Lote manual: ' + added + ' agregados', '#10b981');
+                      } else {
+                          window.playBeep('error');
+                          showBtToast('Ã¢ÂÅ’ Textos no encontrados', '#ef4444');
+                      }
+                      return;
+                  }
+                  
+                  if(btSugActiveIdx >= 0 && btSuggestions[btSugActiveIdx]) {
                     addMatchedBt(btSuggestions[btSugActiveIdx]);
                     suggBox.classList.remove('show');
                     return;
@@ -5538,7 +5611,7 @@
                     suggBox.classList.remove('show');
                 } else {
                     window.playBeep('error');
-                    showBtToast('❌ Código no encontrado', '#ef4444');
+                    showBtToast('âŒ Código no encontrado', '#ef4444');
                     input.value = '';
                     input.focus();
                 }
@@ -5559,7 +5632,7 @@
                         <div class="result-item bt-sug-item" id="btsug-${i}" onmousedown="addMatchedBtByIdx(${i})">
                             <div class="result-thumb"><img src="${img}" onerror="this.src='${flb}'"></div>
                             <div class="result-info">
-                                <div class="result-list-name" style="font-size:13px; font-weight:700; color:#333; max-width:100%; white-space:normal;">${esc(p.descripcion)}</div>
+                                <div class="result-list-name" style="font-size:13px; font-weight:700; color: #fff; max-width:100%; white-space:normal;">${esc(p.nombre)}</div>
                                 <div class="result-list-code">Código: <span style="font-weight:900;color:#dc2626;">${p.codigo}</span> | Clave: <b>${p.clave}</b></div>
                             </div>
                         </div>
@@ -5623,7 +5696,7 @@
                 btList.unshift({ p: p, qty: 1 });
             }
             window.playBeep('success');
-            showBtToast('✅ ' + esc(p.clave || p.codigo) + ' agregado', '#10b981');
+            showBtToast('&#9989; ' + esc(p.clave || p.codigo) + ' agregado', '#10b981');
             saveBtList();
             renderBtList();
             setTimeout(() => {
@@ -5678,7 +5751,7 @@
                 if(badge) {
                     let totalTags = btList.reduce((acc, it) => acc + (parseInt(it.qty) || 0), 0);
                     let totalPages = Math.ceil(totalTags / 12);
-                    badge.innerHTML = `📦 Total: <span style="color:#fff">${totalTags}</span> Gafetes &nbsp;|&nbsp; 🖨️ Hojas estimadas: <span style="color:#fff">${totalPages}</span>`;
+                    badge.innerHTML = `📦 Total: <span style="color:#fff">${totalTags}</span> Gafetes &nbsp;|&nbsp; 🖨️ Hojas estimadas: <span style="color:#fff">${totalPages}</span>`;
                 }
             }, 10);
             const list = document.getElementById('btList');
@@ -5695,7 +5768,7 @@
                 var flb = "https://www.truper.com/media/import/imagenes/" + item.p.clave + ".jpg";
 
                 list.insertAdjacentHTML('beforeend', `
-                    <div class="bt-item">
+                    <div class="bt-item" oncontextmenu="importRelatedBt(${i}, event)" title="Clic Derecho para Importar Relacionados">
                         <div class="bt-badge-qty">x${item.qty}</div>
                         <div class="bt-item-header">
                             <img src="${img}" onerror="this.src='${flb}'">
@@ -5704,12 +5777,14 @@
                                 <div class="bt-item-code">Cód: <strong>${item.p.codigo}</strong> | Clv: <strong>${item.p.clave}</strong></div>
                             </div>
                         </div>
-                        <div class="bt-item-hover-overlay">
+                        <div class="bt-item-hover-overlay" oncontextmenu="importRelatedBt(${i}, event)">
                             <div class="qty-controls">
                                 <button class="qty-btn" onclick="changeBtQtyBtn(${i}, -1)"><i class="fas fa-minus"></i></button>
                                 <input type="number" class="bt-item-qty" value="${item.qty}" min="1" onchange="changeBtQty(${i}, this.value)">
                                 <button class="qty-btn" onclick="changeBtQtyBtn(${i}, 1)"><i class="fas fa-plus"></i></button>
                             </div>
+                            
+                            <button class="bt-item-remove" style="background:var(--primary); color: #fff !important; margin-right: 8px;" onclick="importRelatedBt(${i}, event)" title="Importar Hermandad (Relacionados)"><i class="fas fa-sitemap"></i></button>
                             <button class="bt-item-remove" onclick="removeBt(${i})" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
                         </div>
                     </div>
@@ -5717,7 +5792,78 @@
             });
         }
 
-        window.printBackTags = function() {
+        
+          // Extraer Productos Relacionados vía Click Propio
+          
+          // Extractor de Productos Relacionados vía Modal Flujo
+          let pendingRelImports = [];
+          
+          window.closeRelatedModal = function() {
+              document.getElementById('btRelatedModal').style.display = 'none';
+          };
+          
+          window.commitRelatedImport = function() {
+              if(!pendingRelImports || pendingRelImports.length === 0) return;
+              let added = 0;
+              const scannerInput = document.getElementById('btScannerInput');
+              
+              pendingRelImports.forEach(rel => {
+                  const pm = getProductByClaveOrCodigo(rel.codigo);
+                  if (pm) { addMatchedBt(pm); added++; }
+              });
+              
+              window.closeRelatedModal();
+              
+              if(added > 0) {
+                  window.playBeep('success');
+                  showBtToast('✅ ¡Importación masiva exitosa! (' + added + ')', '#10b981');
+              }
+              pendingRelImports = [];
+          };
+
+          window.importRelatedBt = function(index, e) {
+              window.playBeep('success'); // Feedback audial instantaneo
+              
+              if (e) { e.preventDefault(); e.stopPropagation(); }
+              const item = btList[index];
+              if(!item || !item.p) return;
+              
+              // 1. Mostrar modal con estado de carga
+              const modal = document.getElementById('btRelatedModal');
+              const loadUI = document.getElementById('btRelLoading');
+              const confirmUI = document.getElementById('btRelConfirm');
+              
+              modal.style.display = 'flex';
+              loadUI.style.display = 'block';
+              confirmUI.style.display = 'none';
+              
+              // Simular un poco de busqueda (Delay UX para que vean que trabaja)
+              setTimeout(function() {
+                  // Bypass Cache 
+                  const freshP = getProductByClaveOrCodigo(item.p.codigo) || item.p;
+                  
+                  // Agresivo: Buscar tanto en .productos_relacionados como local
+                  const rels = freshP.productos_relacionados || item.p.productos_relacionados || freshP.relacionados || [];
+                  
+                  loadUI.style.display = 'none';
+                  
+                  if(rels.length === 0) {
+                      window.playBeep('error');
+                      modal.style.display = 'none';
+                      showBtToast('❌ Sin registros hermanos en BD', '#ef4444');
+                      return;
+                  }
+                  
+                  // Tiene hijos! Preparamos el Modal UI de confirmacion
+                  document.getElementById('btRelQty').textContent = rels.length;
+                  pendingRelImports = rels; // Guardar estado
+                  confirmUI.style.display = 'block';
+                  window.playBeep('success');
+                  
+              }, 600); // 600ms de spinner animado
+          };
+
+          window.printBackTags = function() {
             if(!btList.length) {
                 alert("Agrega productos primero.");
                 return;
@@ -5813,7 +5959,7 @@
         init();
     </script>
     <footer class="app-footer">
-        <div id="catalog-version-badge" class="footer-badge">🏷️ Versión: --</div>
+        <div id="catalog-version-badge" class="footer-badge">&#127991;&#65039; Versión: --</div>
         <div class="header-stats" id="headerStats" style="margin: 0;"></div>
         <div style="display: flex; gap: 12px; align-items: center;">
             <button class="dashboard-btn" onclick="toggleBackTagsView()" title="Generar Back Tags" style="background:#dc2626; color:white;">
@@ -5826,7 +5972,7 @@
     </footer>
     
     <script>
-        // ======= INSTALACIÓN PWA EXPLÍCITA =======
+        // ======= INSTALACIÓN PWA EXPLÃCITA =======
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
@@ -5854,13 +6000,457 @@
             document.getElementById('pwa-install-container').style.display = 'none';
         }
 
-        // Registrar Web App (PWA ServiceWorker base)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('sw.js').catch(function(err) {});
             });
         }
     </script>
+
+    <!-- ============================================== -->
+    <!-- MOTOR MULTI-PLANTILLAS BACKTAG (V2)            -->
+    <!-- ============================================== -->
+    <style>
+        .bktpl-modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10,15,25,0.9); backdrop-filter: blur(8px);
+            z-index: 10000; display: none; align-items: center; justify-content: center;
+        }
+        .bktpl-modal {
+            background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1);
+            width: 900px; max-width: 95vw; height: 600px; max-height: 90vh;
+            border-radius: 16px; display: flex; overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+        .bktpl-sidebar {
+            width: 350px; background: rgba(0,0,0,0.2); border-right: 1px solid rgba(255,255,255,0.05);
+            display: flex; flex-direction: column;
+        }
+        .bktpl-header {
+            padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .bktpl-header h3 { margin: 0; font-size: 18px; color: #fff; display: flex; align-items: center; gap: 8px;}
+        .bktpl-list {
+            flex: 1; overflow-y: auto; padding: 10px;
+        }
+        .bktpl-item {
+            background: rgba(255,255,255,0.03); border: 1px solid transparent;
+            border-radius: 12px; padding: 15px; margin-bottom: 10px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .bktpl-item:hover { background: rgba(255,255,255,0.06); }
+        .bktpl-item.active {
+            background: rgba(16,185,129,0.1); border-color: #10b981;
+        }
+        .bktpl-item-title { font-weight: 700; color: #fff; font-size: 15px; }
+        .bktpl-item-desc { font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.4;}
+        
+        .bktpl-preview-area {
+            flex: 1; display: flex; flex-direction: column; background: #fff;
+            position: relative;
+        }
+        .bktpl-preview-top {
+            padding: 15px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;
+            display: flex; justify-content: space-between; align-items: center; color: #fff;
+        }
+        .bktpl-preview-canvas {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            overflow: auto; padding: 40px; background: #e2e8f0;
+        }
+        .bktpl-footer {
+            padding: 20px; background: #fff; border-top: 1px solid #e2e8f0;
+            display: flex; justify-content: flex-end; gap: 12px;
+        }
+        .bktpl-btn-cancel {
+            padding: 10px 20px; border-radius: 8px; border: none; font-weight: 600;
+            cursor: pointer; background: #f1f5f9; color: #64748b; font-size: 14px;
+        }
+        .bktpl-btn-cancel:hover { background: #e2e8f0; }
+        .bktpl-btn-print {
+            padding: 10px 24px; border-radius: 8px; border: none; font-weight: 800;
+            cursor: pointer; background: #10b981; color: #fff; font-size: 15px;
+            box-shadow: 0 4px 15px rgba(16,185,129,0.3); display: flex; align-items: center; gap: 8px;
+        }
+        .bktpl-btn-print:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16,185,129,0.5); }
+    </style>
+
+    <div class="bktpl-modal-overlay" id="bktplModalWrap">
+        <div class="bktpl-modal">
+            <div class="bktpl-sidebar">
+                <div class="bktpl-header">
+                    <h3><i class="fas fa-layer-group" style="color:#10b981;"></i> Plantillas</h3>
+                </div>
+                <div class="bktpl-list" id="bktplList">
+                    <!-- Templates gen -->
+                </div>
+            </div>
+            <div class="bktpl-preview-area">
+                <div class="bktpl-preview-top">
+                    <strong style="color:#0f172a;"><i class="fas fa-eye"></i> Precompilación</strong>
+                    <span id="bktplPreviewDims" style="font-size:12px; font-weight:600; font-family:monospace; background:#cbd5e1; padding:4px 8px; border-radius:4px; color:#1e293b;"></span>
+                </div>
+                <div class="bktpl-preview-canvas" id="bktplCanvasWrapper">
+                    <div id="bktplLiveCanvas"></div>
+                </div>
+                <div class="bktpl-footer">
+                    <button class="bktpl-btn-cancel" onclick="window.bkGallery.closeModal()">Cerrar Menú</button>
+                    <button class="bktpl-btn-print" id="bktplPrintBtn" onclick="window.bkGallery.triggerPrint()"><i class="fas fa-print"></i> Confirmar Impresión</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.bkGallery = {
+            activeTemplateId: null,
+            templates: [
+                {
+                    id: 'std-5x8',
+                    name: 'BackTag 5 x 8 cm',
+                    description: 'Formato vertical clásico. Texto adaptativo y código de barra inferior. Ideal para exhibidores estándar.',
+                    width: '5cm',
+                    height: '8cm',
+                    css: `
+                        .bktag {
+                            width: 5cm; height: 8cm; border: 2px solid #000; box-sizing: border-box;
+                            position: relative; background: #fff; overflow: hidden;
+                            font-family: 'Inter', sans-serif; color: #000;
+                        }
+                        .bktag-redhead {
+                            background: #ff0000; height: 1.25cm; width: 100%; padding: 4px 6px;
+                            box-sizing: border-box; display: flex; align-items: center; justify-content: center;
+                        }
+                        .bktag-redhead span {
+                            color: #fff; text-align: center; font-weight: 800; font-size: 13.5px;
+                            line-height: 1.15; display: -webkit-box; -webkit-line-clamp: 2;
+                            -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;
+                        }
+                        .bktag-clave {
+                            position: absolute; top: 1.25cm; right: 4px; color: #ff0000;
+                            font-weight: 900; font-size: 15px; z-index: 10;
+                            text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+                        }
+                        .bktag-img {
+                            position: absolute; top: 1.25cm; left: 0; right: 0; height: 5.1cm; width: 100%;
+                            display: flex; align-items: center; justify-content: center;
+                        }
+                        .bktag-img img { max-width: 90%; max-height: 90%; object-fit: contain; }
+                        .bktag-codigo {
+                            position: absolute; bottom: 1.3cm; left: 4px; border: 1.5px solid #000;
+                            border-radius: 4px; background: #fff; padding: 2px 5px;
+                            font-size: 13px; font-weight: 800; z-index: 10; color: #000;
+                        }
+                        .bktag-codigo span { color: #ff0000; }
+                        .bktag-barcode {
+                              position: absolute; bottom: 2px; left: 0; width: 3.2cm;
+                              display: flex; justify-content: flex-start;
+                          }
+                          .bktag-barcode svg { width: 100% !important; height: auto !important; }
+                        .bktag-tigre {
+                              position: absolute; bottom: 0px; right: -2px; width: 2.3cm; height: auto !important; object-fit: contain !important;
+                              opacity: 1 !important; z-index: 11;
+                          }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let tigreSrc = 'images/tigre_esquina_inferiror_derecha.png';
+                        let flb = "https://www.truper.com/media/import/imagenes/" + item.p.clave + ".jpg";
+                        let nombre = (item.p.nombre || '').toUpperCase();
+                        let marca = (item.p.marca || 'TRUPER').toUpperCase();      
+                        let headerText = nombre;
+                        if(headerText.indexOf(marca) === -1) headerText += ', ' + marca;
+
+                        return `
+                        <div class="bktag">
+                            <div class="bktag-redhead"><span>${esc(headerText)}</span></div>
+                            <div class="bktag-clave">${item.p.clave}</div>
+                            <div class="bktag-img"><img src="${imgSrc}" style="transform:scale(1.05);" onerror="this.src='${flb}'"></div>
+                            <div class="bktag-codigo">Código: <span>${item.p.codigo}</span></div>
+                            <div class="bktag-barcode"><svg id="${idBarcode}"></svg></div>
+                            <img class="bktag-tigre" src="${tigreSrc}" onerror="this.src='imagenes/tigre3.png'">
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'pija-10x4',
+                    name: 'Pija Cuerda Fina (10x4 cm)',
+                    description: 'Formato apaisado, incluye extracción automática de grosor y medida y cruz Phillips.',
+                    width: '10cm',
+                    height: '4cm',
+                    css: `
+                        .pija-bktag {
+                            width: 10cm; height: 4cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000;
+                            page-break-inside: avoid;
+                            break-inside: avoid;
+                        }
+                        /* Franja Superior Negra (10x1) */
+                        .pija-top { 
+                            position: absolute; top:0; left:0; width: 10cm; height: 1cm; background: #000; z-index: 10; 
+                        }
+                        /* Zona Media Verde (7x2) */
+                        .pija-mid {
+                            position: absolute; top: 1cm; left: 0; width: 7cm; height: 2cm; background: #13a650;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .pija-screw-box {
+                            width: 1cm; height: 2cm; display: flex; align-items: center; justify-content: flex-end;
+                        }
+                        .pija-screw-box img { max-height: 1.8cm; max-width: 100%; object-fit: contain; }
+                        
+                        .pija-text-col {
+                            width: 6cm; height: 2cm; display: flex; flex-direction: column;
+                        }
+                        /* Caja Subtitulo: 6x0.5 */
+                        .pija-subtitle-box {
+                            width: 6cm; height: 0.5cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 12px; font-weight: 800; color: #fff; letter-spacing: 0.5px;
+                        }
+                        /* Caja Titulo: 6x1.5 */
+                        .pija-title-box {
+                            width: 6cm; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1.5px;
+                        }
+                        .pija-title-box.normal { font-size: 48px; }
+                        .pija-title-box.small { font-size: 34px; letter-spacing: -1px; }
+
+                        /* Zona Inferior (7x1) */
+                        .pija-bot {
+                            position: absolute; top: 3cm; left: 0; width: 7cm; height: 1cm; display: flex; z-index: 5;
+                        }
+                        .pija-bot-code {
+                            width: 3.5cm; background: #1e5a26; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 36px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .pija-bot-br {
+                            width: 3.5cm; background: #fff; height: 1cm; display: flex; align-items: flex-end; justify-content: center;
+                            overflow: hidden; padding-bottom: 2px; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+
+                        /* Zona Imagen Derecha (3x3) Blanca */
+                        .pija-img-area {
+                            position: absolute; top: 1cm; right: 0; width: 3cm; height: 3cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                        }
+                        .pija-phillips { position: absolute; right: 0.1cm; top: 0.1cm; width: 0.6cm; height: 0.6cm; z-index:10; }
+                        .pija-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let grosor = "#?";
+                        let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
+                        if(matchG) grosor = "#" + matchG[1];
+                        let largo = '??"';
+                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
+                        
+                        let cruzSvg = '<svg viewBox="0 0 100 100" class="pija-phillips"><circle cx="50" cy="50" r="45" fill="#000"/><path d="M50 20 L50 80 M20 50 L80 50" stroke="#fff" stroke-width="20" stroke-linecap="square"/></svg>';
+
+                        let fullText = grosor + " x " + largo;
+                        let sizeClass = fullText.length > 10 ? 'small' : 'normal';
+
+                        return `
+                        <div class="pija-bktag">
+                            <div class="pija-top"></div>
+                            
+                            <div class="pija-mid">
+                                <div class="pija-screw-box">
+                                    <img src="images/pija_blanca.png" onerror="this.style.display='none'">
+                                </div>
+                                <div class="pija-text-col">
+                                    <div class="pija-subtitle-box">CUERDA FINA</div>
+                                    <div class="pija-title-box ${sizeClass}">${fullText}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="pija-bot">
+                                <div class="pija-bot-code">${item.p.codigo}</div>
+                                <div class="pija-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            
+                            <div class="pija-img-area">
+                                ${cruzSvg}
+                                <img src="${imgSrc}" onerror="this.style.display='none'">
+                            </div>
+                        </div>`;
+                    }
+                }
+            ],
+            
+            initUI() {
+                const listEl = document.getElementById('bktplList');
+                listEl.innerHTML = '';
+                this.templates.forEach((t, index) => {
+                    let div = document.createElement('div');
+                    div.className = 'bktpl-item' + (index === 0 ? ' active' : '');
+                    div.innerHTML = `<div class="bktpl-item-title">${t.name}</div>
+                                     <div class="bktpl-item-desc">${t.description}</div>`;
+                    div.onclick = () => {
+                        document.querySelectorAll('.bktpl-item').forEach(e => e.classList.remove('active'));
+                        div.classList.add('active');
+                        this.selectTemplate(t.id);
+                    };
+                    listEl.appendChild(div);
+                });
+                if(this.templates.length > 0) this.selectTemplate(this.templates[0].id);
+            },
+
+            selectTemplate(id) {
+                this.activeTemplateId = id;
+                const tpl = this.templates.find(t => t.id === id);
+                if(!tpl) return;
+                
+                document.getElementById('bktplPreviewDims').innerText = `Tamaño Físico: ${tpl.width} x ${tpl.height}`;
+                
+                if(typeof btList !== 'undefined' && btList && btList.length > 0) {
+                    const sample = btList[0];
+                    let img = sample.p.imagenes && sample.p.imagenes.length ? sample.p.imagenes[0] : '';
+                    if(!img) img = sample.p.imagenes_local && sample.p.imagenes_local.length ? sample.p.imagenes_local[0] : '';
+                    let baseSrc = img;
+                    let imgSrc = baseSrc;
+                    if(baseSrc && baseSrc.indexOf('http') === 0) {
+                        imgSrc = 'https://wsrv.nl/?url=' + encodeURIComponent(baseSrc) + '&w=400&trim=12';
+                    }
+                    let ean = sample.p.ean ? sample.p.ean : ('10' + sample.p.codigo);
+                    let idBarcode = 'bktpl-preview-barcode';
+                    
+                    const canvas = document.getElementById('bktplLiveCanvas');
+                    canvas.innerHTML = '<style>' + tpl.css + '</style>' + tpl.render(sample, ean, imgSrc, idBarcode);
+                    
+                    const bk = canvas.querySelector('.bktag'); if(bk) bk.style.boxShadow = "0 10px 25px rgba(0,0,0,0.25)";
+                    if(bk) bk.style.margin = "0 auto";
+                    
+                    setTimeout(() => {
+                        if(window.JsBarcode) {
+                            JsBarcode("#"+idBarcode, ean, {
+                                format: "CODE128", displayValue: true, fontSize: 13, fontOptions: "bold",
+                                textMargin: 1, textPosition: "bottom", textAlign: "center", margin: 0, height: 26, width: 1.5
+                            });
+                        }
+                    }, 50);
+                } else {
+                    document.getElementById('bktplLiveCanvas').innerHTML = '<div style="color:#64748b; text-align:center; padding:20px;">Escanea al menos un producto en tu mesa de trabajo para ver la previsualización.</div>';
+                }
+            },
+
+            openModal() {
+                if(typeof btList !== 'undefined' && !btList.length) {
+                    alert("Por favor, agrega productos primero a tu listado."); return;
+                }
+                this.initUI();
+                document.getElementById('bktplModalWrap').style.display = 'flex';
+            },
+            
+            closeModal() {
+                document.getElementById('bktplModalWrap').style.display = 'none';
+            },
+
+            triggerPrint() {
+                const tpl = this.templates.find(t => t.id === this.activeTemplateId);
+                if(!tpl || typeof btList === 'undefined') return;
+                
+                const btn = document.getElementById('bktplPrintBtn');
+                const oldText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando...';
+                
+                const printArea = document.getElementById('btPrintArea');
+                
+                    // Calculate columns perfectly based on 20cm usable A4 width
+                    
+                      // Override CSS Grid safely with Flexbox Wrapper to avoid Chrome multi-page grid stretching 
+                      printArea.style.setProperty('display', 'flex', 'important');
+                      printArea.style.setProperty('flex-wrap', 'wrap', 'important');
+                      printArea.style.setProperty('justify-content', 'center', 'important');
+                      printArea.style.setProperty('gap', '2mm', 'important');
+                      
+                      printArea.innerHTML = '<style>@media print { .bt-print-container > div { flex: 0 0 ' + tpl.width + ' !important; min-width: 0 !important; max-width: ' + tpl.width + ' !important; overflow: hidden !important; } .bt-print-container svg { max-width: 100% !important; height: auto !important; } } ' + tpl.css + '</style>';
+
+                
+                btList.forEach(item => {
+                    for(let i=0; i<item.qty; i++) {
+                        let img = item.p.imagenes && item.p.imagenes.length ? item.p.imagenes[0] : '';
+                        if(!img) img = item.p.imagenes_local && item.p.imagenes_local.length ? item.p.imagenes_local[0] : '';
+                        
+                        let baseSrc = img;
+                        let imgSrc = baseSrc;
+                        if(baseSrc && baseSrc.indexOf('http') === 0) {
+                            imgSrc = 'https://wsrv.nl/?url=' + encodeURIComponent(baseSrc) + '&w=400&trim=12';
+                        }
+                        
+                        let ean = item.p.ean ? item.p.ean : ('10' + item.p.codigo);
+                        let idBarcode = 'barcode-' + Math.random().toString(36).substr(2, 9);
+                        
+                        printArea.insertAdjacentHTML('beforeend', tpl.render(item, ean, imgSrc, idBarcode));
+                        
+                        setTimeout(() => {
+                            if(window.JsBarcode) {
+                                JsBarcode("#"+idBarcode, ean, {
+                                    format: "CODE128", displayValue: true, fontSize: 13, fontOptions: "bold",
+                                    textMargin: 1, textPosition: "bottom", textAlign: "center", margin: 0, height: 26, width: 1.5
+                                });
+                            }
+                        }, 50);
+                    }
+                });
+
+                setTimeout(() => {
+                    btn.innerHTML = oldText;
+                    this.closeModal();
+                    window.print();
+
+                    setTimeout(() => {
+                        if (window.Swal) {
+                            Swal.fire({
+                                title: '¿Impresión procesada?',
+                                text: "¿Deseas vaciar la mesa de trabajo para escanear nuevos productos?",
+                                icon: 'question', showCancelButton: true, confirmButtonColor: '#10b981', cancelButtonColor: '#475569',
+                                confirmButtonText: 'Sí, vaciar mesa', cancelButtonText: 'No, conservarlos'
+                            }).then((result) => {
+                                if (result.isConfirmed && typeof window.clearAllBt === 'function') window.clearAllBt();
+                            });
+                        }
+                    }, 1000);
+                }, 3000);
+            }
+        };
+
+        // Sobrescribir llamada legacy
+        window.printBackTags = function() {
+            window.bkGallery.openModal();
+        };
+    </script>
+
+  <!-- MODAL PARA IMPORTAR PRODUCTOS RELACIONADOS -->
+  <div id="btRelatedModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+      <div style="background:var(--surface); border: 1px solid var(--border); border-radius: 12px; width:400px; max-width:90%; padding:24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align:center;">
+          
+          <!-- Estado de Carga -->
+          <div id="btRelLoading" style="display:none;">
+              <i class="fas fa-circle-notch fa-spin" style="font-size: 40px; color: var(--primary); margin-bottom: 16px;"></i>
+              <h3 style="color:#fff; margin:0; font-size:18px;">Buscando en Base de Datos...</h3>
+              <p style="color:var(--text-muted); font-size:13px; margin-top:8px;">Rastreando árbol genealógico del producto.</p>
+          </div>
+
+          <!-- Estado de Pregunta/Confirmación -->
+          <div id="btRelConfirm" style="display:none;">
+              <div style="width: 50px; height: 50px; background: rgba(16,185,129,0.15); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 16px auto;">
+                  <i class="fas fa-sitemap" style="color: #10b981; font-size: 24px;"></i>
+              </div>
+              <h3 style="color:#fff; margin:0; font-size:20px; line-height:1.2;">Artículos Relacionados<br>Encontrados</h3>
+              <p style="color:var(--text-muted); font-size:14px; margin-top:12px;">Se localizaron <strong id="btRelQty" style="color:#fff;">x</strong> productos vinculados a este artículo.</p>
+              <h4 style="color:#10b981; font-size: 15px; margin: 16px 0;">¿Deseas agregarlos a la lista?</h4>
+              
+              <div style="display:flex; gap:12px; margin-top:20px;">
+                  <button id="btRelCancelBtn" style="flex:1; background:var(--bg); border:1px solid var(--border); color:#fff; padding:12px; border-radius:8px; font-weight:700; cursor:pointer;" onclick="closeRelatedModal()">Cancelar</button>
+                  <button id="btRelAcceptBtn" style="flex:1; background:var(--primary); border:none; color:#fff; padding:12px; border-radius:8px; font-weight:700; cursor:pointer;" onclick="commitRelatedImport()">SÍ, Agregar Todos</button>
+              </div>
+          </div>
+          
+      </div>
+  </div>
+
 </body>
 
 </html>

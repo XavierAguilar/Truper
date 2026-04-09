@@ -1,0 +1,21 @@
+const fs = require('fs');
+let txt = fs.readFileSync('index.html', 'utf8');
+txt = txt.replace(/Ã¡/g, 'á');
+txt = txt.replace(/Ã©/g, 'é');
+txt = txt.replace(/Ã­/g, 'í');
+txt = txt.replace(/Ã³/g, 'ó');
+txt = txt.replace(/Ãº/g, 'ú');
+txt = txt.replace(/Ã±/g, 'ñ');
+txt = txt.replace(/Ã /g, 'Á');
+txt = txt.replace(/Ã‰/g, 'É');
+txt = txt.replace(/Ã /g, 'Í');
+txt = txt.replace(/Ã“/g, 'Ó');
+txt = txt.replace(/Ãš/g, 'Ú');
+txt = txt.replace(/Ã‘/g, 'Ñ');
+txt = txt.replace(/Â¿/g, '¿');
+txt = txt.replace(/ðŸ·ï¸/g, '🏷️');
+txt = txt.replace(/ðŸ“¦/g, '📦');
+txt = txt.replace(/ðŸ–¨ï¸/g, '🖨️');
+txt = txt.replace(/Â/g, ''); // cleanup any lingering Â associated with non-breaking spaces or similar
+fs.writeFileSync('index.html', txt, 'utf8');
+console.log("Limpieza de UTF-8 finalizada");
