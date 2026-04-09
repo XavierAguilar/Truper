@@ -6160,6 +6160,21 @@
         .bktpl-item-title { font-weight: 700; color: #fff; font-size: 15px; }
         .bktpl-item-desc { font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.4;}
         
+        
+        .bktpl-size-row {
+            display: flex; gap: 6px; margin-top: 8px;
+        }
+        .bktpl-size-btn {
+            flex: 1; padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05); color: var(--text-muted); font-size: 11px;
+            font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center;
+            font-family: monospace;
+        }
+        .bktpl-size-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .bktpl-size-btn.bktpl-size-active {
+            background: rgba(16,185,129,0.2); border-color: #10b981; color: #10b981;
+        }
+
         .bktpl-preview-area {
             flex: 1; display: flex; flex-direction: column; background: #fff;
             position: relative;
@@ -6221,6 +6236,7 @@
             templates: [
                 {
                     id: 'std-5x8',
+                    group: 'backtag',
                     name: 'BackTag 5 x 8 cm',
                     description: 'Formato vertical clásico. Texto adaptativo y código de barra inferior. Ideal para exhibidores estándar.',
                     width: '5cm',
@@ -6287,6 +6303,7 @@
                 },
                 {
                     id: 'pija-10x4',
+                    group: 'pija-fina',
                     name: 'Pija Cuerda Fina (10x4 cm)',
                     description: 'Formato apaisado, incluye extracción automática de grosor y medida y cruz Phillips.',
                     width: '10cm',
@@ -6392,6 +6409,7 @@
                 },
                 {
                     id: 'pija-abierta-10x4',
+                    group: 'pija-abierta',
                     name: 'Pija Cuerda Abierta (10x4 cm)',
                     description: 'Formato apaisado, incluye extracción automática de grosor y medida y cruz Phillips. Cuerda abierta.',
                     width: '10cm',
@@ -6497,6 +6515,7 @@
                 },
                 {
                     id: 'pija-fina-12x6',
+                    group: 'pija-fina',
                     name: 'Pija Cuerda Fina (12x6 cm)',
                     description: 'Formato apaisado GRANDE. Extracción automática de grosor y medida y cruz Phillips. Escala 120%.',
                     width: '12cm',
@@ -6596,6 +6615,7 @@
                 },
                 {
                     id: 'pija-abierta-12x6',
+                    group: 'pija-abierta',
                     name: 'Pija Cuerda Abierta (12x6 cm)',
                     description: 'Formato apaisado GRANDE. Extracción automática de grosor y medida y cruz Phillips. Cuerda abierta. Escala 120%.',
                     width: '12cm',
@@ -6698,19 +6718,80 @@
             initUI() {
                 const listEl = document.getElementById('bktplList');
                 listEl.innerHTML = '';
-                this.templates.forEach((t, index) => {
+                
+                // Agrupar plantillas por familia
+                const groups = [];
+                const groupMap = {};
+                this.templates.forEach(t => {
+                    const g = t.group || t.id;
+                    if(!groupMap[g]) {
+                        groupMap[g] = { key: g, variants: [] };
+                        groups.push(groupMap[g]);
+                    }
+                    groupMap[g].variants.push(t);
+                });
+                
+                let isFirst = true;
+                groups.forEach(group => {
+                    const first = group.variants[0];
+                    const hasMultiple = group.variants.length > 1;
+                    
+                    // Nombre base sin el tamaño
+                    let baseName = first.name.replace(/\s*\(.*?\)\s*/g, '').trim();
+                    if(!hasMultiple) baseName = first.name;
+                    
                     let div = document.createElement('div');
-                    div.className = 'bktpl-item' + (index === 0 ? ' active' : '');
-                    div.innerHTML = `<div class="bktpl-item-title">${t.name}</div>
-                                     <div class="bktpl-item-desc">${t.description}</div>`;
+                    div.className = 'bktpl-item' + (isFirst ? ' active' : '');
+                    div.dataset.group = group.key;
+                    
+                    let sizeBtns = '';
+                    if(hasMultiple) {
+                        sizeBtns = '<div class="bktpl-size-row">';
+                        group.variants.forEach((v, vi) => {
+                            const sizeLabel = v.width + ' x ' + v.height;
+                            const activeClass = vi === 0 ? ' bktpl-size-active' : '';
+                            sizeBtns += '<button class="bktpl-size-btn' + activeClass + '" data-tpl-id="' + v.id + '" onclick="event.stopPropagation(); window.bkGallery.selectVariant(this, \'' + v.id + '\')">' + sizeLabel + '</button>';
+                        });
+                        sizeBtns += '</div>';
+                    }
+                    
+                    div.innerHTML = '<div class="bktpl-item-title">' + baseName + '</div>' +
+                                    '<div class="bktpl-item-desc">' + first.description + '</div>' +
+                                    sizeBtns;
+                    
                     div.onclick = () => {
                         document.querySelectorAll('.bktpl-item').forEach(e => e.classList.remove('active'));
                         div.classList.add('active');
-                        this.selectTemplate(t.id);
+                        // Seleccionar la variante activa dentro de este grupo
+                        const activeBtn = div.querySelector('.bktpl-size-active');
+                        const tplId = activeBtn ? activeBtn.dataset.tplId : first.id;
+                        this.selectTemplate(tplId);
                     };
                     listEl.appendChild(div);
+                    
+                    if(isFirst) this.selectTemplate(first.id);
+                    isFirst = false;
                 });
-                if(this.templates.length > 0) this.selectTemplate(this.templates[0].id);
+            },
+            
+            selectVariant(btn, tplId) {
+                // Activar el grupo padre
+                const groupItem = btn.closest('.bktpl-item');
+                document.querySelectorAll('.bktpl-item').forEach(e => e.classList.remove('active'));
+                groupItem.classList.add('active');
+                
+                // Activar el botón de tamaño
+                groupItem.querySelectorAll('.bktpl-size-btn').forEach(b => b.classList.remove('bktpl-size-active'));
+                btn.classList.add('bktpl-size-active');
+                
+                // Actualizar descripción
+                const tpl = this.templates.find(t => t.id === tplId);
+                if(tpl) {
+                    const descEl = groupItem.querySelector('.bktpl-item-desc');
+                    if(descEl) descEl.textContent = tpl.description;
+                }
+                
+                this.selectTemplate(tplId);
             },
 
             selectTemplate(id) {
