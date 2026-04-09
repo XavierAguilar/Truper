@@ -5885,7 +5885,7 @@
                     let ean = item.p.ean ? item.p.ean : ('10' + item.p.codigo);
                     let idBarcode = 'barcode-' + Math.random().toString(36).substr(2, 9);
                     
-                    let tigreSrc = 'images/tigre_esquina_inferiror_derecha.png?v=' + Date.now();
+                    let tigreSrc = 'images/tigre_final.png?v=' + Date.now();
                     
                     let baseSrc = img;
                     let imgSrc = baseSrc;
@@ -6154,7 +6154,7 @@
                           }
                     `,
                     render: function(item, ean, imgSrc, idBarcode) {
-                        let tigreSrc = 'images/tigre_esquina_inferiror_derecha.png?v=' + Date.now();
+                        let tigreSrc = 'images/tigre_final.png?v=' + Date.now();
                         let flb = "https://www.truper.com/media/import/imagenes/" + item.p.clave + ".jpg";
                         let nombre = (item.p.nombre || '').toUpperCase();
                         let marca = (item.p.marca || 'TRUPER').toUpperCase();      
@@ -6257,7 +6257,7 @@
                             
                             <div class="pija-mid">
                                 <div class="pija-screw-box">
-                                    <img src="images/pija_blanca.png?v=' + Date.now() + '" onerror="this.style.display='none'">
+                                    <img src="images/pija_blanca.png?v=${Date.now()}" onerror="this.style.display='none'">
                                 </div>
                                 <div class="pija-text-col">
                                     <div class="pija-subtitle-box">CUERDA FINA</div>
