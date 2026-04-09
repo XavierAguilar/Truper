@@ -6912,6 +6912,206 @@
                             </div>
                         </div>`;
                     }
+                },
+                {
+                    id: 'lamina-hex-10x4',
+                    group: 'lamina-hex',
+                    name: 'Lámina Cab Hexagonal (10x4 cm)',
+                    description: 'Formato apaisado, extracción automática de grosor y medida. Cabeza hexagonal.',
+                    width: '10cm',
+                    height: '4cm',
+                    css: `
+                        .pija-hex-bktag {
+                            width: 10cm; height: 4cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000;
+                            page-break-inside: avoid;
+                            break-inside: avoid;
+                        }
+                        .pija-hex-top { 
+                            position: absolute; top:0; left:0; width: 10cm; height: 1cm; background: #000; z-index: 10; 
+                        }
+                        .pija-hex-mid {
+                            position: absolute; top: 1cm; left: 0; width: 7cm; height: 2cm; background: #1890C4;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .pija-hex-screw-box {
+                            width: 1cm; height: 2cm; display: flex; align-items: center; justify-content: flex-end;
+                        }
+                        .pija-hex-screw-box img { max-height: 1.8cm; max-width: 100%; object-fit: contain; }
+                        
+                        .pija-hex-text-col {
+                            width: 6cm; height: 2cm; display: flex; flex-direction: column;
+                        }
+                        .pija-hex-subtitle-box {
+                            width: 6cm; height: 0.5cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 10px; font-weight: 800; color: #fff; letter-spacing: 0.3px;
+                        }
+                        .pija-hex-title-box {
+                            width: 6cm; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1.5px;
+                        }
+                        .pija-hex-title-box.normal { font-size: 48px; }
+                        .pija-hex-title-box.small { font-size: 34px; letter-spacing: -1px; }
+
+                        .pija-hex-bot {
+                            position: absolute; top: 3cm; left: 0; width: 7cm; height: 1cm; display: flex; z-index: 5;
+                        }
+                        .pija-hex-bot-code {
+                            width: 3.5cm; background: #0D5A75; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 36px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .pija-hex-bot-br {
+                            width: 3.5cm; background: #fff; height: 1cm; display: flex; align-items: flex-end; justify-content: center;
+                            overflow: hidden; padding-bottom: 2px; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+
+                        .pija-hex-img-area {
+                            position: absolute; top: 1cm; right: 0; width: 3cm; height: 3cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                        }
+                        .pija-hex-symbol { position: absolute; right: 0.1cm; top: 0.1cm; width: 0.6cm; height: 0.6cm; z-index:10; }
+                        .pija-hex-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let grosor = "#?";
+                        let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
+                        if(matchG) grosor = "#" + matchG[1];
+                        let largo = '??"';
+                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
+                        
+                        let hexSvg = '<svg viewBox="0 0 100 100" class="pija-hex-symbol"><circle cx="50" cy="50" r="45" fill="#000"/><polygon points="50,18 78,34 78,66 50,82 22,66 22,34" fill="#fff"/><rect x="0" y="38" width="100" height="24" fill="#000"/></svg>';
+
+                        let fullText = grosor + " x " + largo;
+                        let sizeClass = fullText.length > 10 ? 'small' : 'normal';
+
+                        return `
+                        <div class="pija-hex-bktag">
+                            <div class="pija-hex-top"></div>
+                            
+                            <div class="pija-hex-mid">
+                                <div class="pija-hex-screw-box">
+                                    <img src="imagenes/lamina_hexagonal.png?v=${Date.now()}" onerror="this.style.display=\'none\'">
+                                </div>
+                                <div class="pija-hex-text-col">
+                                    <div class="pija-hex-subtitle-box">LÁMINA CAB HEXAGONAL</div>
+                                    <div class="pija-hex-title-box ${sizeClass}">${fullText}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="pija-hex-bot">
+                                <div class="pija-hex-bot-code">${item.p.codigo}</div>
+                                <div class="pija-hex-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            
+                            <div class="pija-hex-img-area">
+                                ${hexSvg}
+                                <img src="${imgSrc}" onerror="this.style.display=\'none\'">
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'lamina-hex-12x6',
+                    group: 'lamina-hex',
+                    name: 'Lámina Cab Hexagonal (12x6 cm)',
+                    description: 'Formato apaisado GRANDE. Extracción automática de grosor y medida. Cabeza hexagonal. Escala 120%.',
+                    width: '12cm',
+                    height: '6cm',
+                    css: `
+                        .pija-hex-lg-bktag {
+                            width: 12cm; height: 6cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000;
+                            page-break-inside: avoid;
+                            break-inside: avoid;
+                        }
+                        .pija-hex-lg-top { 
+                            position: absolute; top:0; left:0; width: 12cm; height: 1.5cm; background: #000; z-index: 10; 
+                        }
+                        .pija-hex-lg-mid {
+                            position: absolute; top: 1.5cm; left: 0; width: 8.4cm; height: 3cm; background: #1890C4;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .pija-hex-lg-screw-box {
+                            width: 1.2cm; height: 3cm; display: flex; align-items: center; justify-content: flex-end;
+                        }
+                        .pija-hex-lg-screw-box img { max-height: 2.7cm; max-width: 100%; object-fit: contain; }
+                        
+                        .pija-hex-lg-text-col {
+                            width: 7.2cm; height: 3cm; display: flex; flex-direction: column;
+                        }
+                        .pija-hex-lg-subtitle-box {
+                            width: 7.2cm; height: 0.75cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 13px; font-weight: 800; color: #fff; letter-spacing: 0.3px;
+                        }
+                        .pija-hex-lg-title-box {
+                            width: 7.2cm; height: 2.25cm; display: flex; align-items: center; justify-content: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1.5px;
+                        }
+                        .pija-hex-lg-title-box.normal { font-size: 58px; }
+                        .pija-hex-lg-title-box.small { font-size: 41px; letter-spacing: -1px; }
+
+                        .pija-hex-lg-bot {
+                            position: absolute; top: 4.5cm; left: 0; width: 8.4cm; height: 1.5cm; display: flex; z-index: 5;
+                        }
+                        .pija-hex-lg-bot-code {
+                            width: 4.2cm; background: #0D5A75; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 43px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .pija-hex-lg-bot-br {
+                            width: 4.2cm; background: #fff; height: 1.5cm; display: flex; align-items: flex-end; justify-content: center;
+                            overflow: hidden; padding-bottom: 2px; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+
+                        .pija-hex-lg-img-area {
+                            position: absolute; top: 1.5cm; right: 0; width: 3.6cm; height: 4.5cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                        }
+                        .pija-hex-lg-symbol { position: absolute; right: 0.12cm; top: 0.12cm; width: 0.72cm; height: 0.72cm; z-index:10; }
+                        .pija-hex-lg-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let grosor = "#?";
+                        let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
+                        if(matchG) grosor = "#" + matchG[1];
+                        let largo = '??"';
+                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
+                        
+                        let hexSvg = '<svg viewBox="0 0 100 100" class="pija-hex-lg-symbol"><circle cx="50" cy="50" r="45" fill="#000"/><polygon points="50,18 78,34 78,66 50,82 22,66 22,34" fill="#fff"/><rect x="0" y="38" width="100" height="24" fill="#000"/></svg>';
+
+                        let fullText = grosor + " x " + largo;
+                        let sizeClass = fullText.length > 10 ? 'small' : 'normal';
+
+                        return `
+                        <div class="pija-hex-lg-bktag">
+                            <div class="pija-hex-lg-top"></div>
+                            
+                            <div class="pija-hex-lg-mid">
+                                <div class="pija-hex-lg-screw-box">
+                                    <img src="imagenes/lamina_hexagonal.png?v=${Date.now()}" onerror="this.style.display=\'none\'">
+                                </div>
+                                <div class="pija-hex-lg-text-col">
+                                    <div class="pija-hex-lg-subtitle-box">LÁMINA CAB HEXAGONAL</div>
+                                    <div class="pija-hex-lg-title-box ${sizeClass}">${fullText}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="pija-hex-lg-bot">
+                                <div class="pija-hex-lg-bot-code">${item.p.codigo}</div>
+                                <div class="pija-hex-lg-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            
+                            <div class="pija-hex-lg-img-area">
+                                ${hexSvg}
+                                <img src="${imgSrc}" onerror="this.style.display=\'none\'">
+                            </div>
+                        </div>`;
+                    }
                 }
             ],
             
