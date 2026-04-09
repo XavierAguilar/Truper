@@ -144,7 +144,7 @@
             padding: 11px 20px;
             font-size: 14px;
             font-family: inherit;
-            color: #fff;
+            color: #000;
             background: transparent;
         }
 
@@ -6271,6 +6271,111 @@
                             </div>
                             
                             <div class="pija-img-area">
+                                ${cruzSvg}
+                                <img src="${imgSrc}" onerror="this.style.display='none'">
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'pija-abierta-10x4',
+                    name: 'Pija Cuerda Abierta (10x4 cm)',
+                    description: 'Formato apaisado, incluye extracción automática de grosor y medida y cruz Phillips. Cuerda abierta.',
+                    width: '10cm',
+                    height: '4cm',
+                    css: `
+                        .pija-ab-bktag {
+                            width: 10cm; height: 4cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000;
+                            page-break-inside: avoid;
+                            break-inside: avoid;
+                        }
+                        /* Franja Superior Negra (10x1) */
+                        .pija-ab-top { 
+                            position: absolute; top:0; left:0; width: 10cm; height: 1cm; background: #000; z-index: 10; 
+                        }
+                        /* Zona Media Verde (7x2) */
+                        .pija-ab-mid {
+                            position: absolute; top: 1cm; left: 0; width: 7cm; height: 2cm; background: #1b5e30;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .pija-ab-screw-box {
+                            width: 1cm; height: 2cm; display: flex; align-items: center; justify-content: flex-end;
+                        }
+                        .pija-ab-screw-box img { max-height: 1.8cm; max-width: 100%; object-fit: contain; }
+                        
+                        .pija-ab-text-col {
+                            width: 6cm; height: 2cm; display: flex; flex-direction: column;
+                        }
+                        /* Caja Subtitulo: 6x0.5 */
+                        .pija-ab-subtitle-box {
+                            width: 6cm; height: 0.5cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 12px; font-weight: 800; color: #fff; letter-spacing: 0.5px;
+                        }
+                        /* Caja Titulo: 6x1.5 */
+                        .pija-ab-title-box {
+                            width: 6cm; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1.5px;
+                        }
+                        .pija-ab-title-box.normal { font-size: 48px; }
+                        .pija-ab-title-box.small { font-size: 34px; letter-spacing: -1px; }
+
+                        /* Zona Inferior (7x1) */
+                        .pija-ab-bot {
+                            position: absolute; top: 3cm; left: 0; width: 7cm; height: 1cm; display: flex; z-index: 5;
+                        }
+                        .pija-ab-bot-code {
+                            width: 3.5cm; background: #0d3318; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 36px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .pija-ab-bot-br {
+                            width: 3.5cm; background: #fff; height: 1cm; display: flex; align-items: flex-end; justify-content: center;
+                            overflow: hidden; padding-bottom: 2px; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+
+                        /* Zona Imagen Derecha (3x3) Blanca */
+                        .pija-ab-img-area {
+                            position: absolute; top: 1cm; right: 0; width: 3cm; height: 3cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                        }
+                        .pija-ab-phillips { position: absolute; right: 0.1cm; top: 0.1cm; width: 0.6cm; height: 0.6cm; z-index:10; }
+                        .pija-ab-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let grosor = "#?";
+                        let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
+                        if(matchG) grosor = "#" + matchG[1];
+                        let largo = '??"';
+                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
+                        
+                        let cruzSvg = '<svg viewBox="0 0 100 100" class="pija-ab-phillips"><circle cx="50" cy="50" r="45" fill="#000"/><path d="M50 20 L50 80 M20 50 L80 50" stroke="#fff" stroke-width="20" stroke-linecap="square"/></svg>';
+
+                        let fullText = grosor + " x " + largo;
+                        let sizeClass = fullText.length > 10 ? 'small' : 'normal';
+
+                        return `
+                        <div class="pija-ab-bktag">
+                            <div class="pija-ab-top"></div>
+                            
+                            <div class="pija-ab-mid">
+                                <div class="pija-ab-screw-box">
+                                    <img src="imagenes/rosca_abierta.png?v=${Date.now()}" onerror="this.style.display='none'">
+                                </div>
+                                <div class="pija-ab-text-col">
+                                    <div class="pija-ab-subtitle-box">CUERDA ABIERTA</div>
+                                    <div class="pija-ab-title-box ${sizeClass}">${fullText}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="pija-ab-bot">
+                                <div class="pija-ab-bot-code">${item.p.codigo}</div>
+                                <div class="pija-ab-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            
+                            <div class="pija-ab-img-area">
                                 ${cruzSvg}
                                 <img src="${imgSrc}" onerror="this.style.display='none'">
                             </div>
