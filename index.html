@@ -6382,6 +6382,205 @@
                         </div>`;
                     }
                 }
+                },
+                {
+                    id: 'pija-fina-12x6',
+                    name: 'Pija Cuerda Fina (12x6 cm)',
+                    description: 'Formato apaisado GRANDE. Extracción automática de grosor y medida y cruz Phillips. Escala 120%.',
+                    width: '12cm',
+                    height: '6cm',
+                    css: `
+                        .pija-lg-bktag {
+                            width: 12cm; height: 6cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000;
+                            page-break-inside: avoid;
+                            break-inside: avoid;
+                        }
+                        .pija-lg-top { 
+                            position: absolute; top:0; left:0; width: 12cm; height: 1.5cm; background: #000; z-index: 10; 
+                        }
+                        .pija-lg-mid {
+                            position: absolute; top: 1.5cm; left: 0; width: 8.4cm; height: 3cm; background: #13a650;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .pija-lg-screw-box {
+                            width: 1.2cm; height: 3cm; display: flex; align-items: center; justify-content: flex-end;
+                        }
+                        .pija-lg-screw-box img { max-height: 2.7cm; max-width: 100%; object-fit: contain; }
+                        
+                        .pija-lg-text-col {
+                            width: 7.2cm; height: 3cm; display: flex; flex-direction: column;
+                        }
+                        .pija-lg-subtitle-box {
+                            width: 7.2cm; height: 0.75cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 15px; font-weight: 800; color: #fff; letter-spacing: 0.5px;
+                        }
+                        .pija-lg-title-box {
+                            width: 7.2cm; height: 2.25cm; display: flex; align-items: center; justify-content: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1.5px;
+                        }
+                        .pija-lg-title-box.normal { font-size: 58px; }
+                        .pija-lg-title-box.small { font-size: 41px; letter-spacing: -1px; }
+
+                        .pija-lg-bot {
+                            position: absolute; top: 4.5cm; left: 0; width: 8.4cm; height: 1.5cm; display: flex; z-index: 5;
+                        }
+                        .pija-lg-bot-code {
+                            width: 4.2cm; background: #1e5a26; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 43px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .pija-lg-bot-br {
+                            width: 4.2cm; background: #fff; height: 1.5cm; display: flex; align-items: flex-end; justify-content: center;
+                            overflow: hidden; padding-bottom: 2px; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+
+                        .pija-lg-img-area {
+                            position: absolute; top: 1.5cm; right: 0; width: 3.6cm; height: 4.5cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                        }
+                        .pija-lg-phillips { position: absolute; right: 0.12cm; top: 0.12cm; width: 0.72cm; height: 0.72cm; z-index:10; }
+                        .pija-lg-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let grosor = "#?";
+                        let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
+                        if(matchG) grosor = "#" + matchG[1];
+                        let largo = '??"';
+                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
+                        
+                        let cruzSvg = '<svg viewBox="0 0 100 100" class="pija-lg-phillips"><circle cx="50" cy="50" r="45" fill="#000"/><path d="M50 20 L50 80 M20 50 L80 50" stroke="#fff" stroke-width="20" stroke-linecap="square"/></svg>';
+
+                        let fullText = grosor + " x " + largo;
+                        let sizeClass = fullText.length > 10 ? 'small' : 'normal';
+
+                        return `
+                        <div class="pija-lg-bktag">
+                            <div class="pija-lg-top"></div>
+                            
+                            <div class="pija-lg-mid">
+                                <div class="pija-lg-screw-box">
+                                    <img src="imagenes/pija_blanca.png?v=${Date.now()}" onerror="this.style.display='none'">
+                                </div>
+                                <div class="pija-lg-text-col">
+                                    <div class="pija-lg-subtitle-box">CUERDA FINA</div>
+                                    <div class="pija-lg-title-box ${sizeClass}">${fullText}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="pija-lg-bot">
+                                <div class="pija-lg-bot-code">${item.p.codigo}</div>
+                                <div class="pija-lg-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            
+                            <div class="pija-lg-img-area">
+                                ${cruzSvg}
+                                <img src="${imgSrc}" onerror="this.style.display='none'">
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'pija-abierta-12x6',
+                    name: 'Pija Cuerda Abierta (12x6 cm)',
+                    description: 'Formato apaisado GRANDE. Extracción automática de grosor y medida y cruz Phillips. Cuerda abierta. Escala 120%.',
+                    width: '12cm',
+                    height: '6cm',
+                    css: `
+                        .pija-ab-lg-bktag {
+                            width: 12cm; height: 6cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000;
+                            page-break-inside: avoid;
+                            break-inside: avoid;
+                        }
+                        .pija-ab-lg-top { 
+                            position: absolute; top:0; left:0; width: 12cm; height: 1.5cm; background: #000; z-index: 10; 
+                        }
+                        .pija-ab-lg-mid {
+                            position: absolute; top: 1.5cm; left: 0; width: 8.4cm; height: 3cm; background: #1b5e30;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .pija-ab-lg-screw-box {
+                            width: 1.2cm; height: 3cm; display: flex; align-items: center; justify-content: flex-end;
+                        }
+                        .pija-ab-lg-screw-box img { max-height: 2.7cm; max-width: 100%; object-fit: contain; }
+                        
+                        .pija-ab-lg-text-col {
+                            width: 7.2cm; height: 3cm; display: flex; flex-direction: column;
+                        }
+                        .pija-ab-lg-subtitle-box {
+                            width: 7.2cm; height: 0.75cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 15px; font-weight: 800; color: #fff; letter-spacing: 0.5px;
+                        }
+                        .pija-ab-lg-title-box {
+                            width: 7.2cm; height: 2.25cm; display: flex; align-items: center; justify-content: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1.5px;
+                        }
+                        .pija-ab-lg-title-box.normal { font-size: 58px; }
+                        .pija-ab-lg-title-box.small { font-size: 41px; letter-spacing: -1px; }
+
+                        .pija-ab-lg-bot {
+                            position: absolute; top: 4.5cm; left: 0; width: 8.4cm; height: 1.5cm; display: flex; z-index: 5;
+                        }
+                        .pija-ab-lg-bot-code {
+                            width: 4.2cm; background: #0d3318; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 43px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .pija-ab-lg-bot-br {
+                            width: 4.2cm; background: #fff; height: 1.5cm; display: flex; align-items: flex-end; justify-content: center;
+                            overflow: hidden; padding-bottom: 2px; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+
+                        .pija-ab-lg-img-area {
+                            position: absolute; top: 1.5cm; right: 0; width: 3.6cm; height: 4.5cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                        }
+                        .pija-ab-lg-phillips { position: absolute; right: 0.12cm; top: 0.12cm; width: 0.72cm; height: 0.72cm; z-index:10; }
+                        .pija-ab-lg-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let grosor = "#?";
+                        let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
+                        if(matchG) grosor = "#" + matchG[1];
+                        let largo = '??"';
+                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
+                        
+                        let cruzSvg = '<svg viewBox="0 0 100 100" class="pija-ab-lg-phillips"><circle cx="50" cy="50" r="45" fill="#000"/><path d="M50 20 L50 80 M20 50 L80 50" stroke="#fff" stroke-width="20" stroke-linecap="square"/></svg>';
+
+                        let fullText = grosor + " x " + largo;
+                        let sizeClass = fullText.length > 10 ? 'small' : 'normal';
+
+                        return `
+                        <div class="pija-ab-lg-bktag">
+                            <div class="pija-ab-lg-top"></div>
+                            
+                            <div class="pija-ab-lg-mid">
+                                <div class="pija-ab-lg-screw-box">
+                                    <img src="imagenes/rosca_abierta.png?v=${Date.now()}" onerror="this.style.display='none'">
+                                </div>
+                                <div class="pija-ab-lg-text-col">
+                                    <div class="pija-ab-lg-subtitle-box">CUERDA ABIERTA</div>
+                                    <div class="pija-ab-lg-title-box ${sizeClass}">${fullText}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="pija-ab-lg-bot">
+                                <div class="pija-ab-lg-bot-code">${item.p.codigo}</div>
+                                <div class="pija-ab-lg-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            
+                            <div class="pija-ab-lg-img-area">
+                                ${cruzSvg}
+                                <img src="${imgSrc}" onerror="this.style.display='none'">
+                            </div>
+                        </div>`;
+                    }
+                }
             ],
             
             initUI() {
