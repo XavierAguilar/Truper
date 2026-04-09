@@ -6712,6 +6712,206 @@
                             </div>
                         </div>`;
                     }
+                },
+                {
+                    id: 'pija-lamina-10x4',
+                    group: 'pija-lamina',
+                    name: 'Pija Para Lámina (10x4 cm)',
+                    description: 'Formato apaisado, extracción automática de grosor y medida. Tornillo de ranura.',
+                    width: '10cm',
+                    height: '4cm',
+                    css: `
+                        .pija-lam-bktag {
+                            width: 10cm; height: 4cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000;
+                            page-break-inside: avoid;
+                            break-inside: avoid;
+                        }
+                        .pija-lam-top { 
+                            position: absolute; top:0; left:0; width: 10cm; height: 1cm; background: #000; z-index: 10; 
+                        }
+                        .pija-lam-mid {
+                            position: absolute; top: 1cm; left: 0; width: 7cm; height: 2cm; background: #56B4E9;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .pija-lam-screw-box {
+                            width: 1cm; height: 2cm; display: flex; align-items: center; justify-content: flex-end;
+                        }
+                        .pija-lam-screw-box img { max-height: 1.8cm; max-width: 100%; object-fit: contain; }
+                        
+                        .pija-lam-text-col {
+                            width: 6cm; height: 2cm; display: flex; flex-direction: column;
+                        }
+                        .pija-lam-subtitle-box {
+                            width: 6cm; height: 0.5cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 11px; font-weight: 800; color: #fff; letter-spacing: 0.5px;
+                        }
+                        .pija-lam-title-box {
+                            width: 6cm; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1.5px;
+                        }
+                        .pija-lam-title-box.normal { font-size: 48px; }
+                        .pija-lam-title-box.small { font-size: 34px; letter-spacing: -1px; }
+
+                        .pija-lam-bot {
+                            position: absolute; top: 3cm; left: 0; width: 7cm; height: 1cm; display: flex; z-index: 5;
+                        }
+                        .pija-lam-bot-code {
+                            width: 3.5cm; background: #1A6B8A; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 36px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .pija-lam-bot-br {
+                            width: 3.5cm; background: #fff; height: 1cm; display: flex; align-items: flex-end; justify-content: center;
+                            overflow: hidden; padding-bottom: 2px; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+
+                        .pija-lam-img-area {
+                            position: absolute; top: 1cm; right: 0; width: 3cm; height: 3cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                        }
+                        .pija-lam-slothead { position: absolute; right: 0.1cm; top: 0.1cm; width: 0.6cm; height: 0.6cm; z-index:10; }
+                        .pija-lam-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let grosor = "#?";
+                        let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
+                        if(matchG) grosor = "#" + matchG[1];
+                        let largo = '??"';
+                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
+                        
+                        let slotSvg = '<svg viewBox="0 0 100 100" class="pija-lam-slothead"><circle cx="50" cy="50" r="45" fill="#000"/><rect x="10" y="38" width="80" height="24" rx="4" fill="#fff"/></svg>';
+
+                        let fullText = grosor + " x " + largo;
+                        let sizeClass = fullText.length > 10 ? 'small' : 'normal';
+
+                        return `
+                        <div class="pija-lam-bktag">
+                            <div class="pija-lam-top"></div>
+                            
+                            <div class="pija-lam-mid">
+                                <div class="pija-lam-screw-box">
+                                    <img src="imagenes/pija_lamina.png?v=${Date.now()}" onerror="this.style.display='none'">
+                                </div>
+                                <div class="pija-lam-text-col">
+                                    <div class="pija-lam-subtitle-box">PIJA PARA LÁMINA</div>
+                                    <div class="pija-lam-title-box ${sizeClass}">${fullText}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="pija-lam-bot">
+                                <div class="pija-lam-bot-code">${item.p.codigo}</div>
+                                <div class="pija-lam-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            
+                            <div class="pija-lam-img-area">
+                                ${slotSvg}
+                                <img src="${imgSrc}" onerror="this.style.display='none'">
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'pija-lamina-12x6',
+                    group: 'pija-lamina',
+                    name: 'Pija Para Lámina (12x6 cm)',
+                    description: 'Formato apaisado GRANDE. Extracción automática de grosor y medida. Tornillo de ranura. Escala 120%.',
+                    width: '12cm',
+                    height: '6cm',
+                    css: `
+                        .pija-lam-lg-bktag {
+                            width: 12cm; height: 6cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000;
+                            page-break-inside: avoid;
+                            break-inside: avoid;
+                        }
+                        .pija-lam-lg-top { 
+                            position: absolute; top:0; left:0; width: 12cm; height: 1.5cm; background: #000; z-index: 10; 
+                        }
+                        .pija-lam-lg-mid {
+                            position: absolute; top: 1.5cm; left: 0; width: 8.4cm; height: 3cm; background: #56B4E9;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .pija-lam-lg-screw-box {
+                            width: 1.2cm; height: 3cm; display: flex; align-items: center; justify-content: flex-end;
+                        }
+                        .pija-lam-lg-screw-box img { max-height: 2.7cm; max-width: 100%; object-fit: contain; }
+                        
+                        .pija-lam-lg-text-col {
+                            width: 7.2cm; height: 3cm; display: flex; flex-direction: column;
+                        }
+                        .pija-lam-lg-subtitle-box {
+                            width: 7.2cm; height: 0.75cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 14px; font-weight: 800; color: #fff; letter-spacing: 0.5px;
+                        }
+                        .pija-lam-lg-title-box {
+                            width: 7.2cm; height: 2.25cm; display: flex; align-items: center; justify-content: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1.5px;
+                        }
+                        .pija-lam-lg-title-box.normal { font-size: 58px; }
+                        .pija-lam-lg-title-box.small { font-size: 41px; letter-spacing: -1px; }
+
+                        .pija-lam-lg-bot {
+                            position: absolute; top: 4.5cm; left: 0; width: 8.4cm; height: 1.5cm; display: flex; z-index: 5;
+                        }
+                        .pija-lam-lg-bot-code {
+                            width: 4.2cm; background: #1A6B8A; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 43px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .pija-lam-lg-bot-br {
+                            width: 4.2cm; background: #fff; height: 1.5cm; display: flex; align-items: flex-end; justify-content: center;
+                            overflow: hidden; padding-bottom: 2px; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+
+                        .pija-lam-lg-img-area {
+                            position: absolute; top: 1.5cm; right: 0; width: 3.6cm; height: 4.5cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                        }
+                        .pija-lam-lg-slothead { position: absolute; right: 0.12cm; top: 0.12cm; width: 0.72cm; height: 0.72cm; z-index:10; }
+                        .pija-lam-lg-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let grosor = "#?";
+                        let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
+                        if(matchG) grosor = "#" + matchG[1];
+                        let largo = '??"';
+                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
+                        
+                        let slotSvg = '<svg viewBox="0 0 100 100" class="pija-lam-lg-slothead"><circle cx="50" cy="50" r="45" fill="#000"/><rect x="10" y="38" width="80" height="24" rx="4" fill="#fff"/></svg>';
+
+                        let fullText = grosor + " x " + largo;
+                        let sizeClass = fullText.length > 10 ? 'small' : 'normal';
+
+                        return `
+                        <div class="pija-lam-lg-bktag">
+                            <div class="pija-lam-lg-top"></div>
+                            
+                            <div class="pija-lam-lg-mid">
+                                <div class="pija-lam-lg-screw-box">
+                                    <img src="imagenes/pija_lamina.png?v=${Date.now()}" onerror="this.style.display='none'">
+                                </div>
+                                <div class="pija-lam-lg-text-col">
+                                    <div class="pija-lam-lg-subtitle-box">PIJA PARA LÁMINA</div>
+                                    <div class="pija-lam-lg-title-box ${sizeClass}">${fullText}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="pija-lam-lg-bot">
+                                <div class="pija-lam-lg-bot-code">${item.p.codigo}</div>
+                                <div class="pija-lam-lg-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            
+                            <div class="pija-lam-lg-img-area">
+                                ${slotSvg}
+                                <img src="${imgSrc}" onerror="this.style.display='none'">
+                            </div>
+                        </div>`;
+                    }
                 }
             ],
             
