@@ -29,7 +29,7 @@ if(startIdx !== -1 && endIdx !== -1) {
                         }
                         /* Zona Media Verde (7x2) */
                         .pija-mid {
-                            position: absolute; top: 1cm; left: 0; width: 7cm; height: 2cm; background: #13a650;
+                            position: absolute; top: 1cm; left: 0; width: 7cm; height: 2cm; background: #1cd468;
                             display: flex; overflow: hidden; z-index: 5;
                         }
                         .pija-screw-box {

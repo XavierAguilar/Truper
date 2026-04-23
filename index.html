@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo Casa Vazquez â€” Fichas Técnicas</title>
+    <title>Catálogo Casa Vazquez — Fichas Técnicas</title>
 
     <!-- PWA Settings -->
     <link rel="manifest" href="manifest.json">
@@ -2639,15 +2639,15 @@
 
     <script>
         var productos = [], selectedIdx = -1, currentMainImg = {};
-        var searchIndex = []; // Ãndice pre-procesado para búsqueda rápida
+        var searchIndex = []; // Índice pre-procesado para búsqueda rápida
 
         // ===== NORMALIZACIÓN: quitar acentos y caracteres especiales =====
         function normalize(str) {
             if (!str) return '';
             return str.toLowerCase()
-                .replace(/[áÃ Ã¢Ã¤]/g, 'a').replace(/[éÃ¨ÃªÃ«]/g, 'e')
-                .replace(/[íÃ¬Ã®Ã¯]/g, 'i').replace(/[óÃ²Ã´Ã¶]/g, 'o')
-                .replace(/[úÃ¹Ã»Ã¼]/g, 'u').replace(/[ñ]/g, 'n')
+                .replace(/[áÍ Í¢Í¤]/g, 'a').replace(/[éÍ¨ÍªÍ«]/g, 'e')
+                .replace(/[íÍ¬Í®Í¯]/g, 'i').replace(/[óÍ²Í´Í¶]/g, 'o')
+                .replace(/[úÍ¹Í»Í¼]/g, 'u').replace(/[ñ]/g, 'n')
                 .replace(/[""]/g, '"').replace(/['']/g, "'");
         }
 
@@ -2655,35 +2655,35 @@
         function getStemVariants(word) {
             if (word.length < 3) return [];
             var variants = [];
-            // Si termina en 's' â†’ posible plural, generar singular
+            // Si termina en 's' → posible plural, generar singular
             if (word.endsWith('ces')) {
-                // luces â†’ luz, lapices â†’ lapiz
+                // luces → luz, lapices → lapiz
                 variants.push(word.slice(0, -3) + 'z');
             }
             if (word.endsWith('iones')) {
-                // conexiones â†’ conexion
+                // conexiones → conexion
                 variants.push(word.slice(0, -2));
             }
             if (word.endsWith('es') && word.length > 4) {
-                // cortadores â†’ cortador, conexiones ya cubierto
+                // cortadores → cortador, conexiones ya cubierto
                 variants.push(word.slice(0, -2));
-                // tambores â†’ tambor (no agrega 'es' a vocal)
+                // tambores → tambor (no agrega 'es' a vocal)
                 variants.push(word.slice(0, -1));
             }
             if (word.endsWith('s') && !word.endsWith('es')) {
-                // cajas â†’ caja, herramientas â†’ herramienta
+                // cajas → caja, herramientas → herramienta
                 variants.push(word.slice(0, -1));
             }
-            // Si NO termina en 's' â†’ generar plural
+            // Si NO termina en 's' → generar plural
             if (!word.endsWith('s')) {
                 if (word.endsWith('z')) {
-                    // luz â†’ luces
+                    // luz → luces
                     variants.push(word.slice(0, -1) + 'ces');
                 } else if (word.endsWith('n') || word.endsWith('r') || word.endsWith('l') || word.endsWith('d')) {
-                    // cortador â†’ cortadores, conexion â†’ conexiones
+                    // cortador → cortadores, conexion → conexiones
                     variants.push(word + 'es');
                 } else {
-                    // caja â†’ cajas, herramienta â†’ herramientas
+                    // caja → cajas, herramienta → herramientas
                     variants.push(word + 's');
                 }
             }
@@ -2864,7 +2864,7 @@
                 .replace(/ce/g, 'se').replace(/ci/g, 'si') // ce/ci suenan como se/si
                 .replace(/z/g, 's')       // z = s
                 .replace(/ge/g, 'je').replace(/gi/g, 'ji') // ge/gi suenan como je/ji
-                .replace(/gÃ¼/g, 'gu')
+                .replace(/gÍ¼/g, 'gu')
                 .replace(/qu/g, 'k')      // qu = k
                 .replace(/ca/g, 'ka').replace(/co/g, 'ko').replace(/cu/g, 'ku')
                 .replace(/ll/g, 'y')      // ll = y
@@ -3253,7 +3253,7 @@
             doSearch();
         }
 
-        // ===== PRE-PROCESAR ÃNDICE DE BÚSQUEDA =====
+        // ===== PRE-PROCESAR ÍNDICE DE BÚSQUEDA =====
         var searchCache = {};
 
         function buildSearchIndex() {
@@ -3786,9 +3786,9 @@
             return Object.entries(brands).sort(function (a, b) { return b[1] - a[1]; });
         }
 
-        // Diccionario: sinónimos de especificaciones â†’ nombre canónico del filtro
+        // Diccionario: sinónimos de especificaciones → nombre canónico del filtro
         var SPEC_SYNONYMS = {
-            // MEDIDA / DIÃMETRO
+            // MEDIDA / DIÍMETRO
             'Medida': 'Medida', 'Diámetro': 'Medida', 'Diámetro nominal': 'Medida',
             'Diámetro interior': 'Medida', 'Diámetro interno': 'Medida',
             'Medida (Número)': 'Medida', 'Medidas': 'Medida', 'Tamaño': 'Medida',
@@ -4416,11 +4416,11 @@
                 '<button class="results-back-btn" onclick="clearResultsGrid()"><i class="fas fa-times" style="margin-right:4px;"></i>Limpiar</button>' +
                 '</div></div>';
 
-            // === FILTRO DE CATEGORÃA (auto-detectado por nombres) ===
+            // === FILTRO DE CATEGORÍA (auto-detectado por nombres) ===
             var categories = getResultCategories(catBase, words);
             if (categories.length >= 2) {
                 html += '<div class="filter-bar" style="padding-top:6px;padding-bottom:6px;">';
-                html += '<span style="color:#10b981;font-size:11px;font-weight:600;min-width:60px;padding-top:3px;">CATEGORÃA</span>';
+                html += '<span style="color:#10b981;font-size:11px;font-weight:600;min-width:60px;padding-top:3px;">CATEGORÍA</span>';
                 for (var ci = 0; ci < categories.length; ci++) {
                     var catName = categories[ci][0];
                     var catCount = categories[ci][1];
@@ -4452,7 +4452,7 @@
                 html += '</div>';
             }
 
-            // === FILTROS POR ATRIBUTOS DINÃMICOS (progresivos: 1 visible, +3, +5, +resto) ===
+            // === FILTROS POR ATRIBUTOS DINÍMICOS (progresivos: 1 visible, +3, +5, +resto) ===
             var attrKeys = Object.keys(attrFilters);
             filterRevealLevel = 0; // Reset on re-render
             function safeAttr(s) { return s.replace(/"/g, '&quot;').replace(/'/g, "\\'"); }
@@ -4463,7 +4463,7 @@
             for (var ak = 0; ak < attrKeys.length; ak++) {
                 var dimName = attrKeys[ak];
                 // Disjunctive faceting: recalcular conteos para esta dimensión
-                // usando resultados filtrados por todas las DEMÃS dimensiones
+                // usando resultados filtrados por todas las DEMÍS dimensiones
                 var dimBase = hasActiveFilters ? applyFiltersExcluding(results, dimName) : results;
                 var dimFaceted = getAttrFilters(dimBase);
                 var dimValues = dimFaceted[dimName] || attrFilters[dimName] || [];
@@ -4504,8 +4504,8 @@
             if (hasFilters) {
                 var filterTags = Object.entries(activeFilters).map(function (e) { var label = e[0] === '__cat__' ? 'Categoría' : e[0]; return '<strong>' + esc(label) + '</strong>: ' + esc(e[1]); }).join(' + ');
                 html += '<div style="padding:8px 20px;background:rgba(234,88,12,0.1);border-bottom:1px solid rgba(234,88,12,0.2);font-size:12px;color:var(--text-light);display:flex;align-items:center;gap:8px;">' +
-                    '<i class="fas fa-filter" style="color:var(--primary);"></i> Filtro: ' + filterTags + ' â†’ <strong>' + filtered.length + '</strong> productos' +
-                    ' <button onclick="clearAllFilters()" style="margin-left:auto;background:none;border:1px solid var(--primary);color:var(--primary);padding:3px 10px;border-radius:12px;cursor:pointer;font-size:11px;font-family:inherit;">âœ• Limpiar filtros</button>' +
+                    '<i class="fas fa-filter" style="color:var(--primary);"></i> Filtro: ' + filterTags + ' → <strong>' + filtered.length + '</strong> productos' +
+                    ' <button onclick="clearAllFilters()" style="margin-left:auto;background:none;border:1px solid var(--primary);color:var(--primary);padding:3px 10px;border-radius:12px;cursor:pointer;font-size:11px;font-family:inherit;">✕ Limpiar filtros</button>' +
                     '</div>';
             }
 
@@ -5204,7 +5204,7 @@
             var body = document.getElementById('dashBody');
 
             if (!data) {
-                body.innerHTML = '<div class="dash-status idle"><i class="fas fa-pause-circle"></i> Sin proceso activo â€” Ejecuta <code>node scraper.js --resume</code></div>' +
+                body.innerHTML = '<div class="dash-status idle"><i class="fas fa-pause-circle"></i> Sin proceso activo — Ejecuta <code>node scraper.js --resume</code></div>' +
                     '<div class="dash-section" style="margin-top:20px">' +
                     '<div class="dash-section-title">Datos cargados en la app</div>' +
                     '<div class="dash-stats-grid">' +
@@ -5281,7 +5281,7 @@
                     ? data.nuevos_en_lote + ' de ' + (data.total_lote || 0) + ' en este lote'
                     : '';
                 html += '<div class="dash-section">' +
-                    '<div class="dash-section-title">Lote [' + data.rango.start + ' â†’ ' + data.rango.end + '] â€” ' + loteLabel + '</div>' +
+                    '<div class="dash-section-title">Lote [' + data.rango.start + ' → ' + data.rango.end + '] — ' + loteLabel + '</div>' +
                     '<div class="progress-bar-container">' +
                     '<div class="progress-bar-fill" style="width:' + Math.max(pctLote, 2) + '%;background:linear-gradient(90deg, #3b82f6, #60a5fa)">' + pctLote.toFixed(1) + '%</div>' +
                     '</div></div>';
@@ -5296,7 +5296,7 @@
                 '<div class="dash-stat"><div class="dash-stat-value" style="color:' + (errores > 0 ? '#ef4444' : '#4ade80') + '">' + errores + '</div><div class="dash-stat-label">Errores</div></div>' +
                 '<div class="dash-stat"><div class="dash-stat-value">' + rate + '</div><div class="dash-stat-label">Prod/min</div></div>' +
                 '<div class="dash-stat"><div class="dash-stat-value">' + formatTime(tiempo) + '</div><div class="dash-stat-label">Transcurrido</div></div>' +
-                '<div class="dash-stat"><div class="dash-stat-value">' + (isRunning && etaMin > 0 ? '~' + formatTime(etaMin * 60) : 'â€”') + '</div><div class="dash-stat-label">ETA</div></div>';
+                '<div class="dash-stat"><div class="dash-stat-value">' + (isRunning && etaMin > 0 ? '~' + formatTime(etaMin * 60) : '—') + '</div><div class="dash-stat-label">ETA</div></div>';
 
             // Script-specific extra stats
             if (data.aliases_generados !== undefined) {
@@ -5317,7 +5317,7 @@
 
             html += '</div></div>';
 
-            // === STATS ESPECÃFICAS DE IMÃGENES ===
+            // === STATS ESPECÍFICAS DE IMÍGENES ===
             if (data.espacio_mb !== undefined) {
                 html += '<div class="dash-section">' +
                     '<div class="dash-section-title"><i class="fas fa-hdd" style="margin-right:4px"></i>Almacenamiento</div>' +
@@ -5359,7 +5359,7 @@
             if (data.reintentando && data.reintentando > 0) {
                 html += '<div class="dash-section">' +
                     '<div style="padding:10px 14px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;font-size:12px;color:#fbbf24">' +
-                    '<i class="fas fa-redo"></i> ' + data.reintentando + ' productos en cola de reintento â€” se procesarán al final del lote' +
+                    '<i class="fas fa-redo"></i> ' + data.reintentando + ' productos en cola de reintento — se procesarán al final del lote' +
                     '</div></div>';
             }
 
@@ -5399,9 +5399,9 @@
                     '<div class="dash-section-title" style="color:#ef4444">Últimos errores (' + errores + ' total)</div>' +
                     '<div class="dash-log" style="border-color:rgba(239,68,68,0.3)">';
                 data.errores_detalle.forEach(function (e) {
-                    var icon = e.tipo === 'timeout' ? 'â ±ï¸ ' : (e.tipo === 'http' ? 'GLB' : (e.tipo === 'conexion' ? '🔌' : 'â “'));
+                    var icon = e.tipo === 'timeout' ? '⏱️' : (e.tipo === 'http' ? 'GLB' : (e.tipo === 'conexion' ? '🔌' : '❓'));
                     html += '<div class="dash-log-entry" style="color:#fca5a5">' +
-                        icon + ' <strong>' + e.codigo + '</strong> ' + e.clave + ' â€” ' + e.error.substring(0, 60) +
+                        icon + ' <strong>' + e.codigo + '</strong> ' + e.clave + ' — ' + e.error.substring(0, 60) +
                         '</div>';
                 });
                 html += '</div></div>';
@@ -5522,7 +5522,7 @@
                                   showBtToast('&#9989; Lote: ' + added + ' agregados masivamente', '#10b981');
                               } else {
                                   window.playBeep('error');
-                                  showBtToast('Ã¢ÂÅ’ Ninguno encontrado en lote', '#ef4444');
+                                  showBtToast('Í¢ÂÅ’ Ninguno encontrado en lote', '#ef4444');
                               }
                               this.value = '';
                           } else {
@@ -5567,12 +5567,12 @@
                           let added = 0;
                           modProducts.forEach(p => { addMatchedBt(p); added++; });
                           window.playBeep('success');
-                          showBtToast('&#9989; PÃ¡gina ' + pageNum + ' extraÃ­da: ' + added + ' gafetes', '#10b981');
+                          showBtToast('&#9989; Página ' + pageNum + ' extraída: ' + added + ' gafetes', '#10b981');
                           suggBox.classList.remove('show');
                           input.value = '';
                       } else {
                           window.playBeep('error');
-                          showBtToast('Ã¢ÂÅ’ Vacío: NingÃºn artÃ­culo en PÃ¡gina ' + pageNum, '#ef4444');
+                          showBtToast('Í¢ÂÅ’ Vacío: Ningún artículo en Página ' + pageNum, '#ef4444');
                       }
                       return;
                   }
@@ -5592,7 +5592,7 @@
                           showBtToast('&#9989; Lote manual: ' + added + ' agregados', '#10b981');
                       } else {
                           window.playBeep('error');
-                          showBtToast('Ã¢ÂÅ’ Textos no encontrados', '#ef4444');
+                          showBtToast('Í¢ÂÅ’ Textos no encontrados', '#ef4444');
                       }
                       return;
                   }
@@ -6085,7 +6085,7 @@
     </footer>
     
     <script>
-        // ======= INSTALACIÓN PWA EXPLÃCITA =======
+        // ======= INSTALACIÓN PWA EXPLÍCITA =======
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
@@ -6202,6 +6202,23 @@
             box-shadow: 0 4px 15px rgba(16,185,129,0.3); display: flex; align-items: center; gap: 8px;
         }
         .bktpl-btn-print:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16,185,129,0.5); }
+        
+        /* COLOR PICKER STYLES */
+        .bktpl-color-picker { margin: 15px 24px; }
+        .bktpl-color-picker > summary { font-size: 13px; font-weight: 700; color: #475569; padding: 10px 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
+        .bktpl-color-picker > summary::-webkit-details-marker { display: none; }
+        .bktpl-color-picker > summary:hover { background: #f8fafc; }
+        .bktpl-color-picker[open] > summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: none; }
+        .cp-panel { background: #fff; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px; padding: 15px; }
+        .bktpl-color-picker button.cp-reset { background: none; border: none; cursor: pointer; color: #ef4444; font-size: 11px; font-weight: bold; }
+        .bktpl-color-picker button.cp-reset:hover { text-decoration: underline; }
+        .bktpl-color-picker .cp-controls { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+        .cp-item { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #334155; }
+        .cp-item input[type="color"] { -webkit-appearance: none; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; padding: 0; background: none; }
+        .cp-item input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        .cp-item input[type="color"]::-webkit-color-swatch { border: 2px solid #cbd5e1; border-radius: 50%; }
+        .cp-item input[type="text"] { width: 70px; padding: 4px 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; font-size: 12px; text-transform: uppercase; }
+        /* END COLOR PICKER STYLES */
     </style>
 
     <div class="bktpl-modal-overlay" id="bktplModalWrap">
@@ -6222,6 +6239,20 @@
                 <div class="bktpl-preview-canvas" id="bktplCanvasWrapper">
                     <div id="bktplLiveCanvas"></div>
                 </div>
+                
+                <details class="bktpl-color-picker" id="bktplColorPicker" style="display:none;">
+                    <summary>
+                        <span><i class="fas fa-palette"></i> Personalizar Plantilla</span>
+                        <i class="fas fa-chevron-down" style="color:#94a3b8; font-size:12px;"></i>
+                    </summary>
+                    <div class="cp-panel">
+                        <div style="text-align: right; margin-bottom: 15px;">
+                             <button class="cp-reset" onclick="window.bkGallery.resetColors()"><i class="fas fa-undo"></i> Restaurar Defecto</button>
+                        </div>
+                        <div class="cp-controls" id="bktplColorControls"></div>
+                    </div>
+                </details>
+                <style id="bktplDynamicCSS"></style>
                 <div class="bktpl-footer">
                     <button class="bktpl-btn-cancel" onclick="window.bkGallery.closeModal()">Cerrar Menú</button>
                     <button class="bktpl-btn-print" id="bktplPrintBtn" onclick="window.bkGallery.triggerPrint()"><i class="fas fa-print"></i> Confirmar Impresión</button>
@@ -6233,6 +6264,162 @@
     <script>
         window.bkGallery = {
             activeTemplateId: null,
+            colorConfig: {
+                'pija-10x4': [
+                    { label: 'Fondo Medio', target: '.pija-mid', prop: 'background-color', def: '#1cd468' },
+                    { label: 'Fondo Código', target: '.pija-bot-code', prop: 'background-color', def: '#1e5a26' },
+                    { label: 'Top Header', target: '.pija-top', prop: 'background-color', def: '#000000' }
+                ],
+                'pija-abierta-10x4': [
+                    { label: 'Fondo Medio', target: '.pija-ab-mid', prop: 'background-color', def: '#1b5e30' },
+                    { label: 'Fondo Código', target: '.pija-ab-bot-code', prop: 'background-color', def: '#0d3318' },
+                    { label: 'Top Header', target: '.pija-ab-top', prop: 'background-color', def: '#000000' }
+                ],
+                'pija-abierta-12x6': [
+                    { label: 'Fondo Medio', target: '.pija-ab-lg-mid', prop: 'background-color', def: '#1b5e30' },
+                    { label: 'Fondo Código', target: '.pija-ab-lg-bot-code', prop: 'background-color', def: '#0d3318' },
+                    { label: 'Top Header', target: '.pija-ab-lg-top', prop: 'background-color', def: '#000000' }
+                ],
+                'pija-lamina-10x4': [
+                    { label: 'Fondo Medio', target: '.pija-lam-mid', prop: 'background-color', def: '#56B4E9' },
+                    { label: 'Fondo Código', target: '.pija-lam-bot-code', prop: 'background-color', def: '#1A6B8A' },
+                    { label: 'Top Header', target: '.pija-lam-top', prop: 'background-color', def: '#000000' }
+                ],
+                'pija-lamina-12x6': [
+                    { label: 'Fondo Medio', target: '.pija-lam-lg-mid', prop: 'background-color', def: '#56B4E9' },
+                    { label: 'Fondo Código', target: '.pija-lam-lg-bot-code', prop: 'background-color', def: '#1A6B8A' },
+                    { label: 'Top Header', target: '.pija-lam-lg-top', prop: 'background-color', def: '#000000' }
+                ],
+                'std-5x8': [
+                    { label: 'Encabezado', target: '.bktag-redhead', prop: 'background-color', def: '#ff0000' }
+                ]
+            },
+            
+            getSavedColors(tplId) {
+                try {
+                    let saved = localStorage.getItem('trpr_tpl_colors');
+                    if(saved) {
+                        let parsed = JSON.parse(saved);
+                        return parsed[tplId] || {};
+                    }
+                } catch(e){}
+                return {};
+            },
+            
+            saveColor(tplId, targetIndex, hexVal) {
+                try {
+                    let saved = localStorage.getItem('trpr_tpl_colors');
+                    let parsed = saved ? JSON.parse(saved) : {};
+                    if(!parsed[tplId]) parsed[tplId] = {};
+                    parsed[tplId][targetIndex] = hexVal;
+                    localStorage.setItem('trpr_tpl_colors', JSON.stringify(parsed));
+                    
+                    let hexInput = document.getElementById('cp_hex_' + targetIndex);
+                    if(hexInput) hexInput.value = hexVal.toUpperCase();
+                    
+                    this.applyColorOverrides();
+                } catch(e){}
+            },
+            
+            resetColors() {
+                if(!this.activeTemplateId) return;
+                try {
+                    let saved = localStorage.getItem('trpr_tpl_colors');
+                    if(saved) {
+                        let parsed = JSON.parse(saved);
+                        delete parsed[this.activeTemplateId];
+                        localStorage.setItem('trpr_tpl_colors', JSON.stringify(parsed));
+                    }
+                } catch(e){}
+                this.renderColorPicker();
+                this.applyColorOverrides();
+            },
+            
+            applyColorOverrides() {
+                const conf = this.colorConfig[this.activeTemplateId];
+                const dynamicCss = document.getElementById('bktplDynamicCSS');
+                if(!conf || !dynamicCss) {
+                    if(dynamicCss) dynamicCss.innerHTML = '';
+                    return;
+                }
+                
+                let saved = this.getSavedColors(this.activeTemplateId);
+                let cssString = '';
+                
+                conf.forEach((item, idx) => {
+                    let val = saved[idx] || item.def;
+                    cssString += '#bktplLiveCanvas ' + item.target + ' { ' + item.prop + ': ' + val + ' !important; }\n';
+                    cssString += '#btPrintArea ' + item.target + ' { ' + item.prop + ': ' + val + ' !important; }\n';
+                });
+                
+                dynamicCss.innerHTML = cssString;
+                
+                const printContainer = document.getElementById('btPrintArea');
+                if(printContainer) {
+                    let existing = printContainer.querySelector('#printDynamicColors');
+                    if(!existing) {
+                        existing = document.createElement('style');
+                        existing.id = 'printDynamicColors';
+                        printContainer.appendChild(existing);
+                    }
+                    existing.innerHTML = cssString;
+                }
+            },
+            
+            renderColorPicker() {
+                const conf = this.colorConfig[this.activeTemplateId];
+                const panel = document.getElementById('bktplColorPicker');
+                const controls = document.getElementById('bktplColorControls');
+                
+                if(!conf || conf.length === 0) {
+                    if(panel) panel.style.display = 'none';
+                    return;
+                }
+                
+                if(panel) panel.style.display = 'block';
+                if(controls) controls.innerHTML = '';
+                
+                let saved = this.getSavedColors(this.activeTemplateId);
+                
+                conf.forEach((item, idx) => {
+                    let currentVal = saved[idx] || item.def;
+                    
+                    let div = document.createElement('div');
+                    div.className = 'cp-item';
+                    
+                    let colorInp = document.createElement('input');
+                    colorInp.type = 'color';
+                    colorInp.value = currentVal;
+                    
+                    let hexInp = document.createElement('input');
+                    hexInp.type = 'text';
+                    hexInp.id = 'cp_hex_' + idx;
+                    hexInp.value = currentVal.toUpperCase();
+                    
+                    colorInp.addEventListener('input', (e) => {
+                        this.saveColor(this.activeTemplateId, idx, e.target.value);
+                    });
+                    
+                    hexInp.addEventListener('change', (e) => {
+                        let val = e.target.value.trim();
+                        if(/^#[0-9A-Fa-f]{6}$/.test(val) || val.match(/^#[0-9A-Fa-f]{3}$/)) {
+                            if(val.length === 4) val = '#' + val[1]+val[1]+val[2]+val[2]+val[3]+val[3];
+                            colorInp.value = val;
+                            this.saveColor(this.activeTemplateId, idx, val);
+                        } else {
+                            hexInp.value = colorInp.value.toUpperCase();
+                        }
+                    });
+                    
+                    let lblSpan = document.createElement('span');
+                    lblSpan.innerText = item.label + ':';
+                    
+                    div.appendChild(lblSpan);
+                    div.appendChild(colorInp);
+                    div.appendChild(hexInp);
+                    controls.appendChild(div);
+                });
+            },
             templates: [
                 {
                     id: 'std-5x8',
@@ -6322,7 +6509,7 @@
                         }
                         /* Zona Media Verde (7x2) */
                         .pija-mid {
-                            position: absolute; top: 1cm; left: 0; width: 7cm; height: 2cm; background: #13a650;
+                            position: absolute; top: 1cm; left: 0; width: 7cm; height: 2cm; background: #1cd468;
                             display: flex; overflow: hidden; z-index: 5;
                         }
                         .pija-screw-box {
@@ -7558,6 +7745,8 @@
                                 textMargin: 1, textPosition: "bottom", textAlign: "center", margin: 0, height: 26, width: 1.5
                             });
                         }
+                        this.renderColorPicker();
+                        this.applyColorOverrides();
                     }, 50);
                 } else {
                     document.getElementById('bktplLiveCanvas').innerHTML = '<div style="color:#64748b; text-align:center; padding:20px;">Escanea al menos un producto en tu mesa de trabajo para ver la previsualización.</div>';
@@ -7595,6 +7784,7 @@
                       printArea.style.setProperty('gap', '2mm', 'important');
                       
                       printArea.innerHTML = '<style>@media print { .bt-print-container > div { flex: 0 0 ' + tpl.width + ' !important; min-width: 0 !important; max-width: ' + tpl.width + ' !important; overflow: hidden !important; } .bt-print-container svg { max-width: 100% !important; height: auto !important; } } ' + tpl.css + '</style>';
+                      this.applyColorOverrides();
 
                 
                 btList.forEach(item => {
