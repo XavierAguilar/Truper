@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punto de Venta X</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0284c7; /* Azul SICAR */
+            --primary-hover: #0369a1;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            overflow: hidden; /* Control total del layout */
+            height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* -----------------------
+           PANEL IZQUIERDO: CATÁLOGO
+           ----------------------- */
+        .catalog-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg);
+            position: relative;
+        }
+
+        .catalog-header {
+            background: var(--primary);
+            padding: 15px 25px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .catalog-search-bar {
+            background: white;
+            padding: 10px 15px;
+            margin: 15px 25px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        .catalog-search-bar input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 16px;
+            margin-left: 10px;
+            color: var(--text-main);
+        }
+
+        .catalog-grid {
+            padding: 0 25px 25px 25px;
+            flex: 1;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            align-content: start;
+        }
+
+        /* Sicar X Card Style */
+        .item-card {
+            background: var(--surface);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            position: relative;
+        }
+
+        .item-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .item-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .item-card .price {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 5px;
+        }
+        
+        .item-card .code {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .item-card .title {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.3;
+            flex: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* -----------------------
+           PANEL DERECHO: TICKET
+           ----------------------- */
+        .ticket-pane {
+            width: 420px;
+            background: var(--surface);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -4px 0 15px rgba(0,0,0,0.03);
+            z-index: 20;
+        }
+
+        .ticket-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            background: #f8fafc;
+        }
+
+        .ticket-client-info input, .ticket-client-info select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-top: 5px;
+            font-size: 13px;
+            outline: none;
+            box-sizing: border-box;
+            background: white;
+        }
+        
+        .ticket-client-info input:focus, .ticket-client-info select:focus {
+            border-color: var(--primary);
+        }
+
+        .ticket-items {
+            flex: 1;
+            overflow-y: auto;
+            background: var(--surface);
+        }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { 
+            background: #f1f5f9; 
+            padding: 10px; 
+            font-size: 12px; 
+            color: var(--text-muted); 
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            border-bottom: 1px solid var(--border);
+        }
+        td { 
+            padding: 12px 10px; 
+            border-bottom: 1px solid #f1f5f9; 
+            font-size: 13px;
+        }
+
+        /* Inputs en fila */
+        .qty-input {
+            width: 45px;
+            padding: 5px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            outline: none;
+        }
+        .qty-input:focus { border-color: var(--primary); }
+
+        .price-select {
+            border: 1px solid transparent;
+            background: transparent;
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+            outline: none;
+            font-size: 13px;
+            width: 100%;
+        }
+        .price-select:hover { border-color: var(--border); background: white; }
+
+        .ticket-totals {
+            background: #f8fafc;
+            border-top: 1px solid var(--border);
+            padding: 20px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .total-final {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #cbd5e1;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        
+        .total-final .amount {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.15s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-action:hover { background: var(--primary-hover); }
+        .btn-secondary { background: var(--text-main); }
+        .btn-secondary:hover { background: #334155; }
+
+        .empty-state { text-align: center; color: var(--text-muted); padding: 40px 20px; }
+
+
+        /* -----------------------
+           FASE 4: IMPRESIÓN PDF A4
+           ----------------------- */
+        @media print {
+            body { background: white; overflow: visible; height: auto; }
+            .catalog-pane, .catalog-header, .btn-action { display: none !important; }
+            .app-container { display: block; height: auto; width: 100%; }
+            .ticket-pane { width: 100%; border: none; box-shadow: none; display: block; height: auto; }
+            .ticket-header { background: white; border-bottom: 2px solid black; padding-bottom: 20px; margin-bottom: 20px; }
+            .ticket-client-info input, .ticket-client-info select { border: none !important; background: transparent; padding: 0; font-size: 14px; font-weight: bold; color: black; }
+            .ticket-items { overflow: visible; height: auto; }
+            table { width: 100%; }
+            th { background: white; border-bottom: 2px solid black; color: black; position: static; }
+            td { border-bottom: 1px solid #ccc; color: black; }
+            .qty-input, .price-select { border: none !important; background: transparent !important; color: black !important; padding: 0 !important; font-size: 14px; text-align: left; }
+            .ticket-totals { background: white; border: none; padding: 0; margin-top: 30px; width: 350px; float: right; page-break-inside: avoid; }
+            .total-final { border-top: 2px solid black; }
+            .total-final .amount { color: black !important; }
+            .fas.fa-trash { display: none; }
+
+            body::before {
+                content: "CASA VAZQUEZ — RECIBO DE COTIZACIÓN";
+                display: block;
+                font-size: 24px;
+                font-weight: 900;
+                color: black;
+                margin-bottom: 15px;
+                padding-bottom: 5px;
+                border-bottom: 3px solid black;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+        
+        <!-- PANEL IZQUIERDO: EXPLORADOR VISUAL TIPO SICAR -->
+        <div class="catalog-pane">
+            <div class="catalog-header">
+                <h1 style="margin:0; font-size:20px; display:flex; align-items:center; gap:10px;">
+                    <i class="fas fa-boxes"></i> Terminal de Venta P.O.S
+                </h1>
+                <button onclick="window.close()" style="background:none; border:1px solid rgba(255,255,255,0.3); color:white; padding:8px 15px; border-radius:6px; cursor:pointer; font-weight:600;"><i class="fas fa-times"></i> Volver a Catálogo</button>
+            </div>
+
+            <div class="catalog-search-bar">
+                <i class="fas fa-search" style="color:var(--text-muted);"></i>
+                <input type="text" id="explorerSearch" placeholder="Escribe el código, clave o descripción del producto...">
+            </div>
+
+            <div id="explorerGrid" class="catalog-grid">
+                <!-- Se inyecta vía JS -->
+            </div>
+        </div>
+
+
+        <!-- PANEL DERECHO: TICKET DE VENTA -->
+        <div class="ticket-pane">
+            
+            <div class="ticket-header">
+                <div class="ticket-client-info">
+                    <div style="display:flex; justify-content:space-between;">
+                        <label style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Datos de Cliente</label>
+                        <i class="fas fa-user" style="color:var(--primary);"></i>
+                    </div>
+                    <input type="text" id="txtCliente" placeholder="Público en General">
+                    <input type="text" id="txtVigencia" placeholder="Firma / Notas / Vigencia">
+                    
+                    <div style="margin-top:10px;">
+                        <label style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Lista de Precios Activa</label>
+                        <select id="tarifaGlobal">
+                            <option value="mayoreo" selected>💰 Precio Mayoreo</option>
+                            <option value="medio">📦 Medio Mayoreo</option>
+                            <option value="publico">🛒 Precio Público</option>
+                            <option value="distribuidor">🏭 Precio Distribuidor (Especial)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ticket-items">
+                <table id="tpvTable">
+                    <thead>
+                        <tr>
+                            <th style="width:15%; text-align:center;">Cant</th>
+                            <th style="width:40%;">Descripción</th>
+                            <th style="width:25%;">P. Unit.</th>
+                            <th style="width:15%; text-align:right;">Importe</th>
+                            <th style="width:5%;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tpvBody">
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <i class="fas fa-barcode" style="font-size:40px; color:#cbd5e1; margin-bottom:15px;"></i><br>
+                                    Caja abierta.<br>Comienza a cobrar buscando un producto.
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="ticket-totals">
+                <div class="total-row">
+                    <span>Subtotal Original</span>
+                    <span id="lblTotalPublico">$0.00</span>
+                </div>
+                <div class="total-row" style="color:var(--success); font-weight:600;">
+                    <span>Ahorro Aplicado</span>
+                    <span id="lblAhorro">-$0.00</span>
+                </div>
+                <div class="total-final">
+                    <span>Total a Pagar:</span>
+                    <span class="amount" id="lblTotal">$0.00</span>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-action" onclick="window.print()" style="flex:2;"><i class="fas fa-file-invoice"></i> Cobrar / Imprimir</button>
+                    <button class="btn-action btn-secondary" onclick="alert('Guardado!')" style="flex:1;"><i class="fas fa-save"></i></button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- CÓDIGO JS PRINCIPAL -->
+    <script>
+        let db = [];
+        let dbByKey = {};
+        let posState = {}; // { "100788": { qty: 2, customPriceType: 'publico' } }
+        
+        async function initTPV() {
+            try {
+                let param = Date.now();
+                try {
+                    let cv = JSON.parse(localStorage.getItem('truper_catalog_version'));
+                    if(cv && cv.timestamp) param = cv.timestamp;
+                } catch(e){}
+                
+                try {
+                    const [resp1, resp2] = await Promise.all([
+                        fetch('productos_truper_min_part1.json?v=' + param),
+                        fetch('productos_truper_min_part2.json?v=' + param)
+                    ]);
+                    if (!resp1.ok || !resp2.ok) throw new Error("Fallo la descarga de partes");
+                    const [part1, part2] = await Promise.all([resp1.json(), resp2.json()]);
+                    db = part1.concat(part2);
+                } catch (e) {
+                    console.warn("Usando fallback de archivo único...");
+                    const resp = await fetch('productos_truper_min.json?v=' + param);
+                    db = await resp.json();
+                }
+                db.forEach(p => { dbByKey[p.codigo] = p; });
+                
+                syncStateWithCart();
+                renderCart();
+                initSearchGrid();
+            } catch(e) {
+                console.error("Error", e);
+                document.getElementById('tpvBody').innerHTML = '<tr><td colspan="5"><div class="empty-state">Error crítico cargando base de datos.</div></td></tr>';
+            }
+        }
+        
+        function syncStateWithCart() {
+            let ls = [];
+            try { ls = JSON.parse(localStorage.getItem('trpr_quote_cart')) || []; } catch(e){}
+            try { posState = JSON.parse(localStorage.getItem('trpr_pos_state')) || {}; } catch(e){}
+            
+            ls.forEach(id => { if(!posState[id]) posState[id] = { qty: 1 }; });
+            Object.keys(posState).forEach(id => { if(!ls.includes(id)) delete posState[id]; });
+            saveState();
+        }
+        
+        function saveState() {
+            localStorage.setItem('trpr_pos_state', JSON.stringify(posState));
+            localStorage.setItem('trpr_quote_cart', JSON.stringify(Object.keys(posState)));
+        }
+        
+        function getPrice(p, tarifa) {
+            if(!p.precios) return 0;
+            switch(tarifa) {
+                case 'distribuidor': return p.precios.distribuidor || 0;
+                case 'mayoreo': return p.precios.mayoreo || 0;
+                case 'medio': return p.precios.medioMayoreo || p.precios.mayoreo || 0;
+                default: return p.precios.publico || p.precios.mayoreo || 0;
+            }
+        }
+        
+        function formatMoney(num) {
+            return '$' + num.toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2});
+        }
+        
+        // ----------------- RENDER DE TICKET DERECHO -----------------
+        function renderCart() {
+            const tbody = document.getElementById('tpvBody');
+            const cartIds = Object.keys(posState);
+            
+            if(cartIds.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><i class="fas fa-barcode" style="font-size:40px; color:#cbd5e1; margin-bottom:15px;"></i><br>Comienza a cobrar buscando un producto.</div></td></tr>';
+                document.getElementById('lblTotal').innerText = '$0.00';
+                document.getElementById('lblTotalPublico').innerText = '$0.00';
+                document.getElementById('lblAhorro').innerText = '-$0.00';
+                return;
+            }
+            
+            let html = '';
+            let tarifaMaestra = document.getElementById('tarifaGlobal').value;
+            let total = 0; let totalPublico = 0;
+            
+            cartIds.forEach(id => {
+                const p = dbByKey[id];
+                if(p) {
+                    const cant = posState[id].qty;
+                    let tarifaFila = posState[id].customPriceType || tarifaMaestra;
+                    let precio = getPrice(p, tarifaFila);
+                    const precioBase = getPrice(p, 'publico');
+                    
+                    total += (precio * cant);
+                    totalPublico += (precioBase * cant);
+                    
+                    html += `
+                        <tr>
+                            <td style="text-align:center;">
+                                <input type="number" class="qty-input" value="${cant}" min="1" onchange="updateQty('${id}', this.value)">
+                            </td>
+                            <td>
+                                <div style="font-weight:700; color:var(--primary); font-size:12px;">${p.clave}</div>
+                                <div style="color:var(--text-main); line-height:1.2;">${p.nombre || p.descripcion_csv || ''}</div>
+                            </td>
+                            <td>
+                                <select class="price-select" onchange="updateRowTariff('${id}', this.value)">
+                                    <option value="" ${!posState[id].customPriceType ? 'selected' : ''}>${formatMoney(getPrice(p, tarifaMaestra))} (Aut)</option>
+                                    <option value="publico" ${posState[id].customPriceType === 'publico' ? 'selected' : ''}>${formatMoney(getPrice(p, 'publico'))} (Púb)</option>
+                                    <option value="medio" ${posState[id].customPriceType === 'medio' ? 'selected' : ''}>${formatMoney(getPrice(p, 'medio'))} (Med)</option>
+                                    <option value="mayoreo" ${posState[id].customPriceType === 'mayoreo' ? 'selected' : ''}>${formatMoney(getPrice(p, 'mayoreo'))} (May)</option>
+                                    <option value="distribuidor" ${posState[id].customPriceType === 'distribuidor' ? 'selected' : ''}>${formatMoney(getPrice(p, 'distribuidor'))} (Dis)</option>
+                                </select>
+                            </td>
+                            <td style="font-weight:800; color:var(--text-main); text-align:right;">${formatMoney(precio * cant)}</td>
+                            <td style="text-align:right;">
+                                <button onclick="removeFromCart('${id}')" style="background:none; border:none; color:var(--danger); cursor:pointer;"><i class="fas fa-times"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                }
+            });
+            
+            let ahorro = totalPublico - total;
+            tbody.innerHTML = html;
+            document.getElementById('lblTotal').innerText = formatMoney(total);
+            document.getElementById('lblTotalPublico').innerText = formatMoney(totalPublico);
+            document.getElementById('lblAhorro').innerText = '-' + formatMoney(ahorro > 0 ? ahorro : 0);
+        }
+        
+        // ----------------- OPERACIONES TICKET -----------------
+        function updateQty(id, val) {
+            if(!posState[id]) return;
+            posState[id].qty = parseInt(val) || 1;
+            saveState(); renderCart();
+        }
+        
+        function updateRowTariff(id, customTariff) {
+            if(!posState[id]) return;
+            if(customTariff === '') delete posState[id].customPriceType;
+            else posState[id].customPriceType = customTariff;
+            saveState(); renderCart();
+        }
+        
+        function removeFromCart(id) {
+            delete posState[id];
+            saveState(); renderCart();
+        }
+        
+        function addFromPOS(id) {
+            if(!posState[id]) posState[id] = { qty: 1 };
+            else posState[id].qty++;
+            saveState(); renderCart();
+            // Resaltar visualmente la tabla (efecto flash)
+            const tbody = document.getElementById('tpvBody');
+            tbody.style.opacity = '0.5';
+            setTimeout(() => tbody.style.opacity = '1', 50);
+        }
+        
+        // ----------------- EXPLORADOR VISUAL IZQUIERDO (GRID) -----------------
+        let explorerDebounce;
+        function initSearchGrid() {
+            const container = document.getElementById('explorerGrid');
+            const input = document.getElementById('explorerSearch');
+            
+            function normalize(t) { return (t || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
+            
+            const drawCards = (results) => {
+                const tarifaMaestra = document.getElementById('tarifaGlobal').value;
+                container.innerHTML = results.map(p => {
+                    let imgUrl = (p.imagenes && p.imagenes.length) ? p.imagenes[0] : ((p.imagenes_local && p.imagenes_local.length) ? p.imagenes_local[0] : '');
+                    let thumbHtml = imgUrl ? `<img src="${imgUrl}" loading="lazy">` : `<div style="width:100%; height:120px; background:#e2e8f0; border-radius:6px; display:flex; align-items:center; justify-content:center; margin-bottom:10px;"><i class="fas fa-image" style="color:#94a3b8; font-size:30px;"></i></div>`;
+                    
+                    return `
+                    <div class="item-card" onclick="addFromPOS('${p.codigo}')">
+                        ${thumbHtml}
+                        <div class="price">${formatMoney(getPrice(p, tarifaMaestra))}</div>
+                        <div class="code">${p.clave} (${p.codigo})</div>
+                        <div class="title" title="${p.nombre || p.descripcion_csv || ''}">${p.nombre || p.descripcion_csv || ''}</div>
+                    </div>
+                `}).join('');
+            };
+            
+            drawCards(db.slice(0, 50));
+            
+            input.oninput = (e) => {
+                clearTimeout(explorerDebounce);
+                explorerDebounce = setTimeout(() => {
+                    const qRaw = e.target.value;
+                    const q = normalize(qRaw).trim();
+                    if(q.length === 0) { drawCards(db.slice(0, 50)); return; }
+                    
+                    const queryWords = q.split(/\s+/);
+                    const results = [];
+                    for(let i=0; i<db.length; i++) {
+                        const p = db[i];
+                        const fullText = normalize(p.codigo + ' ' + (p.clave||'') + ' ' + (p.nombre||'') + ' ' + (p.descripcion_csv||'') + ' ' + (p.ean||''));
+                        let match = true;
+                        for(let w=0; w<queryWords.length; w++) {
+                            if(!fullText.includes(queryWords[w])) { match = false; break; }
+                        }
+                        if(match) {
+                            results.push(p);
+                            if(results.length >= 50) break; // Límite de rendimiento
+                        }
+                    }
+                    drawCards(results);
+                }, 150); // Búsqueda super rápida
+            };
+            
+            // Re-dibujar tarjetas si cambian la tarifa global para que muestre el precio correcto en la foto
+            document.getElementById('tarifaGlobal').addEventListener('change', () => {
+                renderCart();
+                // Forzar trigger de búsqueda para redibujar el grid con la nueva tarifa
+                input.dispatchEvent(new Event('input'));
+            });
+            input.focus();
+        }
+        
+        initTPV();
+    </script>
+</body>
+</html>

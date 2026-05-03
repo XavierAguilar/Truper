@@ -2770,11 +2770,24 @@
                     document.getElementById('loader-msg').innerText = "Descargando catálogo ultrarrápido de última generación...";
                     document.getElementById('p-container').style.display = 'block';
 
-                    const resp = await fetch('productos_truper_min.json?v=' + fetchParam);
-                    if (!resp.ok) throw new Error("Fallo la descarga de la DB");
-                    
-                    document.getElementById('loader-msg').innerText = "Procesando productos...";
-                    productos = await resp.json();
+                    try {
+                        const [resp1, resp2] = await Promise.all([
+                            fetch('productos_truper_min_part1.json?v=' + fetchParam),
+                            fetch('productos_truper_min_part2.json?v=' + fetchParam)
+                        ]);
+                        if (!resp1.ok || !resp2.ok) throw new Error("Fallo la descarga de partes");
+                        
+                        document.getElementById('loader-msg').innerText = "Unificando y procesando catálogo...";
+                        const [part1, part2] = await Promise.all([resp1.json(), resp2.json()]);
+                        productos = part1.concat(part2);
+                    } catch (e) {
+                        console.warn("No se encontraron particiones, usando archivo unificado fallback...");
+                        const resp = await fetch('productos_truper_min.json?v=' + fetchParam);
+                        if (!resp.ok) throw new Error("Fallo la descarga de la DB");
+                        
+                        document.getElementById('loader-msg').innerText = "Procesando productos...";
+                        productos = await resp.json();
+                    }
                     
                     document.getElementById('loader-msg').innerText = "Guardando en caché offline (tomará unos segundos)...";
                     await setCachedData(productos);

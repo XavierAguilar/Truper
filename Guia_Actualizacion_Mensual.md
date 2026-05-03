@@ -37,10 +37,10 @@ Dado que tu base de datos `productos_truper.json` ronda tranquilamente los **116
 Tienes que exprimirle los espacios o minificarla. Puedes correr el siguiente comando mágico directo en tu Powershell:
 
 ```powershell
-node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync('productos_truper.json')); fs.writeFileSync('productos_truper_min.json', JSON.stringify(d));"
+node split_json.js
 ```
 
-Esto fabricará inmediatamente el archivo **`productos_truper_min.json`** comprimido (que pesará ~89 MB) listo para triunfar en la nube.
+Esto dividirá tu gran base de datos a la mitad, creando dos archivos minificados: **`productos_truper_min_part1.json`** y **`productos_truper_min_part2.json`** (ambos por debajo de los 50 MB) listos para triunfar en la nube sin tocar los límites de Vercel.
 
 ---
 
@@ -49,8 +49,8 @@ Ya que procesaste el código y los datos, es hora de poner el nuevo mes en inter
 
 **Opción A: El flujo de GitHub Desktop (Recomendado)**
 1. Abre tu **GitHub Desktop**.
-2. Verás como archivo modificado el archivo `productos_truper_min.json`. Asegúrate de que el grandote de 116MB siga *ignorado* / desmarcado.
-3. Pon tu descripción (Ej: "Precios Abril 2026") y pícale a **Commit > Push**.
+2. Verás como archivos nuevos/modificados **`productos_truper_min_part1.json`** y **`part2.json`**. Asegúrate de que el archivo grandote original de 130MB (`productos_truper.json`) siga *ignorado* / desmarcado.
+3. Pon tu descripción (Ej: "Precios Mayo 2026") y pícale a **Commit > Push**.
 4. Vercel despertará automáticamente en internet y jalará todo sutilmente.
 
 **Opción B: El Despliegue de Emergencia (Sin GitHub)**
