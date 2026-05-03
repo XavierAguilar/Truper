@@ -1,10 +1,269 @@
 {
-  "fechaActualizacion": "2026-04-06",
-  "archivoCSV": "catalogoAbril2026.csv",
-  "nuevos": [],
-  "descontinuados": [],
+  "fechaActualizacion": "2026-05-03",
+  "archivoCSV": "catalogo-MAYO2026.csv",
+  "nuevos": [
+    "104280",
+    "68079"
+  ],
+  "descontinuados": [
+    "29913",
+    "49484",
+    "29876",
+    "26023"
+  ],
   "volatiles": {
-    "subieron": [],
+    "subieron": [
+      {
+        "codigo": "10264",
+        "anterior": 2100,
+        "actual": 2200
+      },
+      {
+        "codigo": "10335",
+        "anterior": 2350,
+        "actual": 2450
+      },
+      {
+        "codigo": "10337",
+        "anterior": 3050,
+        "actual": 3200
+      },
+      {
+        "codigo": "10338",
+        "anterior": 3550,
+        "actual": 3750
+      },
+      {
+        "codigo": "10435",
+        "anterior": 1600,
+        "actual": 1665
+      },
+      {
+        "codigo": "10436",
+        "anterior": 4000,
+        "actual": 4200
+      },
+      {
+        "codigo": "10437",
+        "anterior": 2400,
+        "actual": 2550
+      },
+      {
+        "codigo": "12282",
+        "anterior": 1395,
+        "actual": 1665
+      },
+      {
+        "codigo": "14366",
+        "anterior": 825,
+        "actual": 985
+      },
+      {
+        "codigo": "14367",
+        "anterior": 1395,
+        "actual": 1665
+      },
+      {
+        "codigo": "16740",
+        "anterior": 1150,
+        "actual": 1235
+      },
+      {
+        "codigo": "16741",
+        "anterior": 1400,
+        "actual": 1450
+      },
+      {
+        "codigo": "16742",
+        "anterior": 1750,
+        "actual": 1815
+      },
+      {
+        "codigo": "16743",
+        "anterior": 1950,
+        "actual": 2050
+      },
+      {
+        "codigo": "16744",
+        "anterior": 2750,
+        "actual": 2900
+      },
+      {
+        "codigo": "16758",
+        "anterior": 5800,
+        "actual": 6100
+      },
+      {
+        "codigo": "16759",
+        "anterior": 7250,
+        "actual": 7650
+      },
+      {
+        "codigo": "20685",
+        "anterior": 815,
+        "actual": 875
+      },
+      {
+        "codigo": "20686",
+        "anterior": 985,
+        "actual": 1015
+      },
+      {
+        "codigo": "20687",
+        "anterior": 1250,
+        "actual": 1300
+      },
+      {
+        "codigo": "20688",
+        "anterior": 1450,
+        "actual": 1525
+      },
+      {
+        "codigo": "20689",
+        "anterior": 1725,
+        "actual": 1815
+      },
+      {
+        "codigo": "40993",
+        "anterior": 15,
+        "actual": 19
+      },
+      {
+        "codigo": "40994",
+        "anterior": 19.5,
+        "actual": 24
+      },
+      {
+        "codigo": "42859",
+        "anterior": 1375,
+        "actual": 1450
+      },
+      {
+        "codigo": "42860",
+        "anterior": 1565,
+        "actual": 1650
+      },
+      {
+        "codigo": "42861",
+        "anterior": 1750,
+        "actual": 1850
+      },
+      {
+        "codigo": "42862",
+        "anterior": 1950,
+        "actual": 2050
+      },
+      {
+        "codigo": "42949",
+        "anterior": 2450,
+        "actual": 2600
+      },
+      {
+        "codigo": "42950",
+        "anterior": 3000,
+        "actual": 3150
+      },
+      {
+        "codigo": "42951",
+        "anterior": 3250,
+        "actual": 3400
+      },
+      {
+        "codigo": "42954",
+        "anterior": 2250,
+        "actual": 2400
+      },
+      {
+        "codigo": "42955",
+        "anterior": 2750,
+        "actual": 2850
+      },
+      {
+        "codigo": "42956",
+        "anterior": 3000,
+        "actual": 3150
+      },
+      {
+        "codigo": "42957",
+        "anterior": 1250,
+        "actual": 1300
+      },
+      {
+        "codigo": "42958",
+        "anterior": 1565,
+        "actual": 1665
+      },
+      {
+        "codigo": "42959",
+        "anterior": 2000,
+        "actual": 2100
+      },
+      {
+        "codigo": "42960",
+        "anterior": 2350,
+        "actual": 2450
+      },
+      {
+        "codigo": "42961",
+        "anterior": 2750,
+        "actual": 2850
+      },
+      {
+        "codigo": "44656",
+        "anterior": 1050,
+        "actual": 1115
+      },
+      {
+        "codigo": "44657",
+        "anterior": 1315,
+        "actual": 1375
+      },
+      {
+        "codigo": "44658",
+        "anterior": 1550,
+        "actual": 1635
+      },
+      {
+        "codigo": "44659",
+        "anterior": 1795,
+        "actual": 1885
+      },
+      {
+        "codigo": "45446",
+        "anterior": 865,
+        "actual": 1035
+      },
+      {
+        "codigo": "49897",
+        "anterior": 77,
+        "actual": 95
+      },
+      {
+        "codigo": "49898",
+        "anterior": 115,
+        "actual": 140
+      },
+      {
+        "codigo": "12283",
+        "anterior": 410,
+        "actual": 485
+      },
+      {
+        "codigo": "12284",
+        "anterior": 575,
+        "actual": 675
+      },
+      {
+        "codigo": "13289",
+        "anterior": 175,
+        "actual": 195
+      },
+      {
+        "codigo": "14365",
+        "anterior": 575,
+        "actual": 675
+      }
+    ],
     "bajaron": []
   },
   "descuentos": []

@@ -4,16 +4,20 @@
   "procesados": 3895,
   "pendientes": 0,
   "errores": 0,
-  "tiempo_s": 0,
-  "prod_por_min": 0,
-  "productos_por_minuto": 0,
+  "tiempo_s": 270,
+  "prod_por_min": 865,
+  "productos_por_minuto": 865,
   "pct_lote": 100,
-  "ultima_actualizacion": "2026-04-06T03:51:41.358Z",
+  "ultima_actualizacion": "2026-05-03T19:50:26.444Z",
   "estado": "completado",
   "salud": "healthy",
-  "ultimo_producto": null,
-  "descargados": 0,
-  "existentes": 3895,
-  "espacio_mb": "0.0",
+  "ultimo_producto": {
+    "codigo": "35301",
+    "clave": "",
+    "nombre": ""
+  },
+  "descargados": 3895,
+  "existentes": 0,
+  "espacio_mb": "507.4",
   "problemas": []
 }

@@ -16,6 +16,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 </head>
 <style>
         :root {
@@ -4568,8 +4569,9 @@
                         '<div class="result-card-clave">' + highlightMulti(p.clave, words) + '</div>' +
                         '<div class="result-card-name">' + highlightMulti(p.nombre || p.descripcion_csv || '', words) + '</div>' +
                         '</div>' +
-                        '<div class="result-card-footer">' +
+                        '<div class="result-card-footer" style="display:flex; justify-content:space-between; align-items:center;">' +
                         '<span class="result-card-brand">' + esc(p.marca || 'TRUPER') + '</span>' +
+                        '<button onclick="window.quoteCart.add(\'' + p.codigo + '\', event)" style="background:#10b981; color:white; border:none; border-radius:4px; padding:2px 6px; font-size:10px; cursor:pointer;" title="Añadir a Cotización TPV"><i class="fas fa-cart-plus"></i></button>' +
                         (p.pagina_catalogo ? '<span class="result-card-page">Pág. ' + p.pagina_catalogo + '</span>' : '') +
                         '</div></div>';
                 }).join('');
@@ -4595,7 +4597,8 @@
                         '</div>' +
                         '<div class="result-list-name">' + highlightMulti(p.nombre || p.descripcion_csv || '', words) + '</div>' +
                         '</div>' +
-                        '<div class="result-list-meta">' +
+                        '<div class="result-list-meta" style="display:flex; flex-direction:column; gap:5px; align-items:flex-end;">' +
+                        '<button onclick="window.quoteCart.add(\'' + p.codigo + '\', event)" style="background:#10b981; color:white; border:none; border-radius:4px; padding:4px 8px; font-size:11px; cursor:pointer;" title="Añadir a Cotización TPV"><i class="fas fa-cart-plus"></i> Consignar</button>' +
                         '<span class="result-list-brand">' + esc(p.marca || 'TRUPER') + '</span>' +
                         (p.pagina_catalogo ? '<span class="result-list-page">Pág. ' + p.pagina_catalogo + '</span>' : '') +
                         '</div></div>';
@@ -4778,6 +4781,7 @@
                 : '<div class="empty-state"><i class="fas fa-link"></i>Sin productos relacionados</div>';
 
             var dl = [];
+            dl.push('<button class="download-btn" onclick="window.quoteCart.add(\'' + p.codigo + '\', event)" style="background-color:#10b981; border-color:#059669; color:white; font-weight:bold;"><i class="fas fa-cart-plus"></i> Cotizar PTV</button>');
             if (p.ficha_tecnica_pdf) dl.push('<a class="download-btn" href="' + p.ficha_tecnica_pdf + '" target="_blank"><i class="fas fa-file-pdf"></i>Ficha PDF</a>');
             if (p.banco_fotos_url) dl.push('<a class="download-btn" href="' + p.banco_fotos_url + '" target="_blank"><i class="fas fa-images"></i>Banco Fotos</a>');
             if (p.catalogo_url || p.pagina_catalogo) {
@@ -5489,12 +5493,86 @@
                 btView.style.display = 'none';
                 mainView.style.display = 'block';
             } else {
-                btView.style.display = 'block';
-                mainView.style.display = 'none';
-                searchRes.classList.remove('show');
-                setTimeout(() => document.getElementById('btScannerInput').focus(), 100);
-                renderBtList();
+                showBtPasswordModal(() => {
+                    btView.style.display = 'block';
+                    mainView.style.display = 'none';
+                    searchRes.classList.remove('show');
+                    setTimeout(() => document.getElementById('btScannerInput').focus(), 100);
+                    renderBtList();
+                });
             }
+        }
+
+        function showBtPasswordModal(onSuccess) {
+            let modal = document.getElementById('btPasswordModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'btPasswordModal';
+                modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);backdrop-filter:blur(5px);z-index:99999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;';
+                modal.innerHTML = `
+                    <div style="background:var(--surface, #1e293b); padding:30px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.5); width:350px; text-align:center; transform:scale(0.9); transition:transform 0.3s; border:1px solid var(--border, #334155);">
+                        <div style="color:#ef4444; font-size:40px; margin-bottom:15px;"><i class="fas fa-lock"></i></div>
+                        <h2 style="color:#fff; margin:0 0 10px; font-size:20px;">Acceso Restringido</h2>
+                        <p style="color:#94a3b8; font-size:14px; margin-bottom:20px;">Ingresa la contraseña para acceder a la herramienta de Back Tags.</p>
+                        <input type="password" id="btPasswordInput" style="width:100%; padding:12px; background:var(--bg, #0f172a); border:1px solid var(--border, #334155); border-radius:8px; color:#fff; font-size:16px; margin-bottom:15px; text-align:center; outline:none;" placeholder="••••••">
+                        <div id="btPasswordError" style="color:#ef4444; font-size:13px; margin-bottom:15px; height:15px; visibility:hidden;">Contraseña incorrecta</div>
+                        <div style="display:flex; gap:10px;">
+                            <button id="btPasswordCancel" style="flex:1; padding:10px; background:transparent; border:1px solid var(--border, #334155); color:#fff; border-radius:8px; cursor:pointer; font-weight:bold;">Cancelar</button>
+                            <button id="btPasswordSubmit" style="flex:1; padding:10px; background:#dc2626; border:none; color:#fff; border-radius:8px; cursor:pointer; font-weight:bold;">Entrar</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                const input = document.getElementById('btPasswordInput');
+                const error = document.getElementById('btPasswordError');
+                const btnCancel = document.getElementById('btPasswordCancel');
+                const btnSubmit = document.getElementById('btPasswordSubmit');
+                const inner = modal.children[0];
+
+                const close = () => {
+                    modal.style.opacity = '0';
+                    inner.style.transform = 'scale(0.9)';
+                    setTimeout(() => modal.style.display = 'none', 300);
+                };
+
+                const submit = () => {
+                    if (input.value === '63001') {
+                        error.style.visibility = 'hidden';
+                        close();
+                        if (modal.onSuccessCb) modal.onSuccessCb();
+                    } else {
+                        error.style.visibility = 'visible';
+                        input.value = '';
+                        input.focus();
+                        inner.style.transform = 'translateX(-5px)';
+                        setTimeout(() => inner.style.transform = 'translateX(5px)', 50);
+                        setTimeout(() => inner.style.transform = 'translateX(-5px)', 100);
+                        setTimeout(() => inner.style.transform = 'translateX(5px)', 150);
+                        setTimeout(() => inner.style.transform = 'scale(1)', 200);
+                    }
+                };
+
+                btnCancel.onclick = close;
+                btnSubmit.onclick = submit;
+                input.onkeydown = (e) => { if (e.key === 'Enter') submit(); else if (e.key === 'Escape') close(); };
+            }
+            
+            modal.onSuccessCb = onSuccess;
+            const input = document.getElementById('btPasswordInput');
+            const inner = modal.children[0];
+            const error = document.getElementById('btPasswordError');
+            
+            input.value = '';
+            error.style.visibility = 'hidden';
+            modal.style.display = 'flex';
+            
+            // Trigger reflow for transition
+            void modal.offsetWidth;
+            
+            modal.style.opacity = '1';
+            inner.style.transform = 'scale(1)';
+            setTimeout(() => input.focus(), 100);
         }
 
         let btSuggestions = [];
@@ -6224,8 +6302,12 @@
     <div class="bktpl-modal-overlay" id="bktplModalWrap">
         <div class="bktpl-modal">
             <div class="bktpl-sidebar">
-                <div class="bktpl-header">
-                    <h3><i class="fas fa-layer-group" style="color:#10b981;"></i> Plantillas</h3>
+                <div class="bktpl-header" style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="margin:0;"><i class="fas fa-layer-group" style="color:#10b981;"></i> Plantillas</h3>
+                    <div>
+                        <button onclick="window.bkGallery.exportColors()" title="Exportar Colores" style="background:none; border:none; cursor:pointer; color:#64748b; font-size:14px;"><i class="fas fa-share-square"></i></button>
+                        <button onclick="window.bkGallery.importColors()" title="Importar Colores" style="background:none; border:none; cursor:pointer; color:#64748b; font-size:14px; margin-left:8px;"><i class="fas fa-download"></i></button>
+                    </div>
                 </div>
                 <div class="bktpl-list" id="bktplList">
                     <!-- Templates gen -->
@@ -6250,6 +6332,22 @@
                              <button class="cp-reset" onclick="window.bkGallery.resetColors()"><i class="fas fa-undo"></i> Restaurar Defecto</button>
                         </div>
                         <div class="cp-controls" id="bktplColorControls"></div>
+                        <div style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                            <strong style="color: #334155; font-size: 13px; margin-bottom: 10px; display: block;"><i class="fas fa-barcode"></i> Configuración de Códigos</strong>
+                            <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+                                <label class="cp-item">
+                                    <input type="checkbox" id="cpUseQR" onchange="window.bkGallery.updateCodePrefs()"> Usar Código QR
+                                </label>
+                                <label class="cp-item" title="El QR abrirá el sitio de Truper en lugar de solo leer el número">
+                                    <input type="checkbox" id="cpQRUrl" onchange="window.bkGallery.updateCodePrefs()"> Enlace Web (URL)
+                                </label>
+                                <label class="cp-item" style="gap:5px; margin-left: 10px;">
+                                    <span>Talla:</span>
+                                    <input type="range" id="cpCodeScale" min="0.5" max="2.0" step="0.1" value="1.0" oninput="document.getElementById('cpScaleVal').innerText=this.value; window.bkGallery.updateCodePrefs()" style="width: 80px;">
+                                    <span id="cpScaleVal" style="width:20px; font-weight:bold; color:var(--primary); font-size: 11px;">1.0</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </details>
                 <style id="bktplDynamicCSS"></style>
@@ -6293,6 +6391,34 @@
                 'std-5x8': [
                     { label: 'Encabezado', target: '.bktag-redhead', prop: 'background-color', def: '#ff0000' }
                 ]
+            },
+            
+            exportColors() {
+                const saved = localStorage.getItem('trpr_tpl_colors');
+                if(!saved || saved === '{}') {
+                    alert("Aún no tienes colores personalizados para exportar."); return;
+                }
+                const code = btoa(saved);
+                navigator.clipboard.writeText(code).then(() => {
+                    alert("¡Código de diseño copiado al portapapeles!\nEnvíaselo a tus compañeros para que lo importen.");
+                });
+            },
+            
+            importColors() {
+                const code = prompt("Pega el código de diseño aquí:");
+                if(!code) return;
+                try {
+                    const jsonStr = atob(code.trim());
+                    const parsed = JSON.parse(jsonStr);
+                    if(typeof parsed === 'object') {
+                        localStorage.setItem('trpr_tpl_colors', JSON.stringify(parsed));
+                        this.renderColorPicker();
+                        this.applyColorOverrides();
+                        alert("¡Diseño importado y aplicado correctamente!");
+                    }
+                } catch(e) {
+                    alert("El código ingresado no es válido.");
+                }
             },
             
             getSavedColors(tplId) {
@@ -6419,6 +6545,80 @@
                     div.appendChild(hexInp);
                     controls.appendChild(div);
                 });
+                
+                this.initCodePrefsUI();
+            },
+            
+            initCodePrefsUI() {
+                let useQR = document.getElementById('cpUseQR');
+                let useUrl = document.getElementById('cpQRUrl');
+                let scale = document.getElementById('cpCodeScale');
+                let scaleVal = document.getElementById('cpScaleVal');
+                
+                if(useQR) useQR.checked = localStorage.getItem('trpr_use_qr') === '1';
+                if(useUrl) useUrl.checked = localStorage.getItem('trpr_use_url') === '1';
+                if(scale) {
+                    let sv = localStorage.getItem('trpr_code_scale') || '1.0';
+                    scale.value = sv;
+                    if(scaleVal) scaleVal.innerText = sv;
+                }
+            },
+            
+            updateCodePrefs() {
+                let useQR = document.getElementById('cpUseQR');
+                let useUrl = document.getElementById('cpQRUrl');
+                let scale = document.getElementById('cpCodeScale');
+                
+                if(useQR) localStorage.setItem('trpr_use_qr', useQR.checked ? '1' : '0');
+                if(useUrl) localStorage.setItem('trpr_use_url', useUrl.checked ? '1' : '0');
+                if(scale) localStorage.setItem('trpr_code_scale', scale.value);
+                
+                if(this.activeTemplateId) this.selectTemplate(this.activeTemplateId);
+            },
+            
+            renderBarcodeOrQR(idBarcode, ean, fullItemData) {
+                let isQR = localStorage.getItem('trpr_use_qr') === '1';
+                let isUrl = localStorage.getItem('trpr_use_url') === '1';
+                let scale = parseFloat(localStorage.getItem('trpr_code_scale')) || 1.0;
+                
+                let el = document.getElementById(idBarcode);
+                if(!el) return;
+                
+                let parent = el.parentNode;
+                parent.innerHTML = '';
+                
+                if (isQR && window.QRious) {
+                    let canvas = document.createElement('canvas');
+                    canvas.id = idBarcode;
+                    // Prevenir que crezca infinito perdiendo aspecto en grid
+                    canvas.style.maxWidth = "100%";
+                    parent.appendChild(canvas);
+                    
+                    let val = ean;
+                    if(isUrl && fullItemData && fullItemData.p && fullItemData.p.clave) {
+                        val = "https://www.truper.com/p-" + fullItemData.p.clave;
+                    }
+                    
+                    new QRious({
+                      element: canvas,
+                      value: val,
+                      size: 55 * scale,
+                      level: 'M'
+                    });
+                } else if (window.JsBarcode) {
+                    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    svg.id = idBarcode;
+                    svg.style.maxWidth = "100%";
+                    parent.appendChild(svg);
+                    
+                    try {
+                        JsBarcode(svg, ean, {
+                            format: "CODE128", displayValue: true, fontSize: 13, fontOptions: "bold",
+                            textMargin: 1, textPosition: "bottom", textAlign: "center", margin: 0, 
+                            height: 26 * scale, width: 1.5 * scale
+                        });
+                    } catch(e) {}
+                }
             },
             templates: [
                 {
@@ -7739,12 +7939,7 @@
                     if(bk) bk.style.margin = "0 auto";
                     
                     setTimeout(() => {
-                        if(window.JsBarcode) {
-                            JsBarcode("#"+idBarcode, ean, {
-                                format: "CODE128", displayValue: true, fontSize: 13, fontOptions: "bold",
-                                textMargin: 1, textPosition: "bottom", textAlign: "center", margin: 0, height: 26, width: 1.5
-                            });
-                        }
+                        this.renderBarcodeOrQR(idBarcode, ean, sample);
                         this.renderColorPicker();
                         this.applyColorOverrides();
                     }, 50);
@@ -7804,12 +7999,7 @@
                         printArea.insertAdjacentHTML('beforeend', tpl.render(item, ean, imgSrc, idBarcode));
                         
                         setTimeout(() => {
-                            if(window.JsBarcode) {
-                                JsBarcode("#"+idBarcode, ean, {
-                                    format: "CODE128", displayValue: true, fontSize: 13, fontOptions: "bold",
-                                    textMargin: 1, textPosition: "bottom", textAlign: "center", margin: 0, height: 26, width: 1.5
-                                });
-                            }
+                            this.renderBarcodeOrQR(idBarcode, ean, item);
                         }, 50);
                     }
                 });
@@ -7869,7 +8059,6 @@
           
       </div>
   </div>
-
+  <script src="truper_cart.js"></script>
 </body>
-
 </html>

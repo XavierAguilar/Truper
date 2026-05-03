@@ -88,7 +88,7 @@ async function fetchWithRetry(url, options = {}, retries = 5) {
 function readCatalogCSV(filePath) {
   const data = fs.readFileSync(filePath, 'latin1');
   const products = [];
-  const regex = /^(\d{4,}),([^,]+),(.*)/gm;
+  const regex = /^"?(\d{4,})"?,"?([^,"]+)"?,(.*)/gm;
   let match;
   while ((match = regex.exec(data)) !== null) {
     products.push({

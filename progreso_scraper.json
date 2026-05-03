@@ -1,25 +1,25 @@
 {
   "estado": "completado",
   "salud": "healthy",
-  "total_catalogo": 15382,
+  "total_catalogo": 15385,
   "rango": {
     "start": 0,
-    "end": 15382
+    "end": 15385
   },
-  "procesados": 15389,
+  "procesados": 15391,
   "nuevos_en_lote": 0,
-  "total_lote": 144,
+  "total_lote": 139,
   "pct_lote": 100,
   "errores": 0,
   "reintentando": 0,
   "pendientes": 0,
-  "tiempo_s": "26",
-  "prod_por_min": "331.0",
-  "ultima_actualizacion": "2026-04-06T04:00:05.386Z",
+  "tiempo_s": "24",
+  "prod_por_min": "348.0",
+  "ultima_actualizacion": "2026-05-03T19:14:22.580Z",
   "ultimo_producto": {
-    "codigo": "104441",
-    "clave": "REP-CAREL-913DX-2",
-    "nombre": "Bolsa con 2 micas para careta CAREL-913DX (2025), TRUPER"
+    "codigo": "68079",
+    "clave": "R-TOL-3",
+    "nombre": "Repuesto de lona 3 x 3 m para el toldo TOL-3, TRUPER"
   },
   "errores_detalle": [],
   "problemas": []
