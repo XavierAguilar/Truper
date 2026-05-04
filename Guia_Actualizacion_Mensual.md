@@ -40,7 +40,11 @@ Tienes que exprimirle los espacios o minificarla. Puedes correr el siguiente com
 node split_json.js
 ```
 
-Esto dividirá tu gran base de datos a la mitad, creando dos archivos minificados: **`productos_truper_min_part1.json`** y **`productos_truper_min_part2.json`** (ambos por debajo de los 50 MB) listos para triunfar en la nube sin tocar los límites de Vercel.
+Esto dividirá tu gran base de datos en 4 partes exactas, creando cuatro archivos minificados: **`productos_truper_min_part1.json`**, **`part2`**, **`part3`** y **`part4`** (cada uno de ~25 MB). 
+
+> [!WARNING]
+> **REGLA DE ORO DE VERCEL (.vercelignore)**: Vercel tiene un límite estricto de 50MB para archivos estáticos en cuentas gratuitas y bloquea los archivos `.json` por defecto si están ignorados.
+> Si en el futuro cambias el nombre o la cantidad de particiones, **TIENES** que ir al archivo oculto `.vercelignore` y escribirlos allí (ej: `!productos_truper_min_partX.json`) para darles inmunidad. De lo contrario, Vercel los borrará en silencio y la app tirará Error 404.
 
 ---
 
@@ -49,7 +53,7 @@ Ya que procesaste el código y los datos, es hora de poner el nuevo mes en inter
 
 **Opción A: El flujo de GitHub Desktop (Recomendado)**
 1. Abre tu **GitHub Desktop**.
-2. Verás como archivos nuevos/modificados **`productos_truper_min_part1.json`** y **`part2.json`**. Asegúrate de que el archivo grandote original de 130MB (`productos_truper.json`) siga *ignorado* / desmarcado.
+2. Verás como archivos nuevos/modificados **`productos_truper_min_part1.json`** hasta la **`part4.json`**. Asegúrate de que el archivo grandote original de 130MB (`productos_truper.json`) siga *ignorado* / desmarcado.
 3. Pon tu descripción (Ej: "Precios Mayo 2026") y pícale a **Commit > Push**.
 4. Vercel despertará automáticamente en internet y jalará todo sutilmente.
 
