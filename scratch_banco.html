@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="language" content="es">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <!--<script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>-->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous" type="958e2c3f7bad0d221e1ba42a-text/javascript"></script>	
+	      
+	<script type="958e2c3f7bad0d221e1ba42a-text/javascript" src="/BancoContenidoDigital/assets/7bcfa6cd/jquery.js"></script>
+<script type="958e2c3f7bad0d221e1ba42a-text/javascript" src="/BancoContenidoDigital/js/slick/slick.min.js"></script>
+<script type="958e2c3f7bad0d221e1ba42a-text/javascript" src="/BancoContenidoDigital/js/elevatezoom.js"></script>
+<title>Banco de fotos Truper - ViewInfo Producto</title>
+</head>
+
+<body class="d-flex flex-column h-100">
+
+	<!--<div id="header">
+		<div id="logo"></div>
+	</div>--><!-- header -->
+	
+	<header>
+		<div class="px-3 py-2 bg-light">
+			<div class="container">
+				<div class="row">
+					<div class="col-3">
+					</div>
+					<div class="col-6">
+						<a class="nav-link" href="/BancoContenidoDigital/index.php?r=site/index"><h3 class="mt-2 text-center">BANCO DE CONTENIDO DIGITAL</h3></a>					</div>
+					<div class="col-3">
+						<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">			
+													</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+	<nav class="navbar navbar-expand-lg navbar-light bg-light" aria-label="Tenth navbar example">
+    <div class="container-fluid">
+      
+      <div class="collapse navbar-collapse justify-content-md-center" id="navbarsExample08">
+        <div class="ms-3 me-auto">
+
+        </div>
+      
+        
+        <form class="bd-search position-relative me-auto " style="width: 45%;">
+        <form id="search-form" action="/BancoContenidoDigital/index.php?r=site/search" method="get">
+<input type="hidden" value="site/search" name="r" />            <div class="input-group mb-3">
+                <input class="form-control" name="Productos[clave]" type="text" autocomplete="off" id="buscador" placeholder="Búsqueda por código, clave o descripción..." aria-label="Search" style="border-right: none;">
+                                <span class="input-group-text" id="basic-addon1" style="color: #FF8C3F;background-color: white;border-left: none;"><i class="fa fa-search" aria-hidden="true"></i></span>
+            </div>
+            <div class="containerLiveSearchDesk">
+                <div class="liveSearchDesk">
+                    <div id="modulesDesk"></div>
+                    <!--<div id="searchAllDesk"></div>
+                    <div id="categoriesDesk"></div>-->
+                </div>
+            </div>
+        </form>      </div>
+    </div>
+  </nav>
+	<!--<main class="flex-shrink-0">
+  
+	<div class="container" style="max-width:100%;padding:0;">-->
+			    <div class="container-fluid">
+        <div class="row">
+        
+            <main class="col-md-12 ms-sm-auto px-md-4">
+                <style type="text/css">
+    #wrapper {
+        width: 100%;
+        max-width: 1280px;
+        margin: 30px auto;
+        padding-bottom: 30px;
+    }
+.truper_img{
+    width: 200px !important;
+}
+
+.container_body {
+    display: flex;
+    justify-content: space-between;
+}
+
+.column {
+    width: 49%;
+    margin-bottom: 25px;
+}
+
+    #contentImgs {
+        max-height: 42rem;
+        overflow: hidden;
+        padding-right: 16px;
+        width: 18%;
+    }
+
+    #galeria > div {
+    display: flex;
+    justify-content: center;
+}
+
+    .up {
+    background: #eeeeee;
+    width: auto;
+    position: relative;
+    margin-bottom: 5px;
+}
+
+.arrow {
+    text-align: center;
+    z-index: 2;
+    padding: 5px 0px;
+    position: sticky;   
+}
+
+.arrow > a {
+    color: #ff6800 !important;
+}
+
+.thumbnails {
+    transform: translate3d(0px, 0px, 0px);
+    transition-duration: 400ms;
+    transition-timing-function: ease;
+    height: 591px;
+}
+
+.thumbnails .thumbnail.mini {
+    border: 1px solid #e1e1e1;    
+    margin-bottom: 5px;
+    /*width: 90px;*/
+    /*width: 64px;*/
+    position: relative;
+    -webkit-transition: all .5s;
+    -moz-transition: all .5s;
+    -ms-transition: all .5s;
+    -o-transition: all .5s;
+    transition: all .5s;
+}
+
+img {
+    width: 100%;
+    outline: 0;
+}
+
+.down {
+    top: -314%;
+    background: #eeeeee;
+}
+
+.principal {
+    position: relative;
+    max-width: 70%;
+    border: 1px solid #e1e1e1;
+}
+
+.brand-mobile {
+    display: block;
+    width: 110px;
+    margin: 10px;
+    float: right;
+}
+
+a, a:active {
+    border: none;
+    outline: 0;
+    text-decoration: none;
+    color: #4b4b4b;
+}
+
+img {
+    width: 100%;
+    outline: 0;
+}
+
+.photo-footer {
+    margin-top: 5px;
+}
+
+.photo-footer > p {
+    font-size: 13px;
+    margin-left: 3.5rem;
+    text-align: center;
+}
+
+.selected {
+    opacity: 1 !important;
+}
+
+.check-photo {
+    /*
+    left: -33px;
+    top: -5px;*/
+    position: absolute;
+    border-color:#f60 !important;
+    opacity: 1 !important;
+}
+
+.check-photo:checked {
+    background-color:#f60 !important;
+}
+
+.info-labels {
+    font-weight: 500;
+    font-size: 17px;
+}
+
+.producto {
+    margin-top: 13px;
+    font-size: 22px;
+}
+
+.orange {
+    background-color: #FF6600;
+    border-radius: 20px;
+    border-color: #FF6600;
+}
+
+.orange:hover {
+    background-color:#FF6600;
+    border-color: #FF6600;
+}
+
+.type-photo {
+    height: 26px;
+    background: #262626;
+    position: absolute;
+    right: 0;
+    padding-top: 2px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.type-photo p {
+    font-size: 12px;
+    margin: 0 !important;
+    color: white !important;
+    padding-left: 5px;
+}
+
+.form-download {
+    background-color: #F5F5F5;
+    border-radius: 8px;
+    padding: 5px;
+}
+
+    .disabled {
+        opacity: .3 !important;
+        cursor: default;
+    }
+
+    .disabled > a {        
+        cursor: default;
+    }
+</style>
+
+<div id="wrapper">
+    <p>Da clic en el cuadro naranja para seleccionar las fotos que deseas descargar.</p>
+    <div class="container_body">
+        <div class="column" style="width: 100%;">
+            <section class="galeria hideMobile" id="galeria">
+                <div>
+                    <div class="hidden">
+                                                        <a href="https://www.truper.com/media/import/imagenes/ANDO-4.jpg" class="galery-images" data-fancybox="galeria" data-width="640"></a>
+                                                                                        <a href="https://www.truper.com/media/import/imagenes/ANDO-4+FC1.jpg" class="galery-images" data-fancybox="galeria" data-width="640"></a>
+                                                                                        <a href="https://www.truper.com/media/import/imagenes/ANDO-4+E1.jpg" class="galery-images" data-fancybox="galeria" data-width="640"></a>
+                                                                                        <a href="https://www.truper.com/media/import/imagenes/ANDO-4+EIND1.jpg" class="galery-images" data-fancybox="galeria" data-width="640"></a>
+                                                                                        <a href="https://www.truper.com/media/import/imagenes/ANDO-4+EI1.jpg" class="galery-images" data-fancybox="galeria" data-width="640"></a>
+                                                                            </div>
+                    <div id="contentImgs">
+                                                    <div class="arrow up disabled"><a id="prevImg" href="#"><i class="fa fa-chevron-up" aria-hidden="true"></i></a></div>
+                                                <div class="thumbnails" id="thumbnails"><div class="thumbnail mini selected" data-type="Producto"><input class="form-check-input check-photo" name="photoId[]" value="45211" type="checkbox" autocomplete="off"><img class="img-responsive image zoom" data-zoom-image="https://www.truper.com/media/import/imagenes/ANDO-4.jpg" src="https://www.truper.com/media/import/imagenes/ANDO-4.jpg" order="1"></div><div class="thumbnail mini " data-type="Fotos detalle"><input class="form-check-input check-photo" name="photoId[]" value="97707" type="checkbox" autocomplete="off"><img class="img-responsive image zoom" data-zoom-image="https://www.truper.com/media/import/imagenes/ANDO-4+FC1.jpg" src="https://www.truper.com/media/import/imagenes/ANDO-4+FC1.jpg" order="2"></div><div class="thumbnail mini " data-type="Empaque"><input class="form-check-input check-photo" name="photoId[]" value="45212" type="checkbox" autocomplete="off"><img class="img-responsive image zoom" data-zoom-image="https://www.truper.com/media/import/imagenes/ANDO-4+E1.jpg" src="https://www.truper.com/media/import/imagenes/ANDO-4+E1.jpg" order="3"></div><div class="thumbnail mini " data-type="Empaque Individual"><input class="form-check-input check-photo" name="photoId[]" value="141790" type="checkbox" autocomplete="off"><img class="img-responsive image zoom" data-zoom-image="https://www.truper.com/media/import/imagenes/ANDO-4+EIND1.jpg" src="https://www.truper.com/media/import/imagenes/ANDO-4+EIND1.jpg" order="4"></div><div class="thumbnail mini " data-type="Empaque Inner"><input class="form-check-input check-photo" name="photoId[]" value="141791" type="checkbox" autocomplete="off"><img class="img-responsive image zoom" data-zoom-image="https://www.truper.com/media/import/imagenes/ANDO-4+EI1.jpg" src="https://www.truper.com/media/import/imagenes/ANDO-4+EI1.jpg" order="5"></div></div>                                                    <div class="arrow down"><a id="nextImg" href="#"><i class="fa fa-chevron-down" aria-hidden="true"></i></a></div>
+                                            </div>
+                    <div class="principal">
+                        <div class="type-photo">
+                            <p>Producto</p>
+                        </div>
+                        <a href="https://www.truper.com/media/import/imagenes/ANDO-4.jpg" class="galery-images" id="img-1" data-fancybox-trigger="galeria" data-fancybox-index="0" data-width="640">
+                            <img class="img-responsive zoom" data-zoom-image="https://www.truper.com/media/import/imagenes/ANDO-4.jpg" src="https://www.truper.com/media/import/imagenes/ANDO-4.jpg" id="image_main2"/>
+                        </a>
+                    </div>                    
+                </div>
+                <div class="photo-footer"><p style="margin-left: 21%;">Pasa el mouse sobre la imagen para hacer zoom</p></div>            
+            </section>
+        </div>
+        <div class="column" style="width:35%;">
+            <section class="list-familia">
+                <div id="info" class="info-labels">                    
+                    <span class="code">Código:48470</span>
+                    <span style="margin-right: 10px;color: #FF6600;margin-left: 10px;">|</span>
+                    <span class="sku">Clave:ANDO-4</span>
+                </div>
+            </section>
+            <section class="producto">
+                <span class="main-title">Antena aérea para HD TV, 4 elementos, 2 dB, VOLTECK</span>
+            </section>
+            <div class="row my-5">
+                <form class="form-download" id="downloadPhotosAll-form" action="/BancoContenidoDigital/index.php?r=producto/viewInfo&amp;id=8435" method="post">                
+        
+    
+                    <div class="col-sm-12">
+                        <div class="mb-3" style="margin-left: 0.7rem;">
+                            <label class="form-label" for="Descarga_size">Selecciona el tamaño de descarga en px:</label>                            <select class="form-select" name="Descarga[size]" id="Descarga_size">
+<option value="1800">1800 x 1800</option>
+<option value="1200">1200 x 1200</option>
+<option value="1000">1000 x 1000</option>
+<option value="500">500 x 500</option>
+<option value="150">150 x 150</option>
+</select>                            
+                        </div>                                
+                    </div>
+                </form>            </div>
+            <div class="row justify-content-center">
+                <div class="col-sm-8 text-center">
+                    <a class="btn btn-secondary orange disabled" style="border-radius: 20px;" id="button-download-photo" href="#"><i class="fa fa-cloud-download" aria-hidden="true" style="margin-right: 4px;"></i>Descargar fotos</a>                </div>
+            </div>  
+        </div>
+    </div>
+</div>
+
+            </main>
+        </div>
+    </div>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KRFKWX4MLT" type="958e2c3f7bad0d221e1ba42a-text/javascript"></script>
+<script type="958e2c3f7bad0d221e1ba42a-text/javascript">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-KRFKWX4MLT');
+</script>
+	</script>
+	<footer class="footer mt-auto py-3">
+		<div class="container text-center">
+			<span class="text-muted">
+				Copyright &copy; 2026 by <strong>TRUPER S.A de C.V.</strong><br/>
+				All Rights Reserved.</span>
+		</div>
+	</footer>
+	<style type="text/css">
+    /********************* Search box css **********************************/
+
+.live-search img {
+	-webkit-mix-blend-mode: multiply;
+	   -moz-mix-blend-mode: multiply;
+	    -ms-mix-blend-mode: multiply;
+		 -o-mix-blend-mode: multiply;
+			mix-blend-mode: multiply;
+}
+
+.liveSearchMob, .liveSearchDesk 
+.containerLiveSearchDesk {
+	display: block;
+}
+
+
+/*.containerLiveSearchDesk {
+	position: absolute; 
+	z-index: 10000; 
+	top: 55px;
+	left: 0;
+    width: 100%;
+}*/
+
+.containerLiveSearchDesk > div {
+	background-color: #FFF;
+	width: 90%;
+	/*max-width: 500px;*/
+	margin: auto;
+	-webkit-border-radius: 0 0 5px 5px;
+	-moz-border-radius: 0 0 5px 5px;
+	-ms-border-radius: 0 0 5px 5px;
+	-o-border-radius: 0 0 5px 5px;
+	border-radius: 0 0 5px 5px;
+	-webkit-box-shadow: 0 3px 10px #666;
+	-moz-box-shadow: 0 3px 10px #666;
+	-ms-box-shadow: 0 3px 10px #666;
+	-o-box-shadow: 0 3px 10px #666;
+	box-shadow: 0 3px 10px #666;
+}
+
+/*.containerLiveSearchMob {
+	position: absolute;
+	z-index: 10000;   
+	top: 50px;
+	left: 0; 
+    width: 100%;
+}*/
+
+/*.containerLiveSearchMob > div {
+	background-color: #FFF; 
+	width: 90%;
+    max-width: 500px;
+    margin: auto;
+	
+	-webkit-border-radius: 0 0 5px 5px;
+	   -moz-border-radius: 0 0 5px 5px;
+	    -ms-border-radius: 0 0 5px 5px;
+	     -o-border-radius: 0 0 5px 5px;
+			border-radius: 0 0 5px 5px;
+	
+	-webkit-box-shadow: 0 3px 10px #666;
+	   -moz-box-shadow: 0 3px 10px #666;
+	    -ms-box-shadow: 0 3px 10px #666;
+	     -o-box-shadow: 0 3px 10px #666;
+			box-shadow: 0 3px 10px #666;
+}
+*/
+#modulesMob > div, #modulesDesk > div {
+    padding: 0 10px;
+    position: relative;
+}
+
+#modulesMob > div:hover, #modulesDesk > div:hover {
+    padding: 0 10px;
+    background: #f1f1f1;
+    transition: all .25s;
+}
+
+
+#modulesMob > div > a, #modulesDesk > div > a {
+	display: flex;
+	align-items: center;
+	text-decoration: none !important;
+	border-bottom: 1px solid #e1e1e1;
+    min-height: 49px;
+}
+
+#modulesMob > div > a:hover, #modulesDesk > div > a:hover, #modulesDesk > div > a:hover h5, #modulesDesk > div > a:hover div {
+	color: #f60 !important;
+	cursor: pointer;
+}
+
+#modulesMob > div:last-child > a, #modulesDesk > div:last-child > a {
+/*	border-bottom: 0;*/
+	text-decoration: none !important;
+}
+
+#modulesMob > div > a > div:first-child, #modulesDesk > div > a > div:first-child {
+	width: 40px !important;
+	padding-left: 5px;
+	margin-right: 5px;
+}
+
+#modulesMob > div > a > div:last-child, #modulesDesk > div > a > div:last-child {
+}
+
+div.descrip {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+div.descrip > div {
+    display: flex;
+}
+
+/* sustituye */
+.replace {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 170px;
+    min-height: 49px;
+    text-align: center;
+    margin-left: 10px;
+    padding: 0 8px;
+    background-color: #e7e7e9;
+}
+
+.replace > div > h5, .replace > div > div {
+    font-size: 12px;
+    margin: 0 0 5px;
+    color: #4b4b4b;
+    font-weight: 700 !important;
+    color: #4b4b4b !important;
+}
+/* ends sustituye */
+
+.is_new-live {
+    margin-left: 8px;
+}
+
+.is_new-live img {
+    height: 15px;
+}
+
+#modulesMob > div  p, #modulesDesk > div  p {
+	color: #666 !important;
+	cursor: pointer;
+	line-height: 1;
+	margin: 0;
+    font-weight: 400 !important;
+}
+
+#modulesMob > div:hover  p, #modulesDesk > div:hover  p {
+	color: #f60 !important;
+	cursor: pointer;
+}
+
+#modulesMob > div  p:first-child, #modulesDesk > div  p:first-child {
+	color: #a09c9c !important;
+	margin-bottom: 5px;
+	font-weight: 300;
+}
+
+#modulesMob > div  p:last-child, #modulesDesk > div  p:last-child {
+	font-size: 12px;
+	font-weight: 700 !important;
+}
+
+span.blank {
+	padding: 0 6px;
+	font-weight: 400 !important;
+}
+
+span.highlight {
+	color: #060606 !important;
+	padding: 0px !important;
+	font-weight: 700 !important;
+}
+
+span.highlight, 
+#modulesMob > div:hover  p > span.highlight, 
+#modulesDesk > div:hover  p > span.highlight, 
+#modulesMob > div:hover  p, 
+#modulesDesk > div:hover  p {
+	color: #F60 !important;
+}
+
+.titleCategories {
+	display: none;
+	cursor: default;
+    color: #262626;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px 15px !important;
+    margin: 0 !important;
+}
+
+div.category {
+	font-size: 14px;
+    box-sizing: border-box;
+    height: auto !important;
+    transition: all .25s;
+}
+
+div.category:hover {
+    background: #f1f1f1;
+}
+
+div.category a {
+    display: block;
+    margin: 0 10px;
+    padding: 10px 10px 10px 12px !important;
+    box-sizing: border-box;
+    border-bottom: 1px solid #e1e1e1;
+    color: #a09c9c !important;
+    text-decoration: none !important;
+}
+
+div.category a > p:hover {
+    color: #F60;
+}
+
+div.category a > p {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+#searchAllDesk > div, #searchAllMob > div {
+	text-align: right;
+    margin: 0 10px;
+    border-bottom: 1px solid #e1e1e1;
+}
+
+#sendFormDesk, #sendFormMob {
+	display: inline-block;
+	border: 0;
+    padding: 0;
+    margin: 0;
+    outline: 0;
+    box-shadow: 0;
+	padding: 10px 0;
+    cursor: pointer;
+    color: #353535;
+    font-size: 14px;
+	background: none !important;
+	background-color: #fff;
+	
+	-webkit-appearance:inherit;
+	   -moz-appearance:inherit;
+	    -ms-appearance:inherit;
+	     -o-appearance:inherit;
+			appearance:inherit;
+	
+	-webkit-transition: all .25s;
+	   -moz-transition: all .25s;
+	    -ms-transition: all .25s;
+	     -o-transition: all .25s;
+			transition: all .25s;
+}
+
+#sendFormDesk:hover, #sendFormMob:hover {
+	text-decoration: underline;
+	color: #f60;
+}
+
+#searchAllDesk i, #searchAllMob i {
+	display: inline-block;
+    margin: 0 10px 0 5px;
+	padding: 10px 0;
+	color: #f60;
+}
+
+.searchbar > form > input#buscador:focus {
+    display: block;
+    width: 90% !important;
+}
+
+/*  SCROLLBAR  */
+.scrollbar {
+	overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 510px !important;
+	width: 100%;
+}
+
+.scrollbar::-webkit-scrollbar-track, 
+.scrollbar::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+/*	border-radius: 10px;*/
+/*	background-color: #F5F5F5;*/
+}
+
+.scrollbar::-webkit-scrollbar, 
+.scrollbar::-webkit-scrollbar {
+	width: 8px;
+/*	background-color: #F5F5F5;*/
+}
+
+.scrollbar::-webkit-scrollbar-thumb, 
+.scrollbar::-webkit-scrollbar-thumb {
+	border-radius: 0 0 5px 0;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #F60;
+}
+
+.footer-vin {
+	height: 40px;
+}
+
+.footer-desktop {
+	text-align: center;
+    margin: 15px !important;
+}
+
+.footer-desktop div {
+	padding: 2px;
+}
+
+
+    </style>
+<script type="958e2c3f7bad0d221e1ba42a-text/javascript">
+/*<![CDATA[*/
+jQuery(function($) {
+jQuery('body').on('click','#button-download-photo',function(){jQuery.ajax({'type':'post','data':{ids:$('input[name="photoId[]"]:checked').map(function () {
+                                    return $(this).val();
+                                }).toArray(), size:$('#Descarga_size').val()},'beforeSend':function() {
+                                $(this).attr("disabled","disabled");                            
+                                $(this).removeClass("orange");
+                                $(this).html("<span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span><span class=\"visually-hidden\">Descargando...</span>");
+                                //$("#modal-loading").show();
+                            },'complete':function() {
+                                //$("#modal-loading").hide();
+                                $(this).removeAttr("disabled");
+                                $(this).addClass("orange");
+                                $(this).html("<i class=\"fa fa-cloud-download\" aria-hidden=\"true\" style=\"margin-right: 4px;\"></i>Descargar fotos");
+                            },'success':function(response){
+                                //$(this).addClass("orange");
+                                const str = response;
+                                const n = 3;
+                                if(str.substring(str.length - n) == 'jpg'){
+                                    var urlImg = 'https://www.truper.com';
+                                    var source = urlImg+'/BancoContenidoDigital/'+str;
+                                    var a = document.createElement('a');
+                                    a.download = str;
+                                    a.target = '_blank';
+                                    a.href= source;
+                                    a.click();  
+                                }
+                                if(str.substring(str.length - n) == 'zip'){
+                                    window.location = response;
+                                }                           
+                            },'url':'/BancoContenidoDigital/index.php?r=descarga/downloadPhoto&id=8435','cache':false});return false;});
+
+    
+    var scroll = 0;
+    var move = 60;
+    let ultimaImage;
+    let checkScroll = true;
+
+    $('.arrow').show();
+
+    $("#image_main2").elevateZoom();
+    $("#image_main2").click(function() { return false; });
+    $(document).on('click', '.image', function(e){
+        e.preventDefault();
+        
+        $('.thumbnail.mini').removeClass('selected');
+        let src = $(this).attr('src');
+        let order = $(this).attr('order');
+        let div = $(this).parent('div');
+        let img = $("#image_main2");
+        let type =  $(div).attr('data-type');        
+        $('.type-photo').html('<p>'+type+'</p>');
+        $(div).addClass('selected');
+        const input = $(this).prev();
+        if (input.is(':checked')) 
+            input.prop('checked', false);
+        else
+            input.prop('checked', true);
+        
+        validateCheck();
+
+        /* Update img in zoom */
+        $('.zoomContainer').remove();
+        img.removeData('elevateZoom');
+        img.attr('src', src);        
+        img.data('zoom-image', src);
+        img.elevateZoom();
+
+        /*let str = $('#sonsJson').val();
+        if (str) { updateSelect(str, src); }*/
+
+        /* Update first image to load */
+        //$('#img1').attr('href', src);
+        $('#img1').attr('data-fancybox-index', order);
+    });
+
+    $(document).on('mouseover', '.image', function(e)
+    {
+        $('.thumbnail.mini').removeClass('selected');
+        let src = $(this).attr('src');
+        let order = $(this).attr('order');
+        let div = $(this).parent('div');
+        let img = $("#image_main2");
+        let type =  $(div).attr('data-type');        
+        $('.type-photo').html('<p>'+type+'</p>');
+
+        $(div).addClass('selected');
+
+        /* Update img in zoom */
+        $('.zoomContainer').remove();
+        img.removeData('elevateZoom');
+        img.attr('src', src);
+        img.data('zoom-image', src);
+        img.elevateZoom();
+
+        /*let str = $('#sonsJson').val();
+        if (str) { updateSelect(str, src); }*/
+
+        /* Update first image to load */
+        //$('#img1').attr('href', src);
+        $('#img1').attr('data-fancybox-index', order);
+    });
+
+    // To scroll through the images
+    $(document).on('click', '.arrow', function(e){
+        e.preventDefault();
+        let limit = document.getElementById("contentImgs").scrollHeight;
+        let mainImgSize = document.getElementById("image_main2").scrollHeight;
+        limit = limit - mainImgSize - move;
+
+        if ($(this).hasClass('down')) {
+            $('.up').removeClass('disabled');
+            if (!$(this).hasClass('disabled')) {
+                if (limit >= -54) {
+                    scroll = scroll - move;                
+                    $('#thumbnails').css({ transform: 'translateY(' + scroll + 'px)' });                    
+                    if (checkScroll)
+                        revGallery();
+                }    
+            }
+        } else {
+            if (scroll < 0) {
+                checkScroll = true;
+                $('.down').removeClass('disabled');
+                scroll = scroll + move;
+                $('#thumbnails').css({ transform: 'translateY(' + scroll + 'px)' });
+            } else
+                $('.up').addClass('disabled');
+        }
+    });
+
+    $('.check-photo').on('click', function(){
+        validateCheck();
+    });
+    
+    $('#button-download-photo').on('clic', function(e){        
+        e.preventDefault();
+    });
+    
+
+    function validateCheck()
+    {
+        var total = 0;
+        var data = $('input[name="photoId[]"]:checked').map(function () {
+            return $(this).val();
+        }).toArray();
+    
+        total = data.length;
+
+        if (total > 0) {
+            $('#button-download-photo').addClass('orange');
+            $('#button-download-photo').removeClass('disabled');
+        } else {
+            $('#button-download-photo').addClass('disabled');
+            $('#button-download-photo').removeClass('orange');
+        }        
+    }
+
+
+
+    $(document).on('keyup','#buscador', function(e) {
+        let word = document.getElementById('buscador').value;
+        if(word.length >= 4){
+
+            if (word == '') {
+                $('#modulesDesk').html('');
+                //$('#searchAllDesk').html('');
+                //$('#categoriesDesk').html('');
+                return;
+            }else{
+                addProducts(word);
+                //addButton();
+                //addCategories(word);
+            }
+        }else{
+            var x = document.getElementById('div_search');
+            x.style.display = 'none';
+        }
+    });
+
+    function addProducts(word) {
+        let output = '';
+        let i = 0;
+                        
+        $.ajax({
+            'url': '/BancoContenidoDigital/index.php?r=producto/searching',
+            'type': 'post',
+            'data': {'word': word},
+            'dataType': 'json',
+            'success': function(response){
+                $.each(response.data, function(key, val) {
+                    let onError = 'onerror="this.onerror=null; this.src=\'./images/notAvailable.jpg\'"';
+                    let replace = '';
+                    let isNew = '';
+
+                    output += '<div><a class="live-search hover" href="' + val.url + '" >';
+                    output += '<div><img src="' + val.urlImg + '" height="32" ' + onError + ' ></div>';
+                    output += '<div class="descrip">';
+                    output += '<div><div><p>' + getMatch(val.pn, word) + '</p>';
+                    output += '<p>' + getMatch(val.codigo, word) + '<span class="blank">|</span>' + getMatch(val.clave, word) + '</p></div>' + isNew + '</div>';
+                    output += '' + replace + '';
+                    output += '</div></a>';
+                    output += '</div>';
+                });
+                //$('#modulesMob').html(output);
+                $('#modulesDesk').html(output);
+                $('.containerLiveSearchDesk').show();
+            },
+            error: function (resp){
+                console.log(resp);
+                }
+        });
+    }
+
+    function getMatch(pn, word){
+        let word1 = pn.toLowerCase();
+        let word2 = word.toLowerCase();
+        let start = word1.indexOf(word2);
+        let end = word.length + start;
+        let ellipses = (start > 0) ? '... ' : '';
+        let match = (start >= 0) ? ellipses + pn.substring(start, end) : '';
+        let leftOver = (start >= 0) ? pn.substring(end): pn;
+    
+        return '<span class="highlight">' + match + '</span>' + leftOver;
+    }
+
+    $(document).on('click','#category', function(e){
+        let page = $(this).attr('name');
+        let link = './searchPage?page=' + page;
+        window.open(link, "", "width='100%', height='100%'");
+        return false;
+    });
+    
+    $(document).on('click, focus','.searchbar form', function(e){
+        $('.containerLiveSearchMob').fadeIn();
+        $('.containerLiveSearchDesk').fadeIn();
+    });
+    
+    $(document).on('click','html , .containerLiveSearchMob , .containerLiveSearchDesk', function(e){
+        $('.containerLiveSearchMob').fadeOut();
+        $('.containerLiveSearchDesk').fadeOut();
+    });
+    
+    $(document).on('click','.searchbar form , .liveSearchMob , .liveSearchDesk , .fancybox-container', function(e){
+        e.stopPropagation();
+    });
+    
+    function addButton(){
+        buttonDesk = '<div><input type="submit" value="Ver todos los resultados" id="sendFormDesk" /> <i class="fas fa-chevron-right"></i></div>';
+        buttonMob = '<div><input type="submit" value="Ver todos los resultados" id="sendFormMob" /> <i class="fas fa-chevron-right"></i></div>';
+    
+        $('#searchAllMob').html(buttonMob);
+        $('#searchAllDesk').html(buttonDesk);
+    }
+
+});
+/*]]>*/
+</script>
+<script src="/cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js" data-cf-settings="958e2c3f7bad0d221e1ba42a-|49" defer></script></body>
+</html>
+ 

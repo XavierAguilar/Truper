@@ -1991,6 +1991,22 @@
             margin-left: 8px;
         }
 
+        .ribbon-promo {
+            position: absolute;
+            top: 10px;
+            left: -25px;
+            background: linear-gradient(90deg, #f97316, #ea580c);
+            color: white;
+            padding: 4px 30px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transform: rotate(-45deg);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+
         .ribbon-nuevo {
             position: absolute;
             top: 10px;
@@ -2603,6 +2619,10 @@
             <div class="welcome-title">Explora las herramientas de hoy</div>
             <div class="welcome-hint" id="hintChips"></div>
 
+            <!-- Carruseles de Promociones (3 hileras) -->
+            <div class="welcome-carousel-container" id="promosCarouselContainer" style="display: none; flex-direction: column; gap: 4px; margin-bottom: 30px;">
+            </div>
+
             <!-- Carrusel de Novedades (3 hileras) -->
             <div class="welcome-carousel-container" id="nuevosCarouselContainer" style="display: none; flex-direction: column; gap: 4px;">
                 <!-- Las hileras se inyectan dinámicamente -->
@@ -2796,7 +2816,7 @@
                 buildSearchIndex();
                 renderStats();
                 renderHints();
-                renderNuevosCarousel();
+                renderWelcomeCarousels();
                 setupSearch();
 
                 // === ENRUTAMIENTO DIRECTO (URL PARAMS) ===
@@ -3148,118 +3168,155 @@
             renderHints();
         }
 
-        function renderNuevosCarousel() {
-            var mainContainer = document.getElementById('nuevosCarouselContainer');
-            
-            // Filtrar productos nuevos que tienen al menos 1 imagen
-            var nuevos = productos.filter(function(p) { 
-                return p.es_nuevo === true && p.imagenes && p.imagenes.length > 0; 
-            });
+        function renderWelcomeCarousels() {
+    var promosContainer = document.getElementById('promosCarouselContainer');
+    var nuevosContainer = document.getElementById('nuevosCarouselContainer');
+    
+    // Promos
+    var promos = productos.filter(function(p) { 
+        return p.promocion && p.imagenes && p.imagenes.length > 0; 
+    });
+    // Nuevos
+    var nuevos = productos.filter(function(p) { 
+        return p.es_nuevo === true && p.imagenes && p.imagenes.length > 0; 
+    });
 
-            if (nuevos.length === 0) {
-                mainContainer.style.display = 'none';
-                return;
-            }
+    renderCarouselGroup(promosContainer, promos, {
+        iconHtml: '<i class="fas fa-fire" style="color:#ea580c;font-size:28px;filter:drop-shadow(0 0 10px rgba(234,88,12,0.4));"></i>',
+        title: 'Ofertas y Promociones del Mes',
+        btnAction: 'searchPromos()',
+        btnStyle: 'background:rgba(234,88,12,0.1);border:1px solid #ea580c;color:#ea580c;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;',
+        btnText: 'Ver Todas las Ofertas (' + promos.length.toLocaleString() + ')',
+        rowPrefix: 'prm'
+    });
 
-            mainContainer.innerHTML = ''; // Limpiar
-            
-            // Varias hileras con autoscroll infinito
-            var ROWS_COUNT = 3;
-            var ITEMS_PER_ROW = 30; // Aumentado para mayor variedad (90 productos totales)
-            
-            // Barajado maestro previo
-            var pool = nuevos.slice().sort(function() { return 0.5 - Math.random() });
-            var headerHtml = '<div class="carousel-header" style="justify-content:space-between; width:100%; max-width:1400px; margin:0 auto; margin-bottom: 8px;">' +
-                             '<div style="display:flex;align-items:center;gap:12px;">' +
-                             '<i class="fas fa-sparkles" style="color:#22c55e;font-size:28px;filter:drop-shadow(0 0 10px rgba(34,197,94,0.4));"></i>' +
-                             '<div class="carousel-title" style="margin:0;">Descubre lo Nuevo en Truper</div>' +
-                             '</div>' +
-                             '<button onclick="searchNuevos()" style="background:rgba(34,197,94,0.1);border:1px solid #22c55e;color:#22c55e;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;">' +
-                             'Ver Catálogo de Novedades (' + nuevos.length.toLocaleString() + ') <i class="fas fa-arrow-right" style="margin-left:4px;"></i>' +
-                             '</button>' +
-                             '</div>';
-            mainContainer.insertAdjacentHTML('afterbegin', headerHtml);
+    renderCarouselGroup(nuevosContainer, nuevos, {
+        iconHtml: '<i class="fas fa-sparkles" style="color:#22c55e;font-size:28px;filter:drop-shadow(0 0 10px rgba(34,197,94,0.4));"></i>',
+        title: 'Descubre lo Nuevo en Truper',
+        btnAction: 'searchNuevos()',
+        btnStyle: 'background:rgba(34,197,94,0.1);border:1px solid #22c55e;color:#22c55e;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;',
+        btnText: 'Ver Catálogo de Novedades (' + nuevos.length.toLocaleString() + ')',
+        rowPrefix: 'nvo'
+    });
+}
 
-            for (var row = 1; row <= ROWS_COUNT; row++) {
-                var rowId = 'row-' + row;
-                // Extraer un segmento distinto para cada fila desde el pool barajado
-                var startIdx = (row - 1) * ITEMS_PER_ROW;
-                var shuffled = pool.slice(startIdx, startIdx + ITEMS_PER_ROW);
-                
-                // Si no hay suficientes, volver a barajar para esa fila específica
-                if (shuffled.length < ITEMS_PER_ROW) {
-                    shuffled = pool.sort(function() { return 0.5 - Math.random() }).slice(0, ITEMS_PER_ROW);
-                }
-                
-                // Duplicar items para scroll infinito
-                var displayList = shuffled.concat(shuffled);
-                
-                var rowHtml = '<div class="carousel-wrapper" style="max-width:100%;">' +
-                              '<button class="carousel-nav prev" id="prev-' + rowId + '"><i class="fas fa-chevron-left"></i></button>' +
-                              '<div class="carousel-track" id="track-' + rowId + '" style="scroll-snap-type: none;">';
-                
-                displayList.forEach(function(p, pIdx) {
-                    var locals = p.imagenes_local || [], remots = p.imagenes || [];
-                    var primarySrcs = [], fallbacks = [];
-                    for(var i=0; i<Math.max(locals.length, remots.length); i++) {
-                        var l = locals[i], r = remots[i];
-                        if (l) { primarySrcs.push(l); fallbacks.push(r ? (r.startsWith('http') ? r : 'https://www.truper.com' + (r.startsWith('/') ? r : '/' + r)) : ''); }
-                        else if (r) { primarySrcs.push(r.startsWith('http') ? r : 'https://www.truper.com' + (r.startsWith('/') ? r : '/' + r)); fallbacks.push(''); }
-                    }
-                    if (primarySrcs.length === 0) return;
-                    var imgSrc = primarySrcs[0];
-                    var fStr = fallbacks[0] ? "this.onerror=null; this.src='" + fallbacks[0] + "';" : "this.onerror=null; this.src='https://www.truper.com/build/imgs/logo-truper.svg';";
-                    var hasMulti = primarySrcs.length > 1;
-                    var arrows = '', dots = '';
-                    if (hasMulti) {
-                        var imgJson = JSON.stringify(primarySrcs).replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                        var fbJson = JSON.stringify(fallbacks).replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                        arrows = '<button class="card-arrow card-arrow-left has-multi" onclick="event.stopPropagation();cardSlide(this,-1)" data-imgs="' + imgJson + '" data-fb="' + fbJson + '" data-idx="0"><i class="fas fa-chevron-left"></i></button>' +
-                                 '<button class="card-arrow card-arrow-right has-multi" onclick="event.stopPropagation();cardSlide(this,1)"><i class="fas fa-chevron-right"></i></button>';
-                        dots = '<div class="card-dots has-multi">';
-                        for (var di = 0; di < Math.min(primarySrcs.length, 6); di++) dots += '<span class="card-dot' + (di === 0 ? ' active' : '') + '"></span>';
-                        dots += '</div>';
-                    }
-                    rowHtml += '<div class="carousel-card" onclick="showProduct(' + productos.indexOf(p) + ')" title="' + p.clave + '">' +
-                               '<div class="carousel-card-img-wrapper">' + arrows +
-                               '<img src="' + imgSrc + '" class="carousel-card-img" alt="' + p.clave + '" loading="lazy" onmouseover="autoCrop(this)" onload="autoCrop(this)" onerror="' + fStr + '">' +
-                               dots + '</div>' +
-                               '<div class="carousel-card-category">' + (p.marca || 'TRUPER') + '</div>' +
-                               '<div class="carousel-card-code">' + p.codigo + '</div>' +
-                               '<div class="carousel-card-name">' + (p.nombre ? p.nombre.substring(0,35) + '...' : 'Sin nombre') + '</div>' +
-                               '</div>';
-                });
+function searchPromos() {
+    document.getElementById('searchInput').value = ':promos:';
+    document.getElementById('searchResults').classList.remove('show');
+    doSearch();
+}
 
-                rowHtml += '</div><button class="carousel-nav next" id="next-' + rowId + '"><i class="fas fa-chevron-right"></i></button></div>';
-                mainContainer.insertAdjacentHTML('beforeend', rowHtml);
+function renderCarouselGroup(mainContainer, items, options) {
+    if (!mainContainer) return;
+    if (items.length === 0) {
+        mainContainer.style.display = 'none';
+        return;
+    }
+    mainContainer.innerHTML = '';
+    
+    var ROWS_COUNT = 3;
+    var ITEMS_PER_ROW = 30;
+    
+    var pool = items.slice().sort(function() { return 0.5 - Math.random() });
+    var headerHtml = '<div class="carousel-header" style="justify-content:space-between; width:100%; max-width:1400px; margin:0 auto; margin-bottom: 8px;">' +
+                     '<div style="display:flex;align-items:center;gap:12px;">' +
+                     options.iconHtml +
+                     '<div class="carousel-title" style="margin:0;">' + options.title + '</div>' +
+                     '</div>' +
+                     '<button onclick="' + options.btnAction + '" style="' + options.btnStyle + '">' +
+                     options.btnText + ' <i class="fas fa-arrow-right" style="margin-left:4px;"></i>' +
+                     '</button>' +
+                     '</div>';
+    mainContainer.insertAdjacentHTML('afterbegin', headerHtml);
 
-                // Lógica de Autoscroll Infinito
-                (function(rId, rIndex) {
-                    var t = document.getElementById('track-' + rId);
-                    var isPaused = false;
-                    var speed = 0.5 + (rIndex * 0.2); // Velocidades ligeramente distintas para romper simetría
-                    
-                    t.onmouseover = function() { isPaused = true; };
-                    t.onmouseout = function() { isPaused = false; };
-                    
-                    function step() {
-                        if (!isPaused) {
-                            t.scrollLeft += speed;
-                            // Salto infinito al llegar a la mitad
-                            if (t.scrollLeft >= t.scrollWidth / 2) {
-                                t.scrollLeft = 0;
-                            }
-                        }
-                        requestAnimationFrame(step);
-                    }
-                    requestAnimationFrame(step);
-
-                    document.getElementById('prev-' + rId).onclick = function() { t.scrollBy({ left: -400, behavior: 'smooth' }); };
-                    document.getElementById('next-' + rId).onclick = function() { t.scrollBy({ left: 400, behavior: 'smooth' }); };
-                })(rowId, row);
-            }
-            mainContainer.style.display = 'flex';
+    for (var row = 1; row <= ROWS_COUNT; row++) {
+        var rowId = options.rowPrefix + '-row-' + row;
+        var startIdx = (row - 1) * ITEMS_PER_ROW;
+        var shuffled = pool.slice(startIdx, startIdx + ITEMS_PER_ROW);
+        
+        if (shuffled.length < ITEMS_PER_ROW) {
+            shuffled = pool.sort(function() { return 0.5 - Math.random() }).slice(0, ITEMS_PER_ROW);
         }
+        
+        var displayList = shuffled.concat(shuffled);
+        
+        var rowHtml = '<div class="carousel-wrapper" style="max-width:100%;">' +
+                      '<button class="carousel-nav prev" id="prev-' + rowId + '"><i class="fas fa-chevron-left"></i></button>' +
+                      '<div class="carousel-track" id="track-' + rowId + '" style="scroll-snap-type: none;">';
+        
+        displayList.forEach(function(p) {
+            var locals = p.imagenes_local || [], remots = p.imagenes || [];
+            var primarySrcs = [], fallbacks = [];
+            for(var i=0; i<Math.max(locals.length, remots.length); i++) {
+                var l = locals[i], r = remots[i];
+                if (l) { primarySrcs.push(l); fallbacks.push(r ? (r.startsWith('http') ? r : 'https://www.truper.com' + (r.startsWith('/') ? r : '/' + r)) : ''); }
+                else if (r) { primarySrcs.push(r.startsWith('http') ? r : 'https://www.truper.com' + (r.startsWith('/') ? r : '/' + r)); fallbacks.push(''); }
+            }
+            if (primarySrcs.length === 0) return;
+            var imgSrc = primarySrcs[0];
+            var fStr = fallbacks[0] ? "this.onerror=null; this.src='" + fallbacks[0] + "';" : "this.onerror=null; this.src='https://www.truper.com/build/imgs/logo-truper.svg';";
+            var hasMulti = primarySrcs.length > 1;
+            var arrows = '', dots = '';
+            if (hasMulti) {
+                var imgJson = JSON.stringify(primarySrcs).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                var fbJson = JSON.stringify(fallbacks).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                arrows = '<button class="card-arrow card-arrow-left has-multi" onclick="event.stopPropagation();cardSlide(this,-1)" data-imgs="' + imgJson + '" data-fb="' + fbJson + '" data-idx="0"><i class="fas fa-chevron-left"></i></button>' +
+                         '<button class="card-arrow card-arrow-right has-multi" onclick="event.stopPropagation();cardSlide(this,1)"><i class="fas fa-chevron-right"></i></button>';
+                dots = '<div class="card-dots has-multi">';
+                for (var di = 0; di < Math.min(primarySrcs.length, 6); di++) dots += '<span class="card-dot' + (di === 0 ? ' active' : '') + '"></span>';
+                dots += '</div>';
+            }
+
+            var ribbonNuevo = p.es_nuevo ? '<div class="ribbon-nuevo"><i class="fas fa-star" style="margin-right:4px;"></i>Nuevo</div>' : '';
+            var promoBg = '';
+            if (p.promocion) {
+                var pct = p.promocion.porcentaje;
+                if (pct >= 30) promoBg = 'linear-gradient(90deg, #e11d48, #be123c)';
+                else if (pct >= 20) promoBg = 'linear-gradient(90deg, #f97316, #ea580c)';
+                else promoBg = 'linear-gradient(90deg, #f59e0b, #d97706)';
+            }
+            var ribbonPromo = p.promocion ? '<div class="ribbon-promo" style="background:' + promoBg + ';font-size:10px;padding:3px 20px;left:-20px;text-align:center;">-' + p.promocion.porcentaje + '%</div>' : '';
+
+            rowHtml += '<div class="carousel-card" onclick="showProduct(' + productos.indexOf(p) + ')" title="' + p.clave + '">' +
+                       '<div class="carousel-card-img-wrapper">' + arrows +
+                       '<img src="' + imgSrc + '" class="carousel-card-img" alt="' + p.clave + '" loading="lazy" onmouseover="autoCrop(this)" onload="autoCrop(this)" onerror="' + fStr + '">' +
+                       dots + ribbonNuevo + ribbonPromo + '</div>' +
+                       '<div class="carousel-card-category">' + (p.marca || 'TRUPER') + '</div>' +
+                       '<div class="carousel-card-code">' + p.codigo + '</div>' +
+                       '<div class="carousel-card-name">' + (p.nombre ? p.nombre.substring(0,35) + '...' : 'Sin nombre') + '</div>' +
+                       '</div>';
+        });
+
+        rowHtml += '</div><button class="carousel-nav next" id="next-' + rowId + '"><i class="fas fa-chevron-right"></i></button></div>';
+        mainContainer.insertAdjacentHTML('beforeend', rowHtml);
+
+        (function(rId, rIndex) {
+            var t = document.getElementById('track-' + rId);
+            var isPaused = false;
+            var speed = 0.5 + (rIndex * 0.2);
+            
+            t.onmouseover = function() { isPaused = true; };
+            t.onmouseout = function() { isPaused = false; };
+            
+            function step() {
+                if (!isPaused) {
+                    t.scrollLeft += speed;
+                    if (t.scrollLeft >= t.scrollWidth / 2) {
+                        t.scrollLeft = 0;
+                    }
+                }
+                requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+
+            document.getElementById('prev-' + rId).onclick = function() { t.scrollBy({ left: -400, behavior: 'smooth' }); };
+            document.getElementById('next-' + rId).onclick = function() { t.scrollBy({ left: 400, behavior: 'smooth' }); };
+        })(rowId, row);
+    }
+    mainContainer.style.display = 'flex';
+}
+
+
 
         function searchFromHint(query) {
             document.getElementById('searchInput').value = query;
@@ -3339,6 +3396,15 @@
                     }
                 }
                 return news;
+            }
+            if (rawQuery === ':promos:') {
+                var promos = [];
+                for (var i = 0; i < searchIndex.length; i++) {
+                    if (productos[i].promocion) {
+                        promos.push({ product: productos[i], index: i, score: 100, wholeWord: true });
+                    }
+                }
+                return promos;
             }
             if (searchCache[rawQuery]) return searchCache[rawQuery];
             var normalizedQuery = normalize(rawQuery);
@@ -4413,6 +4479,8 @@
             var qTitle = '';
             if (query === ':nuevos:') {
                 qTitle = '<i class="fas fa-sparkles" style="color:#22c55e;margin-right:8px;font-size:22px;"></i>Explorando <strong style="color:#10b981;">' + results.length.toLocaleString() + ' Novedades</strong> del mes';
+            } else if (query === ':promos:') {
+                qTitle = '<i class="fas fa-fire" style="color:#ea580c;margin-right:8px;font-size:22px;"></i>Explorando <strong style="color:#f97316;">' + results.length.toLocaleString() + ' Ofertas</strong> del mes';
             } else {
                 qTitle = '<i class="fas fa-search" style="margin-right:8px;color:var(--primary);"></i>Resultados para <strong>"' + esc(query) + '"</strong>' + abbrNote;
             }
@@ -4575,8 +4643,16 @@
                         vinetasHtml += '</div>';
                     }
                     var ribbonNuevo = p.es_nuevo ? '<div class="ribbon-nuevo"><i class="fas fa-star" style="margin-right:4px;"></i>Nuevo</div>' : '';
+                    var promoBg = '';
+                    if (p.promocion) {
+                        var pct = p.promocion.porcentaje;
+                        if (pct >= 30) promoBg = 'linear-gradient(90deg, #e11d48, #be123c)';
+                        else if (pct >= 20) promoBg = 'linear-gradient(90deg, #f97316, #ea580c)';
+                        else promoBg = 'linear-gradient(90deg, #f59e0b, #d97706)';
+                    }
+                    var ribbonPromo = p.promocion ? '<div class="ribbon-promo" style="background:' + promoBg + ';font-size:14px;padding:5px 30px;left:-20px;text-align:center;">-' + p.promocion.porcentaje + '%</div>' : '';
                     return '<div class="result-card" onclick="selectResult(' + item.index + ')" style="animation-delay:' + delay + 's;">' +
-                        '<div class="result-card-img">' + arrows + mainImg + dots + vinetasHtml + ribbonNuevo + '</div>' +
+                        '<div class="result-card-img">' + arrows + mainImg + dots + vinetasHtml + ribbonNuevo + ribbonPromo + '</div>' +
                         '<div class="result-card-body">' +
                         '<div class="result-card-code">' + highlightMulti(p.codigo, words) + '</div>' +
                         '<div class="result-card-clave">' + highlightMulti(p.clave, words) + '</div>' +
@@ -4607,6 +4683,7 @@
                         '<span class="result-list-code">' + highlightMulti(p.codigo, words) + '</span>' +
                         '<span class="result-list-clave">' + highlightMulti(p.clave, words) + '</span>' +
                         (p.es_nuevo ? '<span class="badge-nuevo" style="font-size:9px;padding:2px 6px;margin-left:6px;"><i class="fas fa-star"></i>NUEVO</span>' : '') +
+                        (p.promocion ? '<span class="badge-nuevo" style="background:' + (p.promocion.porcentaje >= 30 ? '#be123c' : (p.promocion.porcentaje >= 20 ? '#ea580c' : '#d97706')) + ';color:white;font-size:10px;font-weight:bold;padding:2px 6px;margin-left:6px;">-' + p.promocion.porcentaje + '%</span>' : '') +
                         '</div>' +
                         '<div class="result-list-name">' + highlightMulti(p.nombre || p.descripcion_csv || '', words) + '</div>' +
                         '</div>' +
@@ -4717,13 +4794,35 @@
             var pr = p.precios;
             // Si todos son null, no mostrar
             if (pr.distribuidor == null && pr.mayoreo == null && pr.medioMayoreo == null && pr.publico == null) return '';
+            
+            var dPrice = formatPrice(pr.distribuidor);
+            var mPrice = formatPrice(pr.mayoreo);
+            var mmPrice = formatPrice(pr.medioMayoreo);
+            var pPrice = formatPrice(pr.publico);
+            
+            var titleHtml = '<div class="prices-title"><i class="fas fa-tags"></i>Precios con IVA</div>';
+            if (p.promocion && p.promocion.precios) {
+                var prm = p.promocion.precios;
+                dPrice = '<span style="text-decoration:line-through;color:#9ca3af;font-size:0.8em;">' + formatPrice(pr.distribuidor) + '</span><br><span style="color:#10b981;">' + formatPrice(prm.distribuidor) + '</span>';
+                mPrice = '<span style="text-decoration:line-through;color:#9ca3af;font-size:0.8em;">' + formatPrice(pr.mayoreo) + '</span><br><span style="color:#10b981;">' + formatPrice(prm.mayoreo) + '</span>';
+                mmPrice = '<span style="text-decoration:line-through;color:#9ca3af;font-size:0.8em;">' + formatPrice(pr.medioMayoreo) + '</span><br><span style="color:#10b981;">' + formatPrice(prm.medio_mayoreo) + '</span>';
+                pPrice = '<span style="text-decoration:line-through;color:#9ca3af;font-size:0.8em;">' + formatPrice(pr.publico) + '</span><br><span style="color:#10b981;">' + formatPrice(prm.publico) + '</span>';
+                
+                var pct = p.promocion.porcentaje;
+                var promoBg = pct >= 30 ? 'linear-gradient(90deg, #e11d48, #be123c)' : (pct >= 20 ? 'linear-gradient(90deg, #f97316, #ea580c)' : 'linear-gradient(90deg, #f59e0b, #d97706)');
+                titleHtml = '<div class="prices-title" style="display:flex; justify-content:space-between; align-items:center;">' +
+                            '<span><i class="fas fa-tags"></i>Precios con IVA</span>' +
+                            '<span style="background:' + promoBg + '; color:white; padding:4px 12px; border-radius:12px; font-size:12px; font-weight:bold; letter-spacing:1px; box-shadow:0 2px 4px rgba(0,0,0,0.3);">-' + pct + '% DESCUENTO APLICADO</span>' +
+                            '</div>';
+            }
+
             return '<div class="prices-section">' +
-                '<div class="prices-title"><i class="fas fa-tags"></i>Precios con IVA</div>' +
+                titleHtml +
                 '<div class="prices-grid">' +
-                '<div class="price-card dist"><div class="price-label"><i class="fas fa-building"></i>Distribuidor</div><div class="price-value">' + formatPrice(pr.distribuidor) + '</div></div>' +
-                '<div class="price-card mayo"><div class="price-label"><i class="fas fa-boxes-stacked"></i>Mayoreo</div><div class="price-value">' + formatPrice(pr.mayoreo) + '</div></div>' +
-                '<div class="price-card mmayo"><div class="price-label"><i class="fas fa-box"></i>Medio Mayoreo</div><div class="price-value">' + formatPrice(pr.medioMayoreo) + '</div></div>' +
-                '<div class="price-card pub"><div class="price-label"><i class="fas fa-user"></i>Público</div><div class="price-value">' + formatPrice(pr.publico) + '</div></div>' +
+                '<div class="price-card dist"><div class="price-label"><i class="fas fa-building"></i>Distribuidor</div><div class="price-value" style="line-height:1.2;">' + dPrice + '</div></div>' +
+                '<div class="price-card mayo"><div class="price-label"><i class="fas fa-boxes-stacked"></i>Mayoreo</div><div class="price-value" style="line-height:1.2;">' + mPrice + '</div></div>' +
+                '<div class="price-card mmayo"><div class="price-label"><i class="fas fa-box"></i>Medio Mayoreo</div><div class="price-value" style="line-height:1.2;">' + mmPrice + '</div></div>' +
+                '<div class="price-card pub"><div class="price-label"><i class="fas fa-user"></i>Público</div><div class="price-value" style="line-height:1.2;">' + pPrice + '</div></div>' +
                 '</div></div>';
         }
 
@@ -4742,6 +4841,20 @@
                 var fallbackThumb = flb[ii] || '';
                 return '<div class="thumb ' + (ii === 0 ? 'active' : '') + '" onclick="changeImage(' + idx + ',' + ii + ',\'' + fallbackThumb + '\', this)"><img src="' + img + '" onerror="if(this.dataset.tried!=\'1\'){this.dataset.tried=\'1\';this.src=\''+fallbackThumb+'\'}else{this.parentElement.style.display=\'none\'}"></div>';
             }).join('');
+
+            var extraSuffixes = ['+FC1', '+FC2', '+E1', '+E2', '+EIND1', '+EIND2', '+EI1', '+D1', '+D2', '+M1'];
+            var baseUrl = 'https://www.truper.com/media/import/imagenes/';
+            var displayImgsStr = JSON.stringify(displayImgs);
+            var validExtraUrls = [];
+            var extraThumbs = extraSuffixes.map(function(suf, i) {
+                var filename = p.clave + suf + '.jpg';
+                if (displayImgsStr.includes(filename) || displayImgsStr.includes(filename.toLowerCase())) return '';
+                var imgUrl = baseUrl + filename;
+                validExtraUrls.push(imgUrl);
+                var ii = displayImgs.length + i;
+                return '<div class="thumb" onclick="changeImage(' + idx + ',' + ii + ',\'\', this)"><img src="' + imgUrl + '" onerror="this.parentElement.style.display=\'none\'"></div>';
+            }).join('');
+            thumbs += extraThumbs;
 
             var features = (p.caracteristicas || []).map(function (c) { return '<li>' + esc(c) + '</li>'; }).join('');
 
@@ -4769,8 +4882,9 @@
                 ? '<table class="pack-table"><thead><tr><th>Empaque</th><th>Cantidad</th></tr></thead><tbody>' + pack.map(function (kv) { return '<tr><td>' + esc(kv[0]) + '</td><td>' + esc(kv[1]) + '</td></tr>'; }).join('') + '</tbody></table>'
                 : '<div class="empty-state"><i class="fas fa-box-open"></i>Sin empaque</div>';
 
-            var allImgs = imgs.length > 0
-                ? '<div class="images-tab-grid">' + imgs.map(function (img) { return '<div class="img-card" onclick="openLightbox(this.querySelector(\'img\').src)"><img src="' + img + '" onerror="this.parentElement.style.display=\'none\'"></div>'; }).join('') + '</div>'
+            var allPossibleImgs = imgs.concat(validExtraUrls);
+            var allImgs = allPossibleImgs.length > 0
+                ? '<div class="images-tab-grid">' + allPossibleImgs.map(function (img) { return '<div class="img-card" onclick="openLightbox(this.querySelector(\'img\').src)"><img src="' + img + '" onerror="this.parentElement.style.display=\'none\'"></div>'; }).join('') + '</div>'
                 : '<div class="empty-state"><i class="fas fa-images"></i>Sin imágenes</div>';
 
             var related = p.productos_relacionados || [];
@@ -4795,6 +4909,7 @@
 
             var dl = [];
             dl.push('<button class="download-btn" onclick="window.quoteCart.add(\'' + p.codigo + '\', event)" style="background-color:#10b981; border-color:#059669; color:white; font-weight:bold;"><i class="fas fa-cart-plus"></i> Cotizar PTV</button>');
+            if (p.promocion) dl.push('<a class="download-btn" href="https://www.truper.com/promo/2026/Mayo/Promo%20nacional/5d88e4c6ac836fe7142c71d55b0b013a.pdf" target="_blank" style="background:#ea580c;color:white;border:none;"><i class="fas fa-fire"></i>Ver Folleto Oferta</a>');
             if (p.ficha_tecnica_pdf) dl.push('<a class="download-btn" href="' + p.ficha_tecnica_pdf + '" target="_blank"><i class="fas fa-file-pdf"></i>Ficha PDF</a>');
             if (p.banco_fotos_url) dl.push('<a class="download-btn" href="' + p.banco_fotos_url + '" target="_blank"><i class="fas fa-images"></i>Banco Fotos</a>');
             if (p.catalogo_url || p.pagina_catalogo) {
