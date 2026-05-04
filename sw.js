@@ -1,4 +1,4 @@
-const CACHE_NAME = 'truper-catalogo-pwa-v4';
+const CACHE_NAME = 'truper-catalogo-pwa-v5';
 const urlsToCache = [
   './',
   './index.html',

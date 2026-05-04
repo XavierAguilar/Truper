@@ -3249,10 +3249,17 @@ function renderCarouselGroup(mainContainer, items, options) {
         displayList.forEach(function(p) {
             var locals = p.imagenes_local || [], remots = p.imagenes || [];
             var primarySrcs = [], fallbacks = [];
+            var isLocalEnv = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
             for(var i=0; i<Math.max(locals.length, remots.length); i++) {
                 var l = locals[i], r = remots[i];
-                if (l) { primarySrcs.push(l); fallbacks.push(r ? (r.startsWith('http') ? r : 'https://www.truper.com' + (r.startsWith('/') ? r : '/' + r)) : ''); }
-                else if (r) { primarySrcs.push(r.startsWith('http') ? r : 'https://www.truper.com' + (r.startsWith('/') ? r : '/' + r)); fallbacks.push(''); }
+                var remoteUrl = r ? (r.startsWith('http') ? r : 'https://www.truper.com' + (r.startsWith('/') ? r : '/' + r)) : '';
+                if (isLocalEnv && l) {
+                    primarySrcs.push(l); fallbacks.push(remoteUrl);
+                } else if (remoteUrl) {
+                    primarySrcs.push(remoteUrl); fallbacks.push(l || '');
+                } else if (l) {
+                    primarySrcs.push(l); fallbacks.push('');
+                }
             }
             if (primarySrcs.length === 0) return;
             var imgSrc = primarySrcs[0];
@@ -4601,12 +4608,13 @@ function renderCarouselGroup(mainContainer, items, options) {
                 html += '<div class="results-grid">';
                 html += displayResults.map(function (item, i) {
                     var p = item.product;
-                    var imgs = p.imagenes || [];
-                    var hasMulti = imgs.length > 1;
+                    var imgs = (p.imagenes || []).map(function(u) { return u.startsWith('http') ? u : 'https://www.truper.com' + (u.startsWith('/') ? u : '/' + u); });
+                    var hasMulti = p.imagenes && p.imagenes.length > 1;
                     
                     // Lógica de imágenes locales + fallback
-                    var displayImgs = (p.imagenes_local && p.imagenes_local.length > 0) ? p.imagenes_local : imgs;
-                    var flb = (p.imagenes_local && p.imagenes_local.length > 0) ? imgs : [];
+                    var isLocalEnv = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                    var displayImgs = (isLocalEnv && p.imagenes_local && p.imagenes_local.length > 0) ? p.imagenes_local : imgs;
+                    var flb = (isLocalEnv && p.imagenes_local && p.imagenes_local.length > 0) ? imgs : [];
                     
                     var mainImg = displayImgs.length > 0
                         ? '<img src="' + displayImgs[0] + '" alt="' + esc(p.clave) + '" onmouseover="window.autoCrop&&autoCrop(this)" onload="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!=\'true\'){this.dataset.triedFallback=\'true\';this.src=\'' + (flb[0] || '') + '\';}else{this.parentElement.querySelector(\'.card-dots\')&&(this.parentElement.querySelector(\'.card-dots\').style.display=\'none\');this.style.display=\'none\';this.parentElement.insertAdjacentHTML(\'beforeend\',\'<i class=fas fa-image style=font-size:40px;color:#ccc></i>\');}">'
@@ -4671,8 +4679,10 @@ function renderCarouselGroup(mainContainer, items, options) {
                 html += '<div class="results-list">';
                 html += displayResults.map(function (item, i) {
                     var p = item.product;
-                    var displayImgs = (p.imagenes_local && p.imagenes_local.length > 0) ? p.imagenes_local : (p.imagenes || []);
-                    var flb = (p.imagenes_local && p.imagenes_local.length > 0) ? (p.imagenes || []) : [];
+                    var imgs = (p.imagenes || []).map(function(u) { return u.startsWith('http') ? u : 'https://www.truper.com' + (u.startsWith('/') ? u : '/' + u); });
+                    var isLocalEnv = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                    var displayImgs = (isLocalEnv && p.imagenes_local && p.imagenes_local.length > 0) ? p.imagenes_local : imgs;
+                    var flb = (isLocalEnv && p.imagenes_local && p.imagenes_local.length > 0) ? imgs : [];
                     
                     var img = displayImgs.length > 0
                         ? '<img src="' + displayImgs[0] + '" alt="' + esc(p.clave) + '" onmouseover="window.autoCrop&&autoCrop(this)" onload="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!=\'true\'){this.dataset.triedFallback=\'true\';this.src=\'' + (flb[0] || '') + '\';}else{this.parentElement.innerHTML=\'<i class=fas fa-image style=font-size:20px;color:#ccc></i>\';}">'
@@ -4829,10 +4839,11 @@ function renderCarouselGroup(mainContainer, items, options) {
         }
 
         function renderCard(p, idx) {
-            var imgs = p.imagenes || [];
+            var imgs = (p.imagenes || []).map(function(u) { return u.startsWith('http') ? u : 'https://www.truper.com' + (u.startsWith('/') ? u : '/' + u); });
             var localImgs = p.imagenes_local || [];
-            var displayImgs = localImgs.length > 0 ? localImgs : imgs;
-            var flb = localImgs.length > 0 ? imgs : [];
+            var isLocalEnv = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            var displayImgs = (isLocalEnv && localImgs.length > 0) ? localImgs : imgs;
+            var flb = (isLocalEnv && localImgs.length > 0) ? imgs : [];
             
             var mainImg = displayImgs.length > 0
                 ? '<img id="mainImageImg-' + idx + '" src="' + displayImgs[0] + '" alt="' + esc(p.nombre) + '" onload="window.autoCrop&&autoCrop(this)" onclick="openLightbox(this.src)" onerror="if(this.dataset.triedFallback!=\'true\'){this.dataset.triedFallback=\'true\';this.src=\'' + (flb[0] || '') + '\';}else{this.parentElement.innerHTML=\'<i class=fas fa-image no-image></i>\'}">'
@@ -5834,7 +5845,15 @@ function renderCarouselGroup(mainContainer, items, options) {
             if (btSuggestions.length > 0) {
                 suggBox.innerHTML = '';
                 btSuggestions.forEach((p, i) => {
-                    let img = p.imagenes && p.imagenes.length ? p.imagenes[0] : (p.imagenes_local && p.imagenes_local.length ? p.imagenes_local[0] : '');
+                    var isLocalEnv = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                    let img = '';
+                    if (!isLocalEnv && p.imagenes && p.imagenes.length) {
+                        img = p.imagenes[0].startsWith('http') ? p.imagenes[0] : 'https://www.truper.com' + (p.imagenes[0].startsWith('/') ? p.imagenes[0] : '/' + p.imagenes[0]);
+                    } else if (isLocalEnv && p.imagenes_local && p.imagenes_local.length) {
+                        img = p.imagenes_local[0];
+                    } else if (p.imagenes && p.imagenes.length) {
+                        img = p.imagenes[0].startsWith('http') ? p.imagenes[0] : 'https://www.truper.com' + (p.imagenes[0].startsWith('/') ? p.imagenes[0] : '/' + p.imagenes[0]);
+                    }
                     var flb = "https://www.truper.com/media/import/imagenes/" + p.clave + ".jpg";
                     suggBox.insertAdjacentHTML('beforeend', `
                         <div class="result-item bt-sug-item" id="btsug-${i}" onmousedown="addMatchedBtByIdx(${i})">
@@ -6084,8 +6103,15 @@ function renderCarouselGroup(mainContainer, items, options) {
             }
 
             btList.forEach((item, i) => {
-                let img = item.p.imagenes && item.p.imagenes.length ? item.p.imagenes[0] : '';
-                if(!img) img = item.p.imagenes_local && item.p.imagenes_local.length ? item.p.imagenes_local[0] : '';
+                var isLocalEnv = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                let img = '';
+                if (!isLocalEnv && item.p.imagenes && item.p.imagenes.length) {
+                    img = item.p.imagenes[0].startsWith('http') ? item.p.imagenes[0] : 'https://www.truper.com' + (item.p.imagenes[0].startsWith('/') ? item.p.imagenes[0] : '/' + item.p.imagenes[0]);
+                } else if (isLocalEnv && item.p.imagenes_local && item.p.imagenes_local.length) {
+                    img = item.p.imagenes_local[0];
+                } else if (item.p.imagenes && item.p.imagenes.length) {
+                    img = item.p.imagenes[0].startsWith('http') ? item.p.imagenes[0] : 'https://www.truper.com' + (item.p.imagenes[0].startsWith('/') ? item.p.imagenes[0] : '/' + item.p.imagenes[0]);
+                }
                 var flb = "https://www.truper.com/media/import/imagenes/" + item.p.clave + ".jpg";
 
                 list.insertAdjacentHTML('beforeend', `
@@ -6194,8 +6220,15 @@ function renderCarouselGroup(mainContainer, items, options) {
             
             btList.forEach(item => {
                 for(let i=0; i<item.qty; i++) {
-                    let img = item.p.imagenes && item.p.imagenes.length ? item.p.imagenes[0] : '';
-                    if(!img) img = item.p.imagenes_local && item.p.imagenes_local.length ? item.p.imagenes_local[0] : '';
+                    var isLocalEnv = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                    let img = '';
+                    if (!isLocalEnv && item.p.imagenes && item.p.imagenes.length) {
+                        img = item.p.imagenes[0].startsWith('http') ? item.p.imagenes[0] : 'https://www.truper.com' + (item.p.imagenes[0].startsWith('/') ? item.p.imagenes[0] : '/' + item.p.imagenes[0]);
+                    } else if (isLocalEnv && item.p.imagenes_local && item.p.imagenes_local.length) {
+                        img = item.p.imagenes_local[0];
+                    } else if (item.p.imagenes && item.p.imagenes.length) {
+                        img = item.p.imagenes[0].startsWith('http') ? item.p.imagenes[0] : 'https://www.truper.com' + (item.p.imagenes[0].startsWith('/') ? item.p.imagenes[0] : '/' + item.p.imagenes[0]);
+                    }
                     var flb = "https://www.truper.com/media/import/imagenes/" + item.p.clave + ".jpg";
                     
                     let nombre = (item.p.nombre || '').toUpperCase();
@@ -8052,8 +8085,15 @@ function renderCarouselGroup(mainContainer, items, options) {
                 
                 if(typeof btList !== 'undefined' && btList && btList.length > 0) {
                     const sample = btList[0];
-                    let img = sample.p.imagenes && sample.p.imagenes.length ? sample.p.imagenes[0] : '';
-                    if(!img) img = sample.p.imagenes_local && sample.p.imagenes_local.length ? sample.p.imagenes_local[0] : '';
+                    var isLocalEnv = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                    let img = '';
+                    if (!isLocalEnv && sample.p.imagenes && sample.p.imagenes.length) {
+                        img = sample.p.imagenes[0].startsWith('http') ? sample.p.imagenes[0] : 'https://www.truper.com' + (sample.p.imagenes[0].startsWith('/') ? sample.p.imagenes[0] : '/' + sample.p.imagenes[0]);
+                    } else if (isLocalEnv && sample.p.imagenes_local && sample.p.imagenes_local.length) {
+                        img = sample.p.imagenes_local[0];
+                    } else if (sample.p.imagenes && sample.p.imagenes.length) {
+                        img = sample.p.imagenes[0].startsWith('http') ? sample.p.imagenes[0] : 'https://www.truper.com' + (sample.p.imagenes[0].startsWith('/') ? sample.p.imagenes[0] : '/' + sample.p.imagenes[0]);
+                    }
                     let baseSrc = img;
                     let imgSrc = baseSrc;
                     if(baseSrc && baseSrc.indexOf('http') === 0) {
@@ -8114,8 +8154,15 @@ function renderCarouselGroup(mainContainer, items, options) {
                 
                 btList.forEach(item => {
                     for(let i=0; i<item.qty; i++) {
-                        let img = item.p.imagenes && item.p.imagenes.length ? item.p.imagenes[0] : '';
-                        if(!img) img = item.p.imagenes_local && item.p.imagenes_local.length ? item.p.imagenes_local[0] : '';
+                        var isLocalEnv = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                        let img = '';
+                        if (!isLocalEnv && item.p.imagenes && item.p.imagenes.length) {
+                            img = item.p.imagenes[0].startsWith('http') ? item.p.imagenes[0] : 'https://www.truper.com' + (item.p.imagenes[0].startsWith('/') ? item.p.imagenes[0] : '/' + item.p.imagenes[0]);
+                        } else if (isLocalEnv && item.p.imagenes_local && item.p.imagenes_local.length) {
+                            img = item.p.imagenes_local[0];
+                        } else if (item.p.imagenes && item.p.imagenes.length) {
+                            img = item.p.imagenes[0].startsWith('http') ? item.p.imagenes[0] : 'https://www.truper.com' + (item.p.imagenes[0].startsWith('/') ? item.p.imagenes[0] : '/' + item.p.imagenes[0]);
+                        }
                         
                         let baseSrc = img;
                         let imgSrc = baseSrc;
