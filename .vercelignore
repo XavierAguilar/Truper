@@ -3,5 +3,9 @@ node_modules/
 modulos/
 *.json
 !productos_truper_min.json
+!productos_truper_min_part1.json
+!productos_truper_min_part2.json
+!productos_truper_min_part3.json
+!productos_truper_min_part4.json
 !version.json
 !manifest.json
