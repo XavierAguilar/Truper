@@ -63,3 +63,15 @@ window.quoteCart = {
 document.addEventListener('DOMContentLoaded', () => {
     window.quoteCart.init();
 });
+
+// Escuchar cambios en localStorage para sincronizar con el POS
+window.addEventListener('storage', (e) => {
+    if (e.key === 'trpr_quote_cart') {
+        try {
+            window.quoteCart.items = JSON.parse(e.newValue) || [];
+            window.quoteCart.updateUI();
+        } catch(err) {
+            console.error("Error parsing cart storage event", err);
+        }
+    }
+});
