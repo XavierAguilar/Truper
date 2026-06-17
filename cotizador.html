@@ -819,19 +819,48 @@
         async function initTPV() {
             try {
                 let param = Date.now();
+                let forceDownload = false;
+
+                // 1. Verificador de Versión (Anti-Caché)
                 try {
-                    let cv = JSON.parse(localStorage.getItem('truper_catalog_version'));
-                    if(cv && cv.timestamp) param = cv.timestamp;
-                } catch(e){}
+                    const vResp = await fetch('version.json?_t=' + Date.now());
+                    if (vResp.ok) {
+                        const remoteV = await vResp.json();
+                        const localV = JSON.parse(localStorage.getItem('truper_catalog_version') || '{}');
+                        
+                        if (!localV.timestamp || remoteV.timestamp > localV.timestamp) {
+                            forceDownload = true;
+                            param = remoteV.timestamp;
+                            localStorage.setItem('truper_catalog_version', JSON.stringify(remoteV));
+                            console.log("¡Nueva versión de catálogo detectada en cotizador! Forzando limpieza de caché...");
+                        } else {
+                            param = localV.timestamp;
+                        }
+                    }
+                } catch (e) {
+                    console.warn("No se pudo verificar la versión en cotizador:", e);
+                    try {
+                        let cv = JSON.parse(localStorage.getItem('truper_catalog_version'));
+                        if(cv && cv.timestamp) param = cv.timestamp;
+                    } catch(err){}
+                }
                 
+                // 2. Cargar las 4 partes del catálogo
                 try {
-                    const [resp1, resp2] = await Promise.all([
+                    const [resp1, resp2, resp3, resp4] = await Promise.all([
                         fetch('productos_truper_min_part1.json?v=' + param),
-                        fetch('productos_truper_min_part2.json?v=' + param)
+                        fetch('productos_truper_min_part2.json?v=' + param),
+                        fetch('productos_truper_min_part3.json?v=' + param),
+                        fetch('productos_truper_min_part4.json?v=' + param)
                     ]);
-                    if (!resp1.ok || !resp2.ok) throw new Error("Fallo la descarga de partes");
-                    const [part1, part2] = await Promise.all([resp1.json(), resp2.json()]);
-                    db = part1.concat(part2);
+                    if (!resp1.ok || !resp2.ok || !resp3.ok || !resp4.ok) throw new Error("Fallo la descarga de partes");
+                    const [part1, part2, part3, part4] = await Promise.all([
+                        resp1.json(),
+                        resp2.json(),
+                        resp3.json(),
+                        resp4.json()
+                    ]);
+                    db = part1.concat(part2).concat(part3).concat(part4);
                 } catch (e) {
                     console.warn("Usando fallback de archivo único...");
                     const resp = await fetch('productos_truper_min.json?v=' + param);
