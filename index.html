@@ -4922,7 +4922,12 @@ function renderCarouselGroup(mainContainer, items, options) {
 
             var dl = [];
             dl.push('<button class="download-btn" onclick="window.quoteCart.add(\'' + p.codigo + '\', event)" style="background-color:#10b981; border-color:#059669; color:white; font-weight:bold;"><i class="fas fa-cart-plus"></i> Cotizar PTV</button>');
-            if (p.promocion) dl.push('<a class="download-btn" href="https://www.truper.com/promo/2026/Mayo/Promo%20nacional/5d88e4c6ac836fe7142c71d55b0b013a.pdf" target="_blank" style="background:#ea580c;color:white;border:none;"><i class="fas fa-fire"></i>Ver Folleto Oferta</a>');
+            if (p.promocion) {
+                var urlFolleto = p.es_nuevo
+                    ? 'https://www.truper.com/promo/2026/Junio/Promo%20nacional/6087e1378135e62775d673ebbacd8279.pdf'
+                    : 'https://www.truper.com/promo/2026/Junio/Promo%20nacional/40766ee7047dfe41031722e352088a39.pdf';
+                dl.push('<a class="download-btn" href="' + urlFolleto + '" target="_blank" style="background:#ea580c;color:white;border:none;"><i class="fas fa-fire"></i>Ver Folleto Oferta</a>');
+            }
             if (p.ficha_tecnica_pdf) dl.push('<a class="download-btn" href="' + p.ficha_tecnica_pdf + '" target="_blank"><i class="fas fa-file-pdf"></i>Ficha PDF</a>');
             if (p.banco_fotos_url) dl.push('<a class="download-btn" href="' + p.banco_fotos_url + '" target="_blank"><i class="fas fa-images"></i>Banco Fotos</a>');
             if (p.catalogo_url || p.pagina_catalogo) {

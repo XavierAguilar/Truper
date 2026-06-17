@@ -24,6 +24,7 @@ const COL = {
     codigo: 0,
     clave: 1,
     descripcion: 2,
+    margen: 3,          // D - Margen de mercado (MM00, MM0, MM1, MM2)
     ean: 8,             // I - código de barras EAN
     mayoreo: 11,       // L - precio mayoreo con IVA
     distribuidor: 12,   // M - precio distribuidor con IVA
@@ -125,6 +126,7 @@ function main() {
             descripcion: vals[COL.descripcion] || '',
             marca: vals[COL.marca] || '',
             ean: vals[COL.ean] || '',
+            margen: vals[COL.margen] || '',
             precios: {
                 distribuidor: parsearPrecio(vals[COL.distribuidor]),
                 mayoreo: parsearPrecio(vals[COL.mayoreo]),
@@ -172,6 +174,7 @@ function main() {
 
             producto.precios = datosCSV.precios;
             producto.ean = datosCSV.ean || producto.ean || '';
+            producto.margen = datosCSV.margen || producto.margen || '';
 
             // Si estaba marcado como descontinuado, reactivarlo
             if (producto.descontinuado) {
@@ -190,6 +193,7 @@ function main() {
                 nombre: datosCSV.descripcion,
                 descripcion_csv: datosCSV.descripcion,
                 marca: datosCSV.marca,
+                margen: datosCSV.margen,
                 precios: datosCSV.precios,
                 ean: datosCSV.ean,
                 imagenes: [],

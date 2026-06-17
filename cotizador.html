@@ -528,11 +528,69 @@
         .gallery-dot.active { background: white; }
 
         /* -----------------------
+           EXTRA DISCOUNTS UTILITY STYLE
+           ----------------------- */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 38px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #cbd5e1;
+            transition: .3s;
+            border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        .switch input:checked + .slider {
+            background-color: var(--primary);
+        }
+        .switch input:checked + .slider:before {
+            transform: translateX(18px);
+        }
+        .desc-input {
+            width: 100%;
+            border: 1px solid #eef2f6;
+            border-radius: 8px;
+            padding: 8px 8px 8px 28px;
+            font-size: 12px;
+            font-weight: 600;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            color: var(--text-main);
+            background: var(--surface);
+        }
+        .desc-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        }
+
+        /* -----------------------
            FASE 4: IMPRESIÓN PDF A4
            ----------------------- */
         @media print {
             body { background: white; overflow: visible; height: auto; }
-            .catalog-pane, .catalog-header, .btn-action { display: none !important; }
+            .catalog-pane, .catalog-header, .btn-action, .descuentos-extra-container { display: none !important; }
             .app-container { display: block; height: auto; width: 100%; }
             .ticket-pane { width: 100%; border: none; box-shadow: none; display: block; height: auto; }
             .ticket-header { background: white; border-bottom: 2px solid black; padding-bottom: 20px; margin-bottom: 20px; }
@@ -626,6 +684,35 @@
                                 <option value="publico">🛒 Precio Público</option>
                                 <option value="distribuidor">🏭 Distribuidor (Especial)</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <!-- Descuentos Adicionales -->
+                    <div class="descuentos-extra-container" style="margin-top:16px; border-top:1px dashed var(--border); padding-top:16px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:6px;">
+                                <i class="fas fa-percentage" style="color:var(--primary);"></i> Descuentos Extra
+                            </label>
+                            <label class="switch">
+                                <input type="checkbox" id="chkDescuentosExtra" onchange="toggleDescuentosExtra()">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div id="divDescuentosInputs" style="display:none; gap:12px; margin-top:12px;">
+                            <div style="flex:1;">
+                                <label style="font-size:9px; color:var(--text-muted); font-weight:700; text-transform:uppercase; display:block; margin-bottom:6px;">Descuento 1 (%)</label>
+                                <div class="input-group" style="margin-top:0;">
+                                    <i class="fas fa-tag" style="left:10px; font-size:11px;"></i>
+                                    <input type="number" id="txtDesc1" value="0" min="0" max="100" step="0.1" class="desc-input" oninput="updateDescuento(1)">
+                                </div>
+                            </div>
+                            <div style="flex:1;">
+                                <label style="font-size:9px; color:var(--text-muted); font-weight:700; text-transform:uppercase; display:block; margin-bottom:6px;">Descuento 2 (%)</label>
+                                <div class="input-group" style="margin-top:0;">
+                                    <i class="fas fa-tag" style="left:10px; font-size:11px;"></i>
+                                    <input type="number" id="txtDesc2" value="0" min="0" max="100" step="0.1" class="desc-input" oninput="updateDescuento(2)">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -725,6 +812,10 @@
         let posState = {};
         let favorites = JSON.parse(localStorage.getItem('trpr_favorites') || '[]');
         
+        let extraDiscountEnabled = localStorage.getItem('trpr_extra_discount_enabled') === 'true';
+        let extraDiscount1 = parseFloat(localStorage.getItem('trpr_extra_discount_1')) || 0;
+        let extraDiscount2 = parseFloat(localStorage.getItem('trpr_extra_discount_2')) || 0;
+        
         async function initTPV() {
             try {
                 let param = Date.now();
@@ -747,6 +838,18 @@
                     db = await resp.json();
                 }
                 db.forEach(p => { dbByKey[p.codigo] = p; });
+                
+                // Initialize Extra Discounts in DOM
+                const chkDesc = document.getElementById('chkDescuentosExtra');
+                const txtDesc1 = document.getElementById('txtDesc1');
+                const txtDesc2 = document.getElementById('txtDesc2');
+                const divInputs = document.getElementById('divDescuentosInputs');
+                if (chkDesc && txtDesc1 && txtDesc2 && divInputs) {
+                    chkDesc.checked = extraDiscountEnabled;
+                    txtDesc1.value = extraDiscount1;
+                    txtDesc2.value = extraDiscount2;
+                    divInputs.style.display = extraDiscountEnabled ? 'flex' : 'none';
+                }
                 
                 syncStateWithCart();
                 renderCart();
@@ -814,12 +917,32 @@
             let tarifaMaestra = document.getElementById('tarifaGlobal').value;
             let total = 0; let totalPublico = 0;
             
+            // Extra discounts state
+            const chkDesc = document.getElementById('chkDescuentosExtra');
+            const enableDesc = chkDesc && chkDesc.checked;
+            const desc1 = enableDesc ? (parseFloat(document.getElementById('txtDesc1').value) || 0) : 0;
+            const desc2 = enableDesc ? (parseFloat(document.getElementById('txtDesc2').value) || 0) : 0;
+            
             cartIds.forEach(id => {
                 const p = dbByKey[id];
                 if(p) {
                     const cant = posState[id].qty;
                     let tarifaFila = posState[id].customPriceType || tarifaMaestra;
                     let precio = getPrice(p, tarifaFila);
+                    let extraDiscountHtml = '';
+                    if (enableDesc) {
+                        const factor = getMarginFactor(p.margen);
+                        if (factor > 0) {
+                            const itemDesc1 = desc1 * factor;
+                            const itemDesc2 = desc2 * factor;
+                            precio = precio * (1 - itemDesc1 / 100) * (1 - itemDesc2 / 100);
+                            precio = Math.round(precio * 100) / 100;
+                            
+                            const d1Val = parseFloat((itemDesc1).toFixed(3));
+                            const d2Val = parseFloat((itemDesc2).toFixed(3));
+                            extraDiscountHtml = `<div style="font-size:9.5px; color:#f97316; margin-top:2px; font-weight:600;"><i class="fas fa-percentage"></i> Margen ${p.margen || 'N/A'} (${(factor * 100)}%): -${d1Val}% y -${d2Val}%</div>`;
+                        }
+                    }
                     let basePrice = getBasePrice(p, tarifaFila);
                     const precioPublicoBase = getBasePrice(p, 'publico');
                     
@@ -839,7 +962,7 @@
                     let discountPct = p.promocion ? p.promocion.porcentaje : 0;
                     let ribbonCls = discountPct >= 25 ? 'badge-disc-high' : discountPct >= 15 ? 'badge-disc-mid' : 'badge-disc-low';
                     let ribbonHtml = discountPct > 0 ? `<span class="discount-ribbon ${ribbonCls}">-${discountPct}%</span>` : '';
-
+ 
                     html += `
                         <div class="ticket-row" oncontextmenu="showContextMenu(event, '${id}')">
                             <div class="tr-qty">
@@ -851,6 +974,7 @@
                                 <div style="color:var(--text-main); font-size:12px; line-height:1.3; margin-top:1px;">${p.nombre || p.descripcion_csv || ''}</div>
                                 ${ahorroHtml}
                                 ${customTariffBadge}
+                                ${extraDiscountHtml}
                             </div>
                             <div class="tr-prices">
                                 <div style="font-size:11px; color:var(--text-muted);">${unitDisplay}</div>
@@ -908,7 +1032,21 @@
             document.getElementById('qtyModalTitle').innerText = p.clave;
             document.getElementById('qtyModalDesc').innerText = p.nombre || p.descripcion_csv || '';
             const tarifaMaestra = document.getElementById('tarifaGlobal').value;
-            document.getElementById('qtyModalPrice').innerText = formatMoney(getPrice(p, tarifaMaestra)) + ' / unidad';
+            
+            let pPrice = getPrice(p, tarifaMaestra);
+            const chkDesc = document.getElementById('chkDescuentosExtra');
+            if (chkDesc && chkDesc.checked) {
+                const desc1 = parseFloat(document.getElementById('txtDesc1').value) || 0;
+                const desc2 = parseFloat(document.getElementById('txtDesc2').value) || 0;
+                const factor = getMarginFactor(p.margen);
+                if (factor > 0) {
+                    const itemDesc1 = desc1 * factor;
+                    const itemDesc2 = desc2 * factor;
+                    pPrice = pPrice * (1 - itemDesc1 / 100) * (1 - itemDesc2 / 100);
+                    pPrice = Math.round(pPrice * 100) / 100;
+                }
+            }
+            document.getElementById('qtyModalPrice').innerText = formatMoney(pPrice) + ' / unidad';
             
             let imgUrl = (p.imagenes && p.imagenes.length) ? p.imagenes[0] : ((p.imagenes_local && p.imagenes_local.length) ? p.imagenes_local[0] : '');
             const imgEl = document.getElementById('qtyModalImg');
@@ -1055,13 +1193,25 @@
         }
         document.addEventListener('click', () => { document.getElementById('catalogContextMenu').style.display = 'none'; });
         
+        let currentGridResults = [];
+
         function initSearchGrid() {
             const container = document.getElementById('explorerGrid');
             const input = document.getElementById('explorerSearch');
             function normalize(t) { return (t || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
             
+            window.reRenderGrid = () => {
+                drawCards(currentGridResults);
+            };
+            
             const drawCards = (results) => {
+                currentGridResults = results;
                 const tarifaMaestra = document.getElementById('tarifaGlobal').value;
+                const chkDesc = document.getElementById('chkDescuentosExtra');
+                const enableDesc = chkDesc && chkDesc.checked;
+                const desc1 = enableDesc ? (parseFloat(document.getElementById('txtDesc1').value) || 0) : 0;
+                const desc2 = enableDesc ? (parseFloat(document.getElementById('txtDesc2').value) || 0) : 0;
+                
                 container.innerHTML = results.map(p => {
                     let bL = '', bR = '';
                     if(p.promocion) {
@@ -1074,6 +1224,16 @@
                     let thumb = imgUrl ? `<div class="img-mask"><img src="${imgUrl}" loading="lazy"></div>` : `<div class="img-mask"><i class="fas fa-image" style="color:#94a3b8;font-size:30px;"></i></div>`;
                     let fav = favorites.includes(p.codigo) ? `<i class="fas fa-star fav-star"></i>` : '';
                     let fp = getPrice(p, tarifaMaestra), bp = getBasePrice(p, tarifaMaestra);
+                    let marginBadge = p.margen ? `<span style="font-size:9px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:4px; padding:1px 4px; margin-left:6px; color:#475569; font-weight:700;">${p.margen}</span>` : '';
+                    if (enableDesc) {
+                        const factor = getMarginFactor(p.margen);
+                        if (factor > 0) {
+                            const itemDesc1 = desc1 * factor;
+                            const itemDesc2 = desc2 * factor;
+                            fp = fp * (1 - itemDesc1 / 100) * (1 - itemDesc2 / 100);
+                            fp = Math.round(fp * 100) / 100;
+                        }
+                    }
                     let pd = fp < bp 
                         ? `<span class="price-old">${formatMoney(bp)}</span> <span class="price-new">${formatMoney(fp)}</span>` 
                         : formatMoney(fp);
@@ -1081,7 +1241,7 @@
                         <div class="badge-container"><div>${bL}</div><div>${bR}</div></div>${fav}${thumb}
                         <div class="card-info">
                             <div class="price">${pd}</div>
-                            <div class="code">${p.clave} (${p.codigo})</div>
+                            <div class="code">${p.clave} (${p.codigo})${marginBadge}</div>
                             <div class="title">${p.nombre||p.descripcion_csv||''}</div>
                         </div></div>`;
                 }).join('');
@@ -1121,8 +1281,37 @@
                 }, 150);
             };
             document.getElementById('gridZoom').addEventListener('input', (e) => { document.getElementById('explorerGrid').style.setProperty('--card-size', e.target.value + 'px'); });
-            document.getElementById('tarifaGlobal').addEventListener('change', () => { renderCart(); input.dispatchEvent(new Event('input')); });
+            document.getElementById('tarifaGlobal').addEventListener('change', () => { renderCart(); if (window.reRenderGrid) window.reRenderGrid(); });
             input.focus();
+        }
+
+        function getMarginFactor(margen) {
+            if (!margen) return 0;
+            const m = margen.toUpperCase().trim();
+            if (m === 'MM00' || m === 'M00') return 1.0;
+            if (m === 'MM0' || m === 'M0') return 0.8;
+            if (m === 'MM1' || m === 'M1') return 0.6;
+            if (m === 'MM2' || m === 'M2') return 0.4;
+            return 0;
+        }
+
+        function toggleDescuentosExtra() {
+            const chk = document.getElementById('chkDescuentosExtra');
+            const div = document.getElementById('divDescuentosInputs');
+            if (chk && div) {
+                const isChecked = chk.checked;
+                div.style.display = isChecked ? 'flex' : 'none';
+                localStorage.setItem('trpr_extra_discount_enabled', isChecked);
+                renderCart();
+                if (window.reRenderGrid) window.reRenderGrid();
+            }
+        }
+        
+        function updateDescuento(num) {
+            const val = parseFloat(document.getElementById('txtDesc' + num).value) || 0;
+            localStorage.setItem('trpr_extra_discount_' + num, val);
+            renderCart();
+            if (window.reRenderGrid) window.reRenderGrid();
         }
         // ----------------- TOASTS, HOTKEYS Y CONTEXT MENU -----------------
         let cmActiveId = null;
