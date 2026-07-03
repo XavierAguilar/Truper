@@ -1,28 +1,89 @@
 {
-  "estado": "procesando",
+  "estado": "completado",
   "salud": "warning",
-  "total_catalogo": 15412,
+  "total_catalogo": 15443,
   "rango": {
     "start": 0,
-    "end": 15412
+    "end": 15443
   },
-  "procesados": 15423,
+  "procesados": 15454,
   "nuevos_en_lote": 0,
-  "total_lote": 169,
-  "pct_lote": 74,
-  "errores": 0,
-  "reintentando": 52,
-  "pendientes": 44,
-  "tiempo_s": "262",
-  "prod_por_min": "28.6",
-  "ultima_actualizacion": "2026-06-04T18:52:06.746Z",
+  "total_lote": 168,
+  "pct_lote": 100,
+  "errores": 14,
+  "reintentando": 42,
+  "pendientes": 0,
+  "tiempo_s": "275",
+  "prod_por_min": "36.7",
+  "ultima_actualizacion": "2026-07-03T15:46:52.807Z",
   "ultimo_producto": {
-    "codigo": "43956",
-    "clave": "TENF-3/4Q",
-    "nombre": "Tensor forjado 3/4\" quijada - quijada, galvanizado, FIERO"
+    "codigo": "43564",
+    "clave": "COLET-3/4-F3",
+    "nombre": "Condulet rectangular 3/4\" tipo FS de 3 salidas, VOLTECK"
   },
-  "errores_detalle": [],
+  "errores_detalle": [
+    {
+      "codigo": "55489",
+      "clave": "EX-HE-SB-CR",
+      "error": "HTTP 429",
+      "tipo": "http"
+    },
+    {
+      "codigo": "55488",
+      "clave": "EX-HE-BI-CR",
+      "error": "HTTP 429",
+      "tipo": "http"
+    },
+    {
+      "codigo": "55494",
+      "clave": "EX-M-048-A-CR",
+      "error": "HTTP 429",
+      "tipo": "http"
+    },
+    {
+      "codigo": "55614",
+      "clave": "EX-M-048I-CR",
+      "error": "HTTP 429",
+      "tipo": "http"
+    },
+    {
+      "codigo": "55617",
+      "clave": "EX-F-317A-CR",
+      "error": "HTTP 429",
+      "tipo": "http"
+    },
+    {
+      "codigo": "55618",
+      "clave": "EX-F-AQF-92-CR",
+      "error": "HTTP 429",
+      "tipo": "http"
+    },
+    {
+      "codigo": "55615",
+      "clave": "EX-M-050I-CR",
+      "error": "HTTP 429",
+      "tipo": "http"
+    },
+    {
+      "codigo": "55616",
+      "clave": "EX-M-060I-CR",
+      "error": "HTTP 429",
+      "tipo": "http"
+    },
+    {
+      "codigo": "55571",
+      "clave": "EX-H-PRO-CR",
+      "error": "HTTP 429",
+      "tipo": "http"
+    },
+    {
+      "codigo": "55620",
+      "clave": "EX-F-319I-CR",
+      "error": "HTTP 429",
+      "tipo": "http"
+    }
+  ],
   "problemas": [
-    "♻️ 52 productos en cola de reintento"
+    "♻️ 42 productos en cola de reintento"
   ]
 }

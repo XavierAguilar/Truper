@@ -3285,11 +3285,12 @@ function renderCarouselGroup(mainContainer, items, options) {
                 else promoBg = 'linear-gradient(90deg, #f59e0b, #d97706)';
             }
             var ribbonPromo = p.promocion ? '<div class="ribbon-promo" style="background:' + promoBg + ';font-size:10px;padding:3px 20px;left:-20px;text-align:center;">-' + p.promocion.porcentaje + '%</div>' : '';
+            var ribbonVolatil = p.es_volatil ? '<div class="ribbon-nuevo" style="background:linear-gradient(90deg, #0284c7, #0369a1);font-size:10px;padding:3px 20px;right:-20px;text-align:center;">Volátil</div>' : '';
 
             rowHtml += '<div class="carousel-card" onclick="showProduct(' + productos.indexOf(p) + ')" title="' + p.clave + '">' +
                        '<div class="carousel-card-img-wrapper">' + arrows +
                        '<img src="' + imgSrc + '" class="carousel-card-img" alt="' + p.clave + '" loading="lazy" onmouseover="autoCrop(this)" onload="autoCrop(this)" onerror="' + fStr + '">' +
-                       dots + ribbonNuevo + ribbonPromo + '</div>' +
+                       dots + ribbonNuevo + ribbonPromo + ribbonVolatil + '</div>' +
                        '<div class="carousel-card-category">' + (p.marca || 'TRUPER') + '</div>' +
                        '<div class="carousel-card-code">' + p.codigo + '</div>' +
                        '<div class="carousel-card-name">' + (p.nombre ? p.nombre.substring(0,35) + '...' : 'Sin nombre') + '</div>' +
@@ -4661,8 +4662,9 @@ function renderCarouselGroup(mainContainer, items, options) {
                         else promoBg = 'linear-gradient(90deg, #f59e0b, #d97706)';
                     }
                     var ribbonPromo = p.promocion ? '<div class="ribbon-promo" style="background:' + promoBg + ';font-size:14px;padding:5px 30px;left:-20px;text-align:center;">-' + p.promocion.porcentaje + '%</div>' : '';
+                    var ribbonVolatil = p.es_volatil ? '<div class="ribbon-nuevo" style="background:linear-gradient(90deg, #0284c7, #0369a1);font-size:14px;padding:5px 30px;right:-20px;text-align:center;">Volátil</div>' : '';
                     return '<div class="result-card" onclick="selectResult(' + item.index + ')" style="animation-delay:' + delay + 's;">' +
-                        '<div class="result-card-img">' + arrows + mainImg + dots + vinetasHtml + ribbonNuevo + ribbonPromo + '</div>' +
+                        '<div class="result-card-img">' + arrows + mainImg + dots + vinetasHtml + ribbonNuevo + ribbonPromo + ribbonVolatil + '</div>' +
                         '<div class="result-card-body">' +
                         '<div class="result-card-code">' + highlightMulti(p.codigo, words) + '</div>' +
                         '<div class="result-card-clave">' + highlightMulti(p.clave, words) + '</div>' +
@@ -4695,6 +4697,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                         '<span class="result-list-code">' + highlightMulti(p.codigo, words) + '</span>' +
                         '<span class="result-list-clave">' + highlightMulti(p.clave, words) + '</span>' +
                         (p.es_nuevo ? '<span class="badge-nuevo" style="font-size:9px;padding:2px 6px;margin-left:6px;"><i class="fas fa-star"></i>NUEVO</span>' : '') +
+                        (p.es_volatil ? '<span class="badge-nuevo" style="background:#0284c7;color:white;font-size:9px;padding:2px 6px;margin-left:6px;border:1px solid #0284c7;"><i class="fas fa-chart-line"></i>VOLÁTIL</span>' : '') +
                         (p.promocion ? '<span class="badge-nuevo" style="background:' + (p.promocion.porcentaje >= 30 ? '#be123c' : (p.promocion.porcentaje >= 20 ? '#ea580c' : '#d97706')) + ';color:white;font-size:10px;font-weight:bold;padding:2px 6px;margin-left:6px;">-' + p.promocion.porcentaje + '%</span>' : '') +
                         '</div>' +
                         '<div class="result-list-name">' + highlightMulti(p.nombre || p.descripcion_csv || '', words) + '</div>' +
@@ -4924,9 +4927,13 @@ function renderCarouselGroup(mainContainer, items, options) {
             dl.push('<button class="download-btn" onclick="window.quoteCart.add(\'' + p.codigo + '\', event)" style="background-color:#10b981; border-color:#059669; color:white; font-weight:bold;"><i class="fas fa-cart-plus"></i> Cotizar PTV</button>');
             if (p.promocion) {
                 var urlFolleto = p.es_nuevo
-                    ? 'https://www.truper.com/promo/2026/Junio/Promo%20nacional/6087e1378135e62775d673ebbacd8279.pdf'
-                    : 'https://www.truper.com/promo/2026/Junio/Promo%20nacional/40766ee7047dfe41031722e352088a39.pdf';
+                    ? 'https://www.truper.com/promo/2026/Julio/Promo%20nacional/a9bdc8adb10d30f7e3d15b9918e463bd.pdf'
+                    : 'https://www.truper.com/promo/2026/Julio/Promo%20nacional/bf694a005b5205cb1be4d0327d5d0f5e.pdf';
                 dl.push('<a class="download-btn" href="' + urlFolleto + '" target="_blank" style="background:#ea580c;color:white;border:none;"><i class="fas fa-fire"></i>Ver Folleto Oferta</a>');
+            }
+            if (p.es_volatil) {
+                var urlVolatiles = 'https://www.truper.com/promo/2026/Julio/Promo%20nacional/1b69dc639524fb96e4656beec624e278.pdf';
+                dl.push('<a class="download-btn" href="' + urlVolatiles + '" target="_blank" style="background:#0284c7;color:white;border:none;"><i class="fas fa-chart-line"></i>Ver Folleto Volátiles</a>');
             }
             if (p.ficha_tecnica_pdf) dl.push('<a class="download-btn" href="' + p.ficha_tecnica_pdf + '" target="_blank"><i class="fas fa-file-pdf"></i>Ficha PDF</a>');
             if (p.banco_fotos_url) dl.push('<a class="download-btn" href="' + p.banco_fotos_url + '" target="_blank"><i class="fas fa-images"></i>Banco Fotos</a>');
@@ -4966,6 +4973,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                 familyBadge + 
                 (p.descontinuado ? '<span class="badge-descontinuado"><i class="fas fa-ban"></i>Descontinuado</span>' : '') + 
                 (p.es_nuevo ? '<span class="badge-nuevo"><i class="fas fa-star"></i>Nuevo</span>' : '') + 
+                (p.es_volatil ? '<span class="badge-nuevo" style="background:#0284c7;color:white;border:1px solid #0284c7;"><i class="fas fa-chart-line"></i>Volátil</span>' : '') + 
                 '</div></div>' +
                 '<div class="card-body"><div class="images-panel">' +
                 '<div class="main-image" id="mainImage-' + idx + '">' + mainImg + '</div>' +
