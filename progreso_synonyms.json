@@ -5,11 +5,11 @@
   "total": 15454,
   "procesados": 15454,
   "pendientes": 0,
-  "aliases_generados": 187249,
+  "aliases_generados": 187309,
   "promedio": 12,
   "tiempo_s": "2",
-  "prod_por_min": "591729.4",
-  "ultima_actualizacion": "2026-07-03T15:47:46.788Z",
+  "prod_por_min": "528643.1",
+  "ultima_actualizacion": "2026-07-03T16:28:00.687Z",
   "errores": 0,
   "problemas": []
 }

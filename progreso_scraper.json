@@ -10,12 +10,12 @@
   "nuevos_en_lote": 0,
   "total_lote": 168,
   "pct_lote": 100,
-  "errores": 14,
-  "reintentando": 42,
+  "errores": 16,
+  "reintentando": 58,
   "pendientes": 0,
-  "tiempo_s": "275",
-  "prod_por_min": "36.7",
-  "ultima_actualizacion": "2026-07-03T15:46:52.807Z",
+  "tiempo_s": "355",
+  "prod_por_min": "28.4",
+  "ultima_actualizacion": "2026-07-03T16:25:54.803Z",
   "ultimo_producto": {
     "codigo": "43564",
     "clave": "COLET-3/4-F3",
@@ -23,26 +23,14 @@
   },
   "errores_detalle": [
     {
-      "codigo": "55489",
-      "clave": "EX-HE-SB-CR",
+      "codigo": "55571",
+      "clave": "EX-H-PRO-CR",
       "error": "HTTP 429",
       "tipo": "http"
     },
     {
-      "codigo": "55488",
-      "clave": "EX-HE-BI-CR",
-      "error": "HTTP 429",
-      "tipo": "http"
-    },
-    {
-      "codigo": "55494",
-      "clave": "EX-M-048-A-CR",
-      "error": "HTTP 429",
-      "tipo": "http"
-    },
-    {
-      "codigo": "55614",
-      "clave": "EX-M-048I-CR",
+      "codigo": "55648",
+      "clave": "EX-VAL-FOS2-CR",
       "error": "HTTP 429",
       "tipo": "http"
     },
@@ -53,37 +41,49 @@
       "tipo": "http"
     },
     {
-      "codigo": "55618",
-      "clave": "EX-F-AQF-92-CR",
-      "error": "HTTP 429",
-      "tipo": "http"
-    },
-    {
-      "codigo": "55615",
-      "clave": "EX-M-050I-CR",
-      "error": "HTTP 429",
-      "tipo": "http"
-    },
-    {
       "codigo": "55616",
       "clave": "EX-M-060I-CR",
       "error": "HTTP 429",
       "tipo": "http"
     },
     {
-      "codigo": "55571",
-      "clave": "EX-H-PRO-CR",
+      "codigo": "55654",
+      "clave": "EX80-CON3-2-CR",
       "error": "HTTP 429",
       "tipo": "http"
     },
     {
-      "codigo": "55620",
-      "clave": "EX-F-319I-CR",
+      "codigo": "55655",
+      "clave": "EX80-CON1-2",
+      "error": "HTTP 429",
+      "tipo": "http"
+    },
+    {
+      "codigo": "55653",
+      "clave": "EX80-CON3-2",
+      "error": "HTTP 429",
+      "tipo": "http"
+    },
+    {
+      "codigo": "55656",
+      "clave": "EX80-CON1-2-CR",
+      "error": "HTTP 429",
+      "tipo": "http"
+    },
+    {
+      "codigo": "56036",
+      "clave": "EX-HER-GO-CR",
+      "error": "HTTP 429",
+      "tipo": "http"
+    },
+    {
+      "codigo": "55652",
+      "clave": "EX80-CON2-2-CR",
       "error": "HTTP 429",
       "tipo": "http"
     }
   ],
   "problemas": [
-    "♻️ 42 productos en cola de reintento"
+    "♻️ 58 productos en cola de reintento"
   ]
 }

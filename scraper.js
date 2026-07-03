@@ -558,7 +558,18 @@ async function main() {
       const { productData, usedApi } = await processProduct(product);
       const existingIdx = results.findIndex(r => r.codigo === productData.codigo);
       if (existingIdx >= 0) {
-          results[existingIdx] = productData;
+          const existing = results[existingIdx];
+          results[existingIdx] = {
+              ...existing,
+              ...productData,
+              nombre: productData.nombre || existing.nombre || '',
+              precios: existing.precios || {},
+              promocion: existing.promocion,
+              es_nuevo: existing.es_nuevo,
+              es_volatil: existing.es_volatil,
+              productos_relacionados: existing.productos_relacionados || productData.productos_relacionados || [],
+              relacionados: existing.relacionados || productData.relacionados || []
+          };
       } else {
           results.push(productData);
       }

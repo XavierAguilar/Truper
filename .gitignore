@@ -20,3 +20,6 @@ parse_pdfs.js
 extract_codes_from_txt.js
 procesar_promos_julio.js
 scratch_*
+check_*
+inspect_*
+restore_*
