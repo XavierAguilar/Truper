@@ -2821,6 +2821,18 @@
                 renderWelcomeCarousels();
                 setupSearch();
 
+                // === RESTAURACIÓN DE VISTA GENERADOR DE BACK TAGS ===
+                const savedView = sessionStorage.getItem('truper_currentView');
+                if (savedView === 'backtags') {
+                    const btView = document.getElementById('backtagsView');
+                    const mainView = document.getElementById('mainContent');
+                    if (btView && mainView) {
+                        btView.style.display = 'block';
+                        mainView.style.display = 'none';
+                        renderBtList();
+                    }
+                }
+
                 // === ENRUTAMIENTO DIRECTO (URL PARAMS) ===
                 var urlParams = new URLSearchParams(window.location.search);
                 var directCodigo = urlParams.get('p');
@@ -5134,8 +5146,8 @@ function renderCarouselGroup(mainContainer, items, options) {
             var isCarouselImg = !!img.closest('.welcome-carousel-container');
             var isProductSheet = !!img.closest('.images-panel');
             var isResultCard = !!img.closest('.result-card-img') || !!img.closest('.result-list-thumb');
-            var isBackTag = !!img.closest('.bktag');
-            var fillFactor = isBackTag ? 1.05 : (isProductSheet ? 0.95 : (isCarouselImg ? 0.875 : 1.025));
+            var isBackTag = !!img.closest('.bktag') || !!img.closest('.conex-bktag') || !!img.closest('.conex-lg-bktag');
+            var fillFactor = isBackTag ? 0.96 : (isProductSheet ? 0.95 : (isCarouselImg ? 0.875 : 1.025));
             
             // Inyectar pre-escala inicial sin delay para que no espere al proxy
             img.style.opacity = '1';
@@ -5646,11 +5658,13 @@ function renderCarouselGroup(mainContainer, items, options) {
             if (btView.style.display === 'block') {
                 btView.style.display = 'none';
                 mainView.style.display = 'block';
+                sessionStorage.setItem('truper_currentView', 'main');
             } else {
                 showBtPasswordModal(() => {
                     btView.style.display = 'block';
                     mainView.style.display = 'none';
                     searchRes.classList.remove('show');
+                    sessionStorage.setItem('truper_currentView', 'backtags');
                     setTimeout(() => document.getElementById('btScannerInput').focus(), 100);
                     renderBtList();
                 });
@@ -8039,6 +8053,887 @@ function renderCarouselGroup(mainContainer, items, options) {
                             <div class="pija-b8-lg-img-area">
                                 ${pSvg}
                                 <img src="${imgSrc}" onerror="this.style.display=\'none\'">
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'conexiones-10x4',
+                    group: 'conexiones',
+                    name: 'Conexiones y Válvulas (10x4 cm)',
+                    description: 'Formato apaisado para conexiones de cobre, CPVC, PPR, PVC y galvanizado, con indicador de material y medidas.',
+                    width: '10cm',
+                    height: '4cm',
+                    css: `
+                        .conex-bktag {
+                            width: 10cm; height: 4cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000; page-break-inside: avoid; break-inside: avoid;
+                        }
+                        .conex-top-black { position: absolute; top:0; left:0; width: 10cm; height: 0.8cm; background: #000; z-index: 10; }
+                        .conex-blue-header {
+                            position: absolute; top: 0.8cm; left: 0; width: 7cm; height: 0.6cm; background: #008AD2;
+                            display: flex; align-items: center; padding-left: 0.2cm; padding-right: 0.2cm; box-sizing: border-box; z-index: 5;
+                        }
+                        .conex-brand-title { color: #fff; font-size: 16px; font-weight: 900; margin-right: 6px; letter-spacing: 0.5px; line-height: 1; }
+                        .conex-badge {
+                            color: #fff; font-size: 10px; font-weight: 900; padding: 2px 7px; border-radius: 9px;
+                            display: inline-block; text-transform: uppercase; line-height: 1; margin-top: 1px;
+                        }
+                        .conex-blue-mm { margin-left: auto; color: #fff; font-weight: bold; font-size: 11px; }
+                        
+                        .conex-mid-text {
+                            position: absolute; top: 1.4cm; left: 0; width: 7cm; height: 1.7cm;
+                            display: flex; flex-direction: column; justify-content: center; padding-left: 0.1cm; padding-right: 0.1cm; box-sizing: border-box; z-index: 5;
+                        }
+                        .conex-title-single { width: 100%; text-align: center; font-size: 19px; font-weight: 900; color: #000; letter-spacing: -0.5px; line-height: 1.15; }
+                        .conex-title { width: 100%; text-align: center; font-weight: 900; color: #000; letter-spacing: -0.5px; line-height: 1.1; }
+                        .conex-title.line1 { font-size: 17.5px; margin-bottom: 2px; }
+                        .conex-title.line2 { font-size: 14.5px; opacity: 0.9; }
+                        .conex-mm-center { width: 100%; text-align: center; font-size: 13.5px; font-weight: 900; margin-top: 4px; }
+                        
+                        .conex-bot-bar { position: absolute; top: 3.1cm; left: 0; width: 7cm; height: 0.9cm; display: flex; z-index: 5; }
+                        .conex-bot-code {
+                            width: 3.3cm; height: 0.9cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 32px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .conex-bot-br {
+                            width: 3.7cm; background: #fff; height: 0.9cm; display: flex; align-items: flex-end; justify-content: center;
+                            overflow: hidden; padding-bottom: 2px; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+                        .conex-img-area {
+                            position: absolute; top: 0.8cm; right: 0; width: 3cm; height: 3.2cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
+                        }
+                        .conex-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                        .conex-diag-box { position: absolute; bottom: 1px; right: 1px; z-index: 10; display: flex; align-items: flex-end; justify-content: flex-end; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        const nameUpper = (item.p.nombre || '').toUpperCase();
+                        const descUpper = (item.p.descripcion_csv || '').toUpperCase();
+                        const specsUpper = (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '').toUpperCase();
+                        const combined = (nameUpper + " " + descUpper + " " + specsUpper).replace(/''/g, '"').replace(/'/g, '"');
+
+                        // 1. Detección de material
+                        let material = '';
+                        let badgeColor = '';
+                        let badgeText = '';
+                        let badgeTextColor = '#fff';
+
+                        if (combined.includes('CPVC')) {
+                            material = 'CPVC';
+                            badgeColor = '#D19F27';
+                            badgeText = 'CPVC';
+                        } else if (combined.includes('PVC')) {
+                            material = 'PVC';
+                            badgeColor = '#009BE0';
+                            badgeText = 'PVC';
+                        } else if (combined.includes('PPR')) {
+                            material = 'PPR';
+                            badgeColor = '#0F6B41';
+                            badgeText = 'PPR';
+                        } else if (combined.includes('POLIPROPILENO') || nameUpper.includes('INSERCION') || nameUpper.includes('INSERCIÓN') || nameUpper.includes(' PP ')) {
+                            material = 'PP';
+                            badgeColor = '#BFA38A'; // Light brown
+                            badgeText = 'PP';
+                        } else if (combined.includes('PE-AL-PE') || combined.includes('PEALPE')) {
+                            material = 'GAS';
+                            badgeColor = '#FAC428'; // Yellow
+                            badgeText = 'GAS';
+                            badgeTextColor = '#000'; // Black text
+                        } else if (combined.includes('COBRE')) {
+                            material = 'COBRE';
+                            badgeColor = '#79462F';
+                            badgeText = 'COBRE';
+                        } else if (combined.includes('GALVANIZADO') || combined.includes('GALV') || combined.includes('FIERRO GALV')) {
+                            material = 'GALV';
+                            badgeColor = '#70767C';
+                            badgeText = 'GALV';
+                        }
+
+                        // 2. Extracción de medidas (EXCLUSIVAMENTE DEL NOMBRE para evitar falsos positivos de empaques o PSI)
+                        const sizeMap = {
+                            '1/4': { mm: '6 mm', color: '#FF7F27' },   // Orange
+                            '3/8': { mm: '10 mm', color: '#8A959E' },  // Gray
+                            '1/2': { mm: '13 mm', color: '#D24D8C' },  // Pink
+                            '3/4': { mm: '19 mm', color: '#3CA5DD' },  // Light Blue
+                            '1': { mm: '25 mm', color: '#FAC428' },    // Yellow
+                            '1-1/4': { mm: '32 mm', color: '#2EAD58' },// Green
+                            '1-1/2': { mm: '38 mm', color: '#612B8E' },// Purple
+                            '2': { mm: '50 mm', color: '#00A59A' }     // Teal
+                        };
+
+                        function normalizeSize(s) {
+                            s = s.trim().replace(/"/g, '').replace(/'/g, '').replace(/\s+/g, '-');
+                            if (s === '1-1/2' || s === '1/2' || s === '3/4' || s === '1-1/4' || s === '1/4' || s === '3/8' || s === '1' || s === '2') return s;
+                            if (s === '1 1/2') return '1-1/2';
+                            if (s === '1 1/4') return '1-1/4';
+                            return s;
+                        }
+
+                        const nameForSize = nameUpper.replace(/''/g, '"').replace(/'/g, '"');
+                        const sizeRegex = /(1-1\/2|1\s+1\/2|1-1\/4|1\s+1\/4|1\/2|3\/4|1\/4|3\/8|1|2)(?:"|'|PULG|IN|\b)/g;
+                        const sizes = [];
+                        let m;
+                        while ((m = sizeRegex.exec(nameForSize)) !== null) {
+                            const norm = normalizeSize(m[1]);
+                            if (sizeMap[norm]) {
+                                sizes.push(norm);
+                            }
+                        }
+
+                        // Deduplicar tamaños
+                        const uniqueSizes = [];
+                        sizes.forEach((s, idx) => {
+                            if (idx === 0 || s !== sizes[idx-1]) {
+                                uniqueSizes.push(s);
+                            }
+                        });
+
+                        let finalSizes = uniqueSizes.slice(0, 3);
+                        
+                        if (finalSizes.length === 0) {
+                            const fallbackRegex = /\b(1\/2|3\/4|1|1-1\/2|2|1\/4|3\/8)\b/g;
+                            let fbMatch;
+                            if ((fbMatch = fallbackRegex.exec(nameForSize)) !== null) {
+                                finalSizes.push(normalizeSize(fbMatch[1]));
+                            }
+                        }
+
+                        let primarySize = '1/2';
+                        let mmText = '';
+
+                        const isPpr = (material === 'PPR');
+                        function getMmLabel(size) {
+                            if (isPpr) {
+                                const pprMm = {
+                                    '1/2': '20 mm',
+                                    '3/4': '25 mm',
+                                    '1': '32 mm',
+                                    '1-1/4': '40 mm',
+                                    '1-1/2': '50 mm',
+                                    '2': '63 mm'
+                                };
+                                if (pprMm[size]) return pprMm[size];
+                            }
+                            return sizeMap[size] ? sizeMap[size].mm : '';
+                        }
+
+                        if (finalSizes.length === 1) {
+                            primarySize = finalSizes[0];
+                            mmText = getMmLabel(primarySize);
+                        } else if (finalSizes.length === 2) {
+                            primarySize = finalSizes[0];
+                            const mmA = getMmLabel(finalSizes[0]).replace(' mm', '');
+                            const mmB = getMmLabel(finalSizes[1]).replace(' mm', '');
+                            mmText = `${mmA} mm a ${mmB} mm`;
+                        } else if (finalSizes.length >= 3) {
+                            const counts = {};
+                            finalSizes.forEach(s => { counts[s] = (counts[s] || 0) + 1; });
+                            let maxCount = 0;
+                            let mostFreq = finalSizes[0];
+                            for (const s in counts) {
+                                if (counts[s] > maxCount) {
+                                    maxCount = counts[s];
+                                    mostFreq = s;
+                                }
+                            }
+                            primarySize = mostFreq;
+                            const mmParts = finalSizes.map(s => getMmLabel(s).replace(' mm', ''));
+                            mmText = `${mmParts.join(' x ')} mm`;
+                        }
+
+                        const sizeInfo = sizeMap[primarySize] || { mm: '13 mm', color: '#D24D8C' };
+                        const primaryColor = sizeInfo.color;
+
+                        // 3. Diagramas vectoriales (SVG)
+                        let diagramSvg = '';
+                        const cleanName = (item.p.nombre || '').toUpperCase();
+                        
+                        if (finalSizes.length === 2) {
+                            if (cleanName.includes('BUSHING')) {
+                                if (material === 'GALV') {
+                                    diagramSvg = `
+                                    <svg viewBox="0 0 80 80" style="width:1.1cm; height:1.1cm; opacity:0.85; margin-right:3px;">
+                                        <polygon points="15,25 25,15 55,15 65,25 65,35 55,45 25,45 15,35" fill="none" stroke="#000" stroke-width="2.5"/>
+                                        <circle cx="40" cy="30" r="12" fill="none" stroke="#000" stroke-width="2"/>
+                                        <path d="M 28,45 L 28,65 L 52,65 L 52,45" fill="none" stroke="#000" stroke-width="2.5"/>
+                                        <line x1="28" y1="65" x2="52" y2="65" stroke="#000" stroke-width="2.5"/>
+                                        <line x1="32" y1="51" x2="48" y2="51" stroke="#000" stroke-width="2"/>
+                                        <line x1="32" y1="56" x2="48" y2="56" stroke="#000" stroke-width="2"/>
+                                        <line x1="32" y1="61" x2="48" y2="61" stroke="#000" stroke-width="2"/>
+                                        <text x="36" y="9" font-size="12" font-weight="900" font-family="Arial" fill="#000">B</text>
+                                        <text x="36" y="78" font-size="12" font-weight="900" font-family="Arial" fill="#000">A</text>
+                                    </svg>`;
+                                } else {
+                                    diagramSvg = `
+                                    <svg viewBox="0 0 100 60" style="width:1.3cm; height:0.8cm; opacity:0.85;">
+                                        <path d="M 15 25 L 48 25 L 52 18 L 85 18 L 85 42 L 52 42 L 48 35 L 15 35 Z" fill="none" stroke="#000" stroke-width="2.5"/>
+                                        <line x1="15" y1="25" x2="15" y2="35" stroke="#000" stroke-width="2.5"/>
+                                        <text x="5" y="34" font-size="12" font-weight="900" font-family="Arial" fill="#000">A</text>
+                                        <text x="89" y="34" font-size="12" font-weight="900" font-family="Arial" fill="#000">B</text>
+                                    </svg>`;
+                                }
+                            } else if (cleanName.includes('CAMPANA')) {
+                                if (material === 'GALV') {
+                                    diagramSvg = `
+                                    <svg viewBox="0 0 80 80" style="width:1.1cm; height:1.1cm; opacity:0.85; margin-right:3px;">
+                                        <path d="M 25,15 L 55,15 L 55,30 L 63,45 L 63,65 L 17,65 L 17,45 L 25,30 Z" fill="none" stroke="#000" stroke-width="2.5"/>
+                                        <line x1="25" y1="15" x2="55" y2="15" stroke="#000" stroke-width="2.5"/>
+                                        <line x1="17" y1="65" x2="63" y2="65" stroke="#000" stroke-width="2.5"/>
+                                        <line x1="30" y1="21" x2="50" y2="21" stroke="#000" stroke-width="2"/>
+                                        <line x1="30" y1="26" x2="50" y2="26" stroke="#000" stroke-width="2"/>
+                                        <line x1="22" y1="52" x2="58" y2="52" stroke="#000" stroke-width="2"/>
+                                        <line x1="22" y1="58" x2="58" y2="58" stroke="#000" stroke-width="2"/>
+                                        <text x="36" y="9" font-size="12" font-weight="900" font-family="Arial" fill="#000">A</text>
+                                        <text x="36" y="78" font-size="12" font-weight="900" font-family="Arial" fill="#000">B</text>
+                                    </svg>`;
+                                } else {
+                                    diagramSvg = `
+                                    <svg viewBox="0 0 100 60" style="width:1.3cm; height:0.8cm; opacity:0.85;">
+                                        <path d="M 15 22 L 40 22 L 50 15 L 85 15 L 85 45 L 50 45 L 40 38 L 15 38 Z" fill="none" stroke="#000" stroke-width="2.5"/>
+                                        <line x1="15" y1="22" x2="15" y2="38" stroke="#000" stroke-width="2.5"/>
+                                        <text x="5" y="34" font-size="12" font-weight="900" font-family="Arial" fill="#000">A</text>
+                                        <text x="89" y="34" font-size="12" font-weight="900" font-family="Arial" fill="#000">B</text>
+                                    </svg>`;
+                                }
+                            } else if (cleanName.includes('CONECTOR') && cleanName.includes('INTERIOR')) {
+                                diagramSvg = `
+                                <svg viewBox="0 0 100 60" style="width:1.3cm; height:0.8cm; opacity:0.85;">
+                                    <polygon points="15,15 45,15 50,20 85,20 85,40 50,40 45,45 15,45" fill="none" stroke="#000" stroke-width="2.5"/>
+                                    <line x1="15" y1="15" x2="15" y2="45" stroke="#000" stroke-width="2.5"/>
+                                    <path d="M 20 18 L 20 42 M 25 18 L 25 42 M 30 18 L 30 42" stroke="#000" stroke-width="1.8"/>
+                                    <text x="5" y="34" font-size="12" font-weight="900" font-family="Arial" fill="#000">B</text>
+                                    <text x="89" y="34" font-size="12" font-weight="900" font-family="Arial" fill="#000">A</text>
+                                </svg>`;
+                            } else if (cleanName.includes('CONECTOR') && cleanName.includes('EXTERIOR')) {
+                                diagramSvg = `
+                                <svg viewBox="0 0 100 60" style="width:1.3cm; height:0.8cm; opacity:0.85;">
+                                    <path d="M 15 22 L 35 22 L 35 15 L 50 15 L 55 18 L 85 18 L 85 42 L 55 42 L 50 45 L 35 45 L 35 38 L 15 38 Z" fill="none" stroke="#000" stroke-width="2.5"/>
+                                    <line x1="15" y1="22" x2="15" y2="38" stroke="#000" stroke-width="2.5"/>
+                                    <line x1="20" y1="22" x2="20" y2="38" stroke="#000" stroke-width="1.8"/>
+                                    <line x1="25" y1="22" x2="25" y2="38" stroke="#000" stroke-width="1.8"/>
+                                    <line x1="30" y1="22" x2="30" y2="38" stroke="#000" stroke-width="1.8"/>
+                                    <text x="5" y="34" font-size="12" font-weight="900" font-family="Arial" fill="#000">A</text>
+                                    <text x="89" y="34" font-size="12" font-weight="900" font-family="Arial" fill="#000">B</text>
+                                </svg>`;
+                            } else if (cleanName.includes('CODO') || cleanName.includes('90')) {
+                                diagramSvg = `
+                                <svg viewBox="0 0 100 80" style="width:1.3cm; height:1.0cm; opacity:0.85;">
+                                    <path d="M 15 15 C 60 15, 65 25, 65 70 L 48 70 C 48 45, 38 35, 15 35 Z" fill="none" stroke="#000" stroke-width="2.5"/>
+                                    <line x1="15" y1="15" x2="15" y2="35" stroke="#000" stroke-width="2.5"/>
+                                    <line x1="48" y1="70" x2="65" y2="70" stroke="#000" stroke-width="2.5"/>
+                                    <text x="5" y="29" font-size="12" font-weight="900" font-family="Arial" fill="#000">A</text>
+                                    <text x="52" y="79" font-size="12" font-weight="900" font-family="Arial" fill="#000">B</text>
+                                </svg>`;
+                            }
+                        } else if (finalSizes.length >= 3 && cleanName.includes('TEE')) {
+                            diagramSvg = `
+                            <svg viewBox="0 0 100 80" style="width:1.3cm; height:1.0cm; opacity:0.85;">
+                                <path d="M 15 30 L 35 30 L 35 10 L 65 10 L 65 30 L 85 30 L 85 60 L 15 60 Z" fill="none" stroke="#000" stroke-width="2.5"/>
+                                <line x1="15" y1="30" x2="15" y2="60" stroke="#000" stroke-width="2.5"/>
+                                <line x1="85" y1="30" x2="85" y2="60" stroke="#000" stroke-width="2.5"/>
+                                <line x1="35" y1="10" x2="65" y2="10" stroke="#000" stroke-width="2.5"/>
+                                <text x="5" y="48" font-size="12" font-weight="900" font-family="Arial" fill="#000">A</text>
+                                <text x="89" y="48" font-size="12" font-weight="900" font-family="Arial" fill="#000">B</text>
+                                <text x="47" y="24" font-size="12" font-weight="900" font-family="Arial" fill="#000">C</text>
+                            </svg>`;
+                        }
+
+                        // 4. Formatear y dividir texto del nombre
+                        let dispNameHTML = '';
+                        let mmHTML = '';
+                        const originalName = item.p.nombre || '';
+
+                        let formattedName = originalName.replace(/,\s*FOSET.*$/i, '').replace(/,\s*TRUPER.*$/i, '').trim();
+
+                        // 1. Remover material redundante cuando ya se muestra en el óvalo de la cabecera
+                        if (material === 'COBRE') {
+                            formattedName = formattedName.replace(/de\s+cobre/gi, '').replace(/cobre/gi, '');
+                        } else if (material === 'CPVC') {
+                            formattedName = formattedName.replace(/de\s+cpvc/gi, '').replace(/cpvc/gi, '');
+                        } else if (material === 'PVC') {
+                            formattedName = formattedName.replace(/de\s+pvc/gi, '').replace(/pvc/gi, '');
+                        } else if (material === 'PPR') {
+                            formattedName = formattedName.replace(/de\s+ppr/gi, '').replace(/ppr/gi, '');
+                        } else if (material === 'PP') {
+                            formattedName = formattedName.replace(/de\s+polipropileno/gi, '')
+                                                         .replace(/polipropileno/gi, '')
+                                                         .replace(/de\s+inserci.n/gi, '')
+                                                         .replace(/inserci.n/gi, '')
+                                                         .replace(/\bpp\b/gi, '');
+                        } else if (material === 'GAS') {
+                            formattedName = formattedName.replace(/de\s+pe-al-pe/gi, '')
+                                                         .replace(/pe-al-pe/gi, '')
+                                                         .replace(/de\s+pealpe/gi, '')
+                                                         .replace(/pealpe/gi, '')
+                                                         .replace(/para\s+gas/gi, '')
+                                                         .replace(/gas/gi, '');
+                        } else if (material === 'GALV') {
+                            formattedName = formattedName.replace(/de\s+fierro\s+galvanizado/gi, '')
+                                                         .replace(/fierro\s+galvanizado/gi, '')
+                                                         .replace(/acero\s+galvanizado/gi, '')
+                                                         .replace(/galvanizado/gi, '')
+                                                         .replace(/galv/gi, '');
+                        }
+
+                        // Limpiar espacios dobles, preposiciones duplicadas, comas colgantes y conectores sobrantes
+                        formattedName = formattedName.replace(/\s+/g, ' ')
+                                                     .replace(/de\s+de/gi, 'de')
+                                                     .replace(/para\s+de/gi, 'de')
+                                                     .replace(/,\s*,/g, ',')
+                                                     .replace(/\s*,\s*(1-1\/2|1-1\/4|1\/2|3\/4|1\/4|3\/8|1|2)("|\b)/g, ' de $1$2')
+                                                     .replace(/para\s+de/gi, 'de')
+                                                     .replace(/para\s+(1-1\/2|1-1\/4|1\/2|3\/4|1\/4|3\/8|1|2)("|\b)/g, ' de $1$2')
+                                                     .replace(/,\s*$/g, '')
+                                                     .replace(/\s*,\s*de\s+/gi, ' de ')
+                                                     .replace(/\bpara\s*$/gi, '')
+                                                     .trim();
+
+                        // Capitalizar palabras y poner conectores en minúscula
+                        formattedName = formattedName.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})
+                                                     .replace(/\bDe\b/g, 'de')
+                                                     .replace(/\bCon\b/g, 'con')
+                                                     .replace(/\bA\b/g, 'a')
+                                                     .replace(/\bPara\b/g, 'para');
+
+                        // Garantizar que siglas queden en mayúsculas si se mantuvieran por alguna razón
+                        formattedName = formattedName.replace(/\bPvc\b/g, 'PVC')
+                                                     .replace(/\bCpvc\b/g, 'CPVC')
+                                                     .replace(/\bPpr\b/g, 'PPR')
+                                                     .replace(/\bCobre\b/g, 'Cobre')
+                                                     .trim();
+
+                        // Cambiado a 26 caracteres para permitir que nombres como "Válvula de Esfera de 2\"" salgan en una sola línea
+                        let isLong = formattedName.length > 26;
+                        if (formattedName.includes('Rosca') || formattedName.includes('Reducción') || formattedName.includes('Reducido')) {
+                            isLong = true;
+                        }
+
+                        if (isLong) {
+                            let line1 = '';
+                            let line2 = '';
+                            
+                            if (formattedName.includes('Rosca Interior')) {
+                                line1 = formattedName.substring(0, formattedName.indexOf('Rosca Interior')).trim();
+                                line2 = formattedName.substring(formattedName.indexOf('Rosca Interior')).trim();
+                            } else if (formattedName.includes('Rosca Exterior')) {
+                                line1 = formattedName.substring(0, formattedName.indexOf('Rosca Exterior')).trim();
+                                line2 = formattedName.substring(formattedName.indexOf('Rosca Exterior')).trim();
+                            } else if (formattedName.includes('Reducción Bushing')) {
+                                line1 = 'Reducción Bushing';
+                                line2 = formattedName.replace('Reducción Bushing', '').trim();
+                            } else if (formattedName.includes('Reducción Campana')) {
+                                line1 = 'Reducción Campana';
+                                line2 = formattedName.replace('Reducción Campana', '').trim();
+                            } else if (formattedName.includes('Conector Reducido')) {
+                                line1 = 'Conector Reducido';
+                                line2 = formattedName.replace('Conector Reducido', '').trim();
+                            } else if (formattedName.includes('Codo 90° Reducción')) {
+                                line1 = 'Codo 90° Reducción';
+                                line2 = formattedName.replace('Codo 90° Reducción', '').trim();
+                            } else if (formattedName.includes('Tee Reducción')) {
+                                line1 = 'Tee Reducción';
+                                line2 = formattedName.replace('Tee Reducción', '').trim();
+                            } else {
+                                const mid = Math.floor(formattedName.length / 2);
+                                const spaceIdx = formattedName.lastIndexOf(' ', mid);
+                                if (spaceIdx > 0) {
+                                    line1 = formattedName.substring(0, spaceIdx).trim();
+                                    line2 = formattedName.substring(spaceIdx).trim();
+                                } else {
+                                    line1 = formattedName;
+                                    line2 = '';
+                                }
+                            }
+
+                            // Tamaño de fuente estático para dos líneas
+                            dispNameHTML = `<div class="conex-title line1" style="font-size: 17.5px;">${esc(line1)}</div>
+                                            <div class="conex-title line2" style="font-size: 14px;">${esc(line2)}</div>`;
+                        } else {
+                            // Tamaño de fuente dinámico para línea única
+                            let fontSize = '18.5px';
+                            if (formattedName.length <= 15) {
+                                fontSize = '22px'; // Texto corto -> más grande para llenar el espacio
+                            }
+                            dispNameHTML = `<div class="conex-title-single" style="font-size: ${fontSize};">${esc(formattedName)}</div>`;
+                        }
+
+                        // Colocar mm abajo del texto centrado (si solo hay una medida)
+                        if (finalSizes.length === 1) {
+                            mmHTML = `<div class="conex-mm-center" style="color:${primaryColor}">${mmText}</div>`;
+                        }
+
+                        let badgeHTML = '';
+                        if (badgeText) {
+                            badgeHTML = `<span class="conex-badge" style="background:${badgeColor}; color:${badgeTextColor}">${badgeText}</span>`;
+                        }
+
+                        let blueBarMmHTML = '';
+                        if (finalSizes.length > 1) {
+                            blueBarMmHTML = `<div class="conex-blue-mm">${mmText}</div>`;
+                        }
+
+                        return `
+                        <div class="conex-bktag">
+                            <div class="conex-top-black"></div>
+                            <div class="conex-blue-header">
+                                <div class="conex-brand-title">FOSET</div>
+                                ${badgeHTML}
+                                ${blueBarMmHTML}
+                            </div>
+                            <div class="conex-mid-text">
+                                ${dispNameHTML}
+                                ${mmHTML}
+                            </div>
+                            <div class="conex-bot-bar">
+                                <div class="conex-bot-code" style="background:${primaryColor}">${item.p.codigo}</div>
+                                <div class="conex-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            <div class="conex-img-area">
+                                <img src="${imgSrc}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="this.style.display='none'">
+                                ${diagramSvg ? `<div class="conex-diag-box">${diagramSvg}</div>` : ''}
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'conexiones-12x6',
+                    group: 'conexiones',
+                    name: 'Conexiones y Válvulas (12x6 cm)',
+                    description: 'Formato apaisado GRANDE para conexiones. Escala 120% para mejor visibilidad.',
+                    width: '12cm',
+                    height: '6cm',
+                    css: `
+                        .conex-lg-bktag {
+                            width: 12cm; height: 6cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000; page-break-inside: avoid; break-inside: avoid;
+                        }
+                        .conex-lg-top-black { position: absolute; top:0; left:0; width: 12cm; height: 1.2cm; background: #000; z-index: 10; }
+                        .conex-lg-blue-header {
+                            position: absolute; top: 1.2cm; left: 0; width: 8.4cm; height: 0.9cm; background: #008AD2;
+                            display: flex; align-items: center; padding-left: 0.3cm; padding-right: 0.3cm; box-sizing: border-box; z-index: 5;
+                        }
+                        .conex-lg-brand-title { color: #fff; font-size: 24px; font-weight: 900; margin-right: 9px; letter-spacing: 0.5px; line-height: 1; }
+                        .conex-lg-badge {
+                            color: #fff; font-size: 14px; font-weight: 900; padding: 3px 10px; border-radius: 12px;
+                            display: inline-block; text-transform: uppercase; line-height: 1; margin-top: 1px;
+                        }
+                        .conex-lg-blue-mm { margin-left: auto; color: #fff; font-weight: bold; font-size: 16px; }
+                        
+                        .conex-lg-mid-text {
+                            position: absolute; top: 2.1cm; left: 0; width: 8.4cm; height: 2.55cm;
+                            display: flex; flex-direction: column; justify-content: center; padding-left: 0.2cm; padding-right: 0.2cm; box-sizing: border-box; z-index: 5;
+                        }
+                        .conex-lg-title-single { width: 100%; text-align: center; font-size: 27px; font-weight: 900; color: #000; letter-spacing: -0.5px; line-height: 1.15; }
+                        .conex-lg-title { width: 100%; text-align: center; font-weight: 900; color: #000; letter-spacing: -0.5px; line-height: 1.1; }
+                        .conex-lg-title.line1 { font-size: 24px; margin-bottom: 3px; }
+                        .conex-lg-title.line2 { font-size: 20px; opacity: 0.9; }
+                        .conex-lg-mm-center { width: 100%; text-align: center; font-size: 18.5px; font-weight: 900; margin-top: 5px; }
+                        
+                        .conex-lg-bot-bar { position: absolute; top: 4.65cm; left: 0; width: 8.4cm; height: 1.35cm; display: flex; z-index: 5; }
+                        .conex-lg-bot-code {
+                            width: 3.96cm; height: 1.35cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 43px; font-weight: 900; color: #fff; padding-bottom: 3px; box-sizing: border-box;
+                        }
+                        .conex-lg-bot-br {
+                            width: 4.44cm; background: #fff; height: 1.35cm; display: flex; align-items: flex-end; justify-content: center;
+                            overflow: hidden; padding-bottom: 3px; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+                        .conex-lg-img-area {
+                            position: absolute; top: 1.2cm; right: 0; width: 3.6cm; height: 4.8cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
+                        }
+                        .conex-lg-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                        .conex-lg-diag-box { position: absolute; bottom: 2px; right: 2px; z-index: 10; display: flex; align-items: flex-end; justify-content: flex-end; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        const nameUpper = (item.p.nombre || '').toUpperCase();
+                        const descUpper = (item.p.descripcion_csv || '').toUpperCase();
+                        const specsUpper = (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '').toUpperCase();
+                        const combined = (nameUpper + " " + descUpper + " " + specsUpper).replace(/''/g, '"').replace(/'/g, '"');
+
+                        // 1. Detección de material
+                        let material = '';
+                        let badgeColor = '';
+                        let badgeText = '';
+                        let badgeTextColor = '#fff';
+
+                        if (combined.includes('CPVC')) {
+                            material = 'CPVC';
+                            badgeColor = '#D19F27';
+                            badgeText = 'CPVC';
+                        } else if (combined.includes('PVC')) {
+                            material = 'PVC';
+                            badgeColor = '#009BE0';
+                            badgeText = 'PVC';
+                        } else if (combined.includes('PPR')) {
+                            material = 'PPR';
+                            badgeColor = '#0F6B41';
+                            badgeText = 'PPR';
+                        } else if (combined.includes('POLIPROPILENO') || nameUpper.includes('INSERCION') || nameUpper.includes('INSERCIÓN') || nameUpper.includes(' PP ')) {
+                            material = 'PP';
+                            badgeColor = '#BFA38A'; // Light brown
+                            badgeText = 'PP';
+                        } else if (combined.includes('PE-AL-PE') || combined.includes('PEALPE')) {
+                            material = 'GAS';
+                            badgeColor = '#FAC428'; // Yellow
+                            badgeText = 'GAS';
+                            badgeTextColor = '#000'; // Black text
+                        } else if (combined.includes('COBRE')) {
+                            material = 'COBRE';
+                            badgeColor = '#79462F';
+                            badgeText = 'COBRE';
+                        } else if (combined.includes('GALVANIZADO') || combined.includes('GALV') || combined.includes('FIERRO GALV')) {
+                            material = 'GALV';
+                            badgeColor = '#70767C';
+                            badgeText = 'GALV';
+                        }
+
+                        // 2. Extracción de medidas (EXCLUSIVAMENTE DEL NOMBRE para evitar falsos positivos de empaques o PSI)
+                        const sizeMap = {
+                            '1/4': { mm: '6 mm', color: '#FF7F27' },
+                            '3/8': { mm: '10 mm', color: '#8A959E' },
+                            '1/2': { mm: '13 mm', color: '#D24D8C' },
+                            '3/4': { mm: '19 mm', color: '#3CA5DD' },
+                            '1': { mm: '25 mm', color: '#FAC428' },
+                            '1-1/4': { mm: '32 mm', color: '#2EAD58' },
+                            '1-1/2': { mm: '38 mm', color: '#612B8E' },
+                            '2': { mm: '50 mm', color: '#00A59A' }
+                        };
+
+                        function normalizeSize(s) {
+                            s = s.trim().replace(/"/g, '').replace(/'/g, '').replace(/\s+/g, '-');
+                            if (s === '1-1/2' || s === '1/2' || s === '3/4' || s === '1-1/4' || s === '1/4' || s === '3/8' || s === '1' || s === '2') return s;
+                            if (s === '1 1/2') return '1-1/2';
+                            if (s === '1 1/4') return '1-1/4';
+                            return s;
+                        }
+
+                        const nameForSize = nameUpper.replace(/''/g, '"').replace(/'/g, '"');
+                        const sizeRegex = /(1-1\/2|1\s+1\/2|1-1\/4|1\s+1\/4|1\/2|3\/4|1\/4|3\/8|1|2)(?:"|'|PULG|IN|\b)/g;
+                        const sizes = [];
+                        let m;
+                        while ((m = sizeRegex.exec(nameForSize)) !== null) {
+                            const norm = normalizeSize(m[1]);
+                            if (sizeMap[norm]) {
+                                sizes.push(norm);
+                            }
+                        }
+
+                        const uniqueSizes = [];
+                        sizes.forEach((s, idx) => {
+                            if (idx === 0 || s !== sizes[idx-1]) {
+                                uniqueSizes.push(s);
+                            }
+                        });
+
+                        let finalSizes = uniqueSizes.slice(0, 3);
+                        
+                        if (finalSizes.length === 0) {
+                            const fallbackRegex = /\b(1\/2|3\/4|1|1-1\/2|2|1\/4|3\/8)\b/g;
+                            let fbMatch;
+                            if ((fbMatch = fallbackRegex.exec(nameForSize)) !== null) {
+                                finalSizes.push(normalizeSize(fbMatch[1]));
+                            }
+                        }
+
+                        let primarySize = '1/2';
+                        let mmText = '';
+
+                        const isPpr = (material === 'PPR');
+                        function getMmLabel(size) {
+                            if (isPpr) {
+                                const pprMm = {
+                                    '1/2': '20 mm',
+                                    '3/4': '25 mm',
+                                    '1': '32 mm',
+                                    '1-1/4': '40 mm',
+                                    '1-1/2': '50 mm',
+                                    '2': '63 mm'
+                                };
+                                if (pprMm[size]) return pprMm[size];
+                            }
+                            return sizeMap[size] ? sizeMap[size].mm : '';
+                        }
+
+                        if (finalSizes.length === 1) {
+                            primarySize = finalSizes[0];
+                            mmText = getMmLabel(primarySize);
+                        } else if (finalSizes.length === 2) {
+                            primarySize = finalSizes[0];
+                            const mmA = getMmLabel(finalSizes[0]).replace(' mm', '');
+                            const mmB = getMmLabel(finalSizes[1]).replace(' mm', '');
+                            mmText = `${mmA} mm a ${mmB} mm`;
+                        } else if (finalSizes.length >= 3) {
+                            const counts = {};
+                            finalSizes.forEach(s => { counts[s] = (counts[s] || 0) + 1; });
+                            let maxCount = 0;
+                            let mostFreq = finalSizes[0];
+                            for (const s in counts) {
+                                if (counts[s] > maxCount) {
+                                    maxCount = counts[s];
+                                    mostFreq = s;
+                                }
+                            }
+                            primarySize = mostFreq;
+                            const mmParts = finalSizes.map(s => getMmLabel(s).replace(' mm', ''));
+                            mmText = `${mmParts.join(' x ')} mm`;
+                        }
+
+                        const sizeInfo = sizeMap[primarySize] || { mm: '13 mm', color: '#D24D8C' };
+                        const primaryColor = sizeInfo.color;
+
+                        // 3. Diagramas vectoriales (SVG)
+                        let diagramSvg = '';
+                        const cleanName = (item.p.nombre || '').toUpperCase();
+                        
+                        if (finalSizes.length === 2) {
+                            if (cleanName.includes('BUSHING')) {
+                                if (material === 'GALV') {
+                                    diagramSvg = `
+                                    <svg viewBox="0 0 80 80" style="width:1.4cm; height:1.4cm; opacity:0.85; margin-right:3px;">
+                                        <polygon points="15,25 25,15 55,15 65,25 65,35 55,45 25,45 15,35" fill="none" stroke="#000" stroke-width="2.5"/>
+                                        <circle cx="40" cy="30" r="12" fill="none" stroke="#000" stroke-width="2"/>
+                                        <path d="M 28,45 L 28,65 L 52,65 L 52,45" fill="none" stroke="#000" stroke-width="2.5"/>
+                                        <line x1="28" y1="65" x2="52" y2="65" stroke="#000" stroke-width="2.5"/>
+                                        <line x1="32" y1="51" x2="48" y2="51" stroke="#000" stroke-width="2"/>
+                                        <line x1="32" y1="56" x2="48" y2="56" stroke="#000" stroke-width="2"/>
+                                        <line x1="32" y1="61" x2="48" y2="61" stroke="#000" stroke-width="2"/>
+                                        <text x="36" y="9" font-size="12" font-weight="900" font-family="Arial" fill="#000">B</text>
+                                        <text x="36" y="78" font-size="12" font-weight="900" font-family="Arial" fill="#000">A</text>
+                                    </svg>`;
+                                } else {
+                                    diagramSvg = `
+                                    <svg viewBox="0 0 100 60" style="width:1.7cm; height:1.1cm; opacity:0.85;">
+                                        <path d="M 15 25 L 48 25 L 52 18 L 85 18 L 85 42 L 52 42 L 48 35 L 15 35 Z" fill="none" stroke="#000" stroke-width="2.5"/>
+                                        <line x1="15" y1="25" x2="15" y2="35" stroke="#000" stroke-width="2.5"/>
+                                        <text x="5" y="34" font-size="12" font-weight="900" font-family="Arial" fill="#000">A</text>
+                                        <text x="89" y="34" font-size="12" font-weight="900" font-family="Arial" fill="#000">B</text>
+                                    </svg>`;
+                                }
+                            } else if (cleanName.includes('CAMPANA')) {
+                                if (material === 'GALV') {
+                                    diagramSvg = `
+                                    <svg viewBox="0 0 80 80" style="width:1.4cm; height:1.4cm; opacity:0.85; margin-right:3px;">
+                                        <path d="M 25,15 L 55,15 L 55,30 L 63,45 L 63,65 L 17,65 L 17,45 L 25,30 Z" fill="none" stroke="#000" stroke-width="2.5"/>
+                                        <line x1="25" y1="15" x2="55" y2="15" stroke="#000" stroke-width="2.5"/>
+                                        <line x1="17" y1="65" x2="63" y2="65" stroke="#000" stroke-width="2.5"/>
+                                        <line x1="30" y1="21" x2="50" y2="21" stroke="#000" stroke-width="2"/>
+                                        <line x1="30" y1="26" x2="50" y2="26" stroke="#000" stroke-width="2"/>
+                                        <line x1="22" y1="52" x2="58" y2="52" stroke="#000" stroke-width="2"/>
+                                        <line x1="22" y1="58" x2="58" y2="58" stroke="#000" stroke-width="2"/>
+                                        <text x="36" y="9" font-size="12" font-weight="900" font-family="Arial" fill="#000">A</text>
+                                        <text x="36" y="78" font-size="12" font-weight="900" font-family="Arial" fill="#000">B</text>
+                                    </svg>`;
+                                } else {
+                                    diagramSvg = `
+                                    <svg viewBox="0 0 100 60" style="width:1.7cm; height:1.1cm; opacity:0.85;">
+                                        <path d="M 15 22 L 40 22 L 50 15 L 85 15 L 85 45 L 50 45 L 40 38 L 15 38 Z" fill="none" stroke="#000" stroke-width="2.5"/>
+                                        <line x1="15" y1="22" x2="15" y2="38" stroke="#000" stroke-width="2.5"/>
+                                        <text x="5" y="34" font-size="12" font-weight="900" font-family="Arial" fill="#000">A</text>
+                                        <text x="89" y="34" font-size="12" font-weight="900" font-family="Arial" fill="#000">B</text>
+                                    </svg>`;
+                                }
+                            } else if (cleanName.includes('CONECTOR') && cleanName.includes('INTERIOR')) {
+                                diagramSvg = `
+                                <svg viewBox="0 0 100 60" style="width:1.7cm; height:1.1cm; opacity:0.85;">
+                                    <polygon points="15,15 45,15 50,20 85,20 85,40 50,40 45,45 15,45" fill="none" stroke="#000" stroke-width="2.5"/>
+                                    <line x1="15" y1="15" x2="15" y2="45" stroke="#000" stroke-width="2.5"/>
+                                    <path d="M 20 18 L 20 42 M 25 18 L 25 42 M 30 18 L 30 42" stroke="#000" stroke-width="1.8"/>
+                                    <text x="5" y="34" font-size="12" font-weight="900" font-family="Arial" fill="#000">B</text>
+                                    <text x="89" y="34" font-size="12" font-weight="900" font-family="Arial" fill="#000">A</text>
+                                </svg>`;
+                            } else if (cleanName.includes('CONECTOR') && cleanName.includes('EXTERIOR')) {
+                                diagramSvg = `
+                                <svg viewBox="0 0 100 60" style="width:1.7cm; height:1.1cm; opacity:0.85;">
+                                    <path d="M 15 22 L 35 22 L 35 15 L 50 15 L 55 18 L 85 18 L 85 42 L 55 42 L 50 45 L 35 45 L 35 38 L 15 38 Z" fill="none" stroke="#000" stroke-width="2.5"/>
+                                    <line x1="15" y1="22" x2="15" y2="38" stroke="#000" stroke-width="2.5"/>
+                                    <line x1="20" y1="22" x2="20" y2="38" stroke="#000" stroke-width="1.8"/>
+                                    <line x1="25" y1="22" x2="25" y2="38" stroke="#000" stroke-width="1.8"/>
+                                    <line x1="30" y1="22" x2="30" y2="38" stroke="#000" stroke-width="1.8"/>
+                                    <text x="5" y="34" font-size="12" font-weight="900" font-family="Arial" fill="#000">A</text>
+                                    <text x="89" y="34" font-size="12" font-weight="900" font-family="Arial" fill="#000">B</text>
+                                </svg>`;
+                            } else if (cleanName.includes('CODO') || cleanName.includes('90')) {
+                                diagramSvg = `
+                                <svg viewBox="0 0 100 80" style="width:1.7cm; height:1.3cm; opacity:0.85;">
+                                    <path d="M 15 15 C 60 15, 65 25, 65 70 L 48 70 C 48 45, 38 35, 15 35 Z" fill="none" stroke="#000" stroke-width="2.5"/>
+                                    <line x1="15" y1="15" x2="15" y2="35" stroke="#000" stroke-width="2.5"/>
+                                    <line x1="48" y1="70" x2="65" y2="70" stroke="#000" stroke-width="2.5"/>
+                                    <text x="5" y="29" font-size="12" font-weight="900" font-family="Arial" fill="#000">A</text>
+                                    <text x="52" y="79" font-size="12" font-weight="900" font-family="Arial" fill="#000">B</text>
+                                </svg>`;
+                            }
+                        } else if (finalSizes.length >= 3 && cleanName.includes('TEE')) {
+                            diagramSvg = `
+                            <svg viewBox="0 0 100 80" style="width:1.7cm; height:1.3cm; opacity:0.85;">
+                                <path d="M 15 30 L 35 30 L 35 10 L 65 10 L 65 30 L 85 30 L 85 60 L 15 60 Z" fill="none" stroke="#000" stroke-width="2.5"/>
+                                <line x1="15" y1="30" x2="15" y2="60" stroke="#000" stroke-width="2.5"/>
+                                <line x1="85" y1="30" x2="85" y2="60" stroke="#000" stroke-width="2.5"/>
+                                <line x1="35" y1="10" x2="65" y2="10" stroke="#000" stroke-width="2.5"/>
+                                <text x="5" y="48" font-size="12" font-weight="900" font-family="Arial" fill="#000">A</text>
+                                <text x="89" y="48" font-size="12" font-weight="900" font-family="Arial" fill="#000">B</text>
+                                <text x="47" y="24" font-size="12" font-weight="900" font-family="Arial" fill="#000">C</text>
+                            </svg>`;
+                        }
+
+                        // 4. Formatear y dividir texto del nombre
+                        let dispNameHTML = '';
+                        let mmHTML = '';
+                        const originalName = item.p.nombre || '';
+
+                        let formattedName = originalName.replace(/,\s*FOSET.*$/i, '').replace(/,\s*TRUPER.*$/i, '').trim();
+
+                        // 1. Remover material redundante cuando ya se muestra en el óvalo de la cabecera
+                        if (material === 'COBRE') {
+                            formattedName = formattedName.replace(/de\s+cobre/gi, '').replace(/cobre/gi, '');
+                        } else if (material === 'CPVC') {
+                            formattedName = formattedName.replace(/de\s+cpvc/gi, '').replace(/cpvc/gi, '');
+                        } else if (material === 'PVC') {
+                            formattedName = formattedName.replace(/de\s+pvc/gi, '').replace(/pvc/gi, '');
+                        } else if (material === 'PPR') {
+                            formattedName = formattedName.replace(/de\s+ppr/gi, '').replace(/ppr/gi, '');
+                        } else if (material === 'PP') {
+                            formattedName = formattedName.replace(/de\s+polipropileno/gi, '')
+                                                         .replace(/polipropileno/gi, '')
+                                                         .replace(/de\s+inserci.n/gi, '')
+                                                         .replace(/inserci.n/gi, '')
+                                                         .replace(/\bpp\b/gi, '');
+                        } else if (material === 'GAS') {
+                            formattedName = formattedName.replace(/de\s+pe-al-pe/gi, '')
+                                                         .replace(/pe-al-pe/gi, '')
+                                                         .replace(/de\s+pealpe/gi, '')
+                                                         .replace(/pealpe/gi, '')
+                                                         .replace(/para\s+gas/gi, '')
+                                                         .replace(/gas/gi, '');
+                        } else if (material === 'GALV') {
+                            formattedName = formattedName.replace(/de\s+fierro\s+galvanizado/gi, '')
+                                                         .replace(/fierro\s+galvanizado/gi, '')
+                                                         .replace(/acero\s+galvanizado/gi, '')
+                                                         .replace(/galvanizado/gi, '')
+                                                         .replace(/galv/gi, '');
+                        }
+
+                        // Limpiar espacios dobles, preposiciones duplicadas, comas colgantes y conectores sobrantes
+                        formattedName = formattedName.replace(/\s+/g, ' ')
+                                                     .replace(/de\s+de/gi, 'de')
+                                                     .replace(/para\s+de/gi, 'de')
+                                                     .replace(/,\s*,/g, ',')
+                                                     .replace(/\s*,\s*(1-1\/2|1-1\/4|1\/2|3\/4|1\/4|3\/8|1|2)("|\b)/g, ' de $1$2')
+                                                     .replace(/para\s+de/gi, 'de')
+                                                     .replace(/para\s+(1-1\/2|1-1\/4|1\/2|3\/4|1\/4|3\/8|1|2)("|\b)/g, ' de $1$2')
+                                                     .replace(/,\s*$/g, '')
+                                                     .replace(/\s*,\s*de\s+/gi, ' de ')
+                                                     .replace(/\bpara\s*$/gi, '')
+                                                     .trim();
+
+                        // Capitalizar palabras y poner conectores en minúscula
+                        formattedName = formattedName.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})
+                                                     .replace(/\bDe\b/g, 'de')
+                                                     .replace(/\bCon\b/g, 'con')
+                                                     .replace(/\bA\b/g, 'a')
+                                                     .replace(/\bPara\b/g, 'para');
+
+                        // Garantizar que siglas queden en mayúsculas si se mantuvieran por alguna razón
+                        formattedName = formattedName.replace(/\bPvc\b/g, 'PVC')
+                                                     .replace(/\bCpvc\b/g, 'CPVC')
+                                                     .replace(/\bPpr\b/g, 'PPR')
+                                                     .replace(/\bCobre\b/g, 'Cobre')
+                                                     .trim();
+
+                        // Cambiado a 26 caracteres para permitir que nombres como "Válvula de Esfera de 2\"" salgan en una sola línea
+                        let isLong = formattedName.length > 26;
+                        if (formattedName.includes('Rosca') || formattedName.includes('Reducción') || formattedName.includes('Reducido')) {
+                            isLong = true;
+                        }
+
+                        if (isLong) {
+                            let line1 = '';
+                            let line2 = '';
+                            
+                            if (formattedName.includes('Rosca Interior')) {
+                                line1 = formattedName.substring(0, formattedName.indexOf('Rosca Interior')).trim();
+                                line2 = formattedName.substring(formattedName.indexOf('Rosca Interior')).trim();
+                            } else if (formattedName.includes('Rosca Exterior')) {
+                                line1 = formattedName.substring(0, formattedName.indexOf('Rosca Exterior')).trim();
+                                line2 = formattedName.substring(formattedName.indexOf('Rosca Exterior')).trim();
+                            } else if (formattedName.includes('Reducción Bushing')) {
+                                line1 = 'Reducción Bushing';
+                                line2 = formattedName.replace('Reducción Bushing', '').trim();
+                            } else if (formattedName.includes('Reducción Campana')) {
+                                line1 = 'Reducción Campana';
+                                line2 = formattedName.replace('Reducción Campana', '').trim();
+                            } else if (formattedName.includes('Conector Reducido')) {
+                                line1 = 'Conector Reducido';
+                                line2 = formattedName.replace('Conector Reducido', '').trim();
+                            } else if (formattedName.includes('Codo 90° Reducción')) {
+                                line1 = 'Codo 90° Reducción';
+                                line2 = formattedName.replace('Codo 90° Reducción', '').trim();
+                            } else if (formattedName.includes('Tee Reducción')) {
+                                line1 = 'Tee Reducción';
+                                line2 = formattedName.replace('Tee Reducción', '').trim();
+                            } else {
+                                const mid = Math.floor(formattedName.length / 2);
+                                const spaceIdx = formattedName.lastIndexOf(' ', mid);
+                                if (spaceIdx > 0) {
+                                    line1 = formattedName.substring(0, spaceIdx).trim();
+                                    line2 = formattedName.substring(spaceIdx).trim();
+                                } else {
+                                    line1 = formattedName;
+                                    line2 = '';
+                                }
+                            }
+
+                            // Tamaño de fuente estático para dos líneas
+                            dispNameHTML = `<div class="conex-lg-title line1" style="font-size: 24px;">${esc(line1)}</div>
+                                            <div class="conex-lg-title line2" style="font-size: 19px;">${esc(line2)}</div>`;
+                        } else {
+                            // Tamaño de fuente dinámico para línea única
+                            let fontSize = '25px';
+                            if (formattedName.length <= 15) {
+                                fontSize = '30px'; // Texto corto -> más grande para llenar el espacio
+                            }
+                            dispNameHTML = `<div class="conex-lg-title-single" style="font-size: ${fontSize};">${esc(formattedName)}</div>`;
+                        }
+
+                        // Colocar mm abajo del texto centrado (si solo hay una medida)
+                        if (finalSizes.length === 1) {
+                            mmHTML = `<div class="conex-lg-mm-center" style="color:${primaryColor}">${mmText}</div>`;
+                        }
+
+                        let badgeHTML = '';
+                        if (badgeText) {
+                            badgeHTML = `<span class="conex-lg-badge" style="background:${badgeColor}; color:${badgeTextColor}">${badgeText}</span>`;
+                        }
+
+                        let blueBarMmHTML = '';
+                        if (finalSizes.length > 1) {
+                            blueBarMmHTML = `<div class="conex-lg-blue-mm">${mmText}</div>`;
+                        }
+
+                        return `
+                        <div class="conex-lg-bktag">
+                            <div class="conex-lg-top-black"></div>
+                            <div class="conex-lg-blue-header">
+                                <div class="conex-lg-brand-title">FOSET</div>
+                                ${badgeHTML}
+                                ${blueBarMmHTML}
+                            </div>
+                            <div class="conex-lg-mid-text">
+                                ${dispNameHTML}
+                                ${mmHTML}
+                            </div>
+                            <div class="conex-lg-bot-bar">
+                                <div class="conex-lg-bot-code" style="background:${primaryColor}">${item.p.codigo}</div>
+                                <div class="conex-lg-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            <div class="conex-lg-img-area">
+                                <img src="${imgSrc}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="this.style.display='none'">
+                                ${diagramSvg ? `<div class="conex-lg-diag-box">${diagramSvg}</div>` : ''}
                             </div>
                         </div>`;
                     }
