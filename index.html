@@ -5146,7 +5146,7 @@ function renderCarouselGroup(mainContainer, items, options) {
             var isCarouselImg = !!img.closest('.welcome-carousel-container');
             var isProductSheet = !!img.closest('.images-panel');
             var isResultCard = !!img.closest('.result-card-img') || !!img.closest('.result-list-thumb');
-            var isBackTag = !!img.closest('.bktag') || !!img.closest('.conex-bktag') || !!img.closest('.conex-lg-bktag');
+            var isBackTag = !!img.closest('.bktag') || !!img.closest('.conex-bktag') || !!img.closest('.conex-lg-bktag') || !!img.closest('.conex-xlg-bktag');
             var fillFactor = isBackTag ? 0.96 : (isProductSheet ? 0.95 : (isCarouselImg ? 0.875 : 1.025));
             
             // Inyectar pre-escala inicial sin delay para que no espere al proxy
@@ -8937,6 +8937,349 @@ function renderCarouselGroup(mainContainer, items, options) {
                             </div>
                         </div>`;
                     }
+                },
+                {
+                    id: 'conexiones-13-5x6',
+                    group: 'conexiones',
+                    name: 'Conexiones y Válvulas (13.5x6 cm)',
+                    description: 'Formato extra grande para conexiones. Ancho 13.5 cm x Alto 6 cm.',
+                    width: '13.5cm',
+                    height: '6cm',
+                    css: `
+                        .conex-xlg-bktag {
+                            width: 13.5cm; height: 6cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000; page-break-inside: avoid; break-inside: avoid;
+                        }
+                        .conex-xlg-top-black { position: absolute; top:0; left:0; width: 13.5cm; height: 1.5cm; background: #000; z-index: 10; }
+                        .conex-xlg-blue-header {
+                            position: absolute; top: 1.5cm; left: 0; width: 9.0cm; height: 1.0cm; background: #008AD2;
+                            display: flex; align-items: center; padding-left: 0.3cm; padding-right: 0.3cm; box-sizing: border-box; z-index: 5;
+                        }
+                        .conex-xlg-brand-title { color: #fff; font-size: 26px; font-weight: 900; margin-right: 10px; letter-spacing: 0.5px; line-height: 1; }
+                        .conex-xlg-badge {
+                            color: #fff; font-size: 15px; font-weight: 900; padding: 3px 12px; border-radius: 14px;
+                            display: inline-block; text-transform: uppercase; line-height: 1; margin-top: 1px;
+                        }
+                        .conex-xlg-blue-mm { margin-left: auto; color: #fff; font-weight: bold; font-size: 18px; }
+                        
+                        .conex-xlg-mid-text {
+                            position: absolute; top: 2.5cm; left: 0; width: 9.0cm; height: 2.0cm;
+                            display: flex; flex-direction: column; justify-content: center; padding-left: 0.2cm; padding-right: 0.2cm; box-sizing: border-box; z-index: 5;
+                        }
+                        .conex-xlg-title-single { width: 100%; text-align: center; font-size: 29px; font-weight: 900; color: #000; letter-spacing: -0.5px; line-height: 1.15; }
+                        .conex-xlg-title { width: 100%; text-align: center; font-weight: 900; color: #000; letter-spacing: -0.5px; line-height: 1.1; }
+                        .conex-xlg-title.line1 { font-size: 26px; margin-bottom: 3px; }
+                        .conex-xlg-title.line2 { font-size: 21px; opacity: 0.9; }
+                        .conex-xlg-mm-center { width: 100%; text-align: center; font-size: 20px; font-weight: 900; margin-top: 4px; }
+                        
+                        .conex-xlg-bot-bar { position: absolute; top: 4.5cm; left: 0; width: 9.0cm; height: 1.5cm; display: flex; z-index: 5; }
+                        .conex-xlg-bot-code {
+                            width: 4.2cm; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 45px; font-weight: 900; color: #fff; padding-bottom: 3px; box-sizing: border-box;
+                        }
+                        .conex-xlg-bot-br {
+                            width: 4.8cm; background: #fff; height: 1.5cm; display: flex; align-items: flex-end; justify-content: center;
+                            overflow: hidden; padding-bottom: 3px; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+                        .conex-xlg-img-area {
+                            position: absolute; top: 1.5cm; right: 0; width: 4.5cm; height: 4.5cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
+                        }
+                        .conex-xlg-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                        .conex-xlg-diag-box { position: absolute; bottom: 2px; right: 2px; z-index: 10; display: flex; align-items: flex-end; justify-content: flex-end; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        const nameUpper = (item.p.nombre || '').toUpperCase();
+                        const descUpper = (item.p.descripcion_csv || '').toUpperCase();
+                        const specsUpper = (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '').toUpperCase();
+                        const combined = (nameUpper + " " + descUpper + " " + specsUpper).replace(/''/g, '"').replace(/'/g, '"');
+
+                        // 1. Detección de material
+                        let material = '';
+                        let badgeColor = '';
+                        let badgeText = '';
+                        let badgeTextColor = '#fff';
+
+                        if (combined.includes('CPVC')) {
+                            material = 'CPVC';
+                            badgeColor = '#D19F27';
+                            badgeText = 'CPVC';
+                        } else if (combined.includes('PVC')) {
+                            material = 'PVC';
+                            badgeColor = '#009BE0';
+                            badgeText = 'PVC';
+                        } else if (combined.includes('PPR')) {
+                            material = 'PPR';
+                            badgeColor = '#0F6B41';
+                            badgeText = 'PPR';
+                        } else if (combined.includes('POLIPROPILENO') || nameUpper.includes('INSERCION') || nameUpper.includes('INSERCIÓN') || nameUpper.includes(' PP ')) {
+                            material = 'PP';
+                            badgeColor = '#BFA38A'; // Light brown
+                            badgeText = 'PP';
+                        } else if (combined.includes('PE-AL-PE') || combined.includes('PEALPE')) {
+                            material = 'GAS';
+                            badgeColor = '#FAC428'; // Yellow
+                            badgeText = 'GAS';
+                            badgeTextColor = '#000'; // Black text
+                        } else if (combined.includes('COBRE')) {
+                            material = 'COBRE';
+                            badgeColor = '#79462F';
+                            badgeText = 'COBRE';
+                        } else if (combined.includes('GALVANIZADO') || combined.includes('GALV') || combined.includes('FIERRO GALV')) {
+                            material = 'GALV';
+                            badgeColor = '#70767C';
+                            badgeText = 'GALV';
+                        }
+
+                        // 2. Extracción de medidas (EXCLUSIVAMENTE DEL NOMBRE para evitar falsos positivos de empaques o PSI)
+                        const sizeMap = {
+                            '1/4': { mm: '6 mm', color: '#FF7F27' },
+                            '3/8': { mm: '10 mm', color: '#8A959E' },
+                            '1/2': { mm: '13 mm', color: '#D24D8C' },
+                            '3/4': { mm: '19 mm', color: '#3CA5DD' },
+                            '1': { mm: '25 mm', color: '#FAC428' },
+                            '1-1/4': { mm: '32 mm', color: '#2EAD58' },
+                            '1-1/2': { mm: '38 mm', color: '#612B8E' },
+                            '2': { mm: '50 mm', color: '#00A59A' }
+                        };
+
+                        function normalizeSize(s) {
+                            s = s.trim().replace(/"/g, '').replace(/'/g, '').replace(/\s+/g, '-');
+                            if (s === '1-1/2' || s === '1/2' || s === '3/4' || s === '1-1/4' || s === '1/4' || s === '3/8' || s === '1' || s === '2') return s;
+                            if (s === '1 1/2') return '1-1/2';
+                            if (s === '1 1/4') return '1-1/4';
+                            return null;
+                        }
+
+                        const words = nameUpper.split(/[\s,]+/);
+                        const foundSizes = [];
+                        words.forEach(w => {
+                            let match = w.match(/^([12]?-?[13]?[//]?[248]?")/);
+                            if (match) {
+                                let norm = normalizeSize(match[1]);
+                                if (norm && !foundSizes.includes(norm)) {
+                                    foundSizes.push(norm);
+                                }
+                            }
+                        });
+
+                        const order = ['2', '1-1/2', '1-1/4', '1', '3/4', '1/2', '3/8', '1/4'];
+                        foundSizes.sort((a,b) => order.indexOf(a) - order.indexOf(b));
+
+                        const finalSizes = foundSizes.slice(0, 3);
+                        let mmText = '';
+                        let primaryColor = '#70767C';
+
+                        if (finalSizes.length === 1) {
+                            let sz = finalSizes[0];
+                            if (sizeMap[sz]) {
+                                primaryColor = sizeMap[sz].color;
+                                if (material === 'PPR') {
+                                    const pprMap = { '1/2': '20 mm', '3/4': '25 mm', '1': '32 mm', '1-1/4': '40 mm', '1-1/2': '50 mm', '2': '63 mm' };
+                                    mmText = pprMap[sz] || sizeMap[sz].mm;
+                                } else {
+                                    mmText = sizeMap[sz].mm;
+                                }
+                            }
+                        } else if (finalSizes.length > 1) {
+                            primaryColor = '#008AD2';
+                            let mmArr = finalSizes.map(sz => {
+                                if (material === 'PPR') {
+                                    const pprMap = { '1/2': '20 mm', '3/4': '25 mm', '1': '32 mm', '1-1/4': '40 mm', '1-1/2': '50 mm', '2': '63 mm' };
+                                    return pprMap[sz] || (sizeMap[sz] ? sizeMap[sz].mm : '');
+                                }
+                                return sizeMap[sz] ? sizeMap[sz].mm : '';
+                            }).filter(Boolean);
+                            mmText = mmArr.join(' x ');
+                        }
+
+                        // 3. Diagrama SVG para conexiones (Tee, Codo, etc.)
+                        let diagramSvg = '';
+                        let cleanName = nameUpper.replace(/[^A-Z0-9\s]/g, ' ');
+                        if (finalSizes.length === 2) {
+                            if (cleanName.includes('REDUCCION') || cleanName.includes('REDUCIDO') || cleanName.includes('REDUCIDA')) {
+                                if (cleanName.includes('CODO') || cleanName.includes('90')) {
+                                    diagramSvg = `
+                                    <svg viewBox="0 0 100 80" style="width:1.7cm; height:1.3cm; opacity:0.85;">
+                                        <path d="M 15 15 C 60 15, 65 25, 65 70 L 48 70 C 48 45, 38 35, 15 35 Z" fill="none" stroke="#000" stroke-width="2.5"/>
+                                        <line x1="15" y1="15" x2="15" y2="35" stroke="#000" stroke-width="2.5"/>
+                                        <line x1="48" y1="70" x2="65" y2="70" stroke="#000" stroke-width="2.5"/>
+                                        <text x="5" y="29" font-size="12" font-weight="900" font-family="Arial" fill="#000">A</text>
+                                        <text x="52" y="79" font-size="12" font-weight="900" font-family="Arial" fill="#000">B</text>
+                                    </svg>`;
+                                }
+                            }
+                        } else if (finalSizes.length >= 3 && cleanName.includes('TEE')) {
+                            diagramSvg = `
+                            <svg viewBox="0 0 100 80" style="width:1.7cm; height:1.3cm; opacity:0.85;">
+                                <path d="M 15 30 L 35 30 L 35 10 L 65 10 L 65 30 L 85 30 L 85 60 L 15 60 Z" fill="none" stroke="#000" stroke-width="2.5"/>
+                                <line x1="15" y1="30" x2="15" y2="60" stroke="#000" stroke-width="2.5"/>
+                                <line x1="85" y1="30" x2="85" y2="60" stroke="#000" stroke-width="2.5"/>
+                                <line x1="35" y1="10" x2="65" y2="10" stroke="#000" stroke-width="2.5"/>
+                                <text x="5" y="48" font-size="12" font-weight="900" font-family="Arial" fill="#000">A</text>
+                                <text x="89" y="48" font-size="12" font-weight="900" font-family="Arial" fill="#000">B</text>
+                                <text x="47" y="24" font-size="12" font-weight="900" font-family="Arial" fill="#000">C</text>
+                            </svg>`;
+                        }
+
+                        // 4. Formatear y dividir texto del nombre
+                        let dispNameHTML = '';
+                        let mmHTML = '';
+                        const originalName = item.p.nombre || '';
+
+                        let formattedName = originalName.replace(/,\s*FOSET.*$/i, '').replace(/,\s*TRUPER.*$/i, '').trim();
+
+                        // 1. Remover material redundante cuando ya se muestra en el óvalo de la cabecera
+                        if (material === 'COBRE') {
+                            formattedName = formattedName.replace(/de\s+cobre/gi, '').replace(/cobre/gi, '');
+                        } else if (material === 'CPVC') {
+                            formattedName = formattedName.replace(/de\s+cpvc/gi, '').replace(/cpvc/gi, '');
+                        } else if (material === 'PVC') {
+                            formattedName = formattedName.replace(/de\s+pvc/gi, '').replace(/pvc/gi, '');
+                        } else if (material === 'PPR') {
+                            formattedName = formattedName.replace(/de\s+ppr/gi, '').replace(/ppr/gi, '');
+                        } else if (material === 'PP') {
+                            formattedName = formattedName.replace(/de\s+polipropileno/gi, '')
+                                                         .replace(/polipropileno/gi, '')
+                                                         .replace(/de\s+inserci.n/gi, '')
+                                                         .replace(/inserci.n/gi, '')
+                                                         .replace(/\bpp\b/gi, '');
+                        } else if (material === 'GAS') {
+                            formattedName = formattedName.replace(/de\s+pe-al-pe/gi, '')
+                                                         .replace(/pe-al-pe/gi, '')
+                                                         .replace(/de\s+pealpe/gi, '')
+                                                         .replace(/pealpe/gi, '')
+                                                         .replace(/para\s+gas/gi, '')
+                                                         .replace(/gas/gi, '');
+                        } else if (material === 'GALV') {
+                            formattedName = formattedName.replace(/de\s+fierro\s+galvanizado/gi, '')
+                                                         .replace(/fierro\s+galvanizado/gi, '')
+                                                         .replace(/acero\s+galvanizado/gi, '')
+                                                         .replace(/galvanizado/gi, '')
+                                                         .replace(/galv/gi, '');
+                        }
+
+                        // Limpiar espacios dobles, preposiciones duplicadas, comas colgantes y conectores sobrantes
+                        formattedName = formattedName.replace(/\s+/g, ' ')
+                                                     .replace(/de\s+de/gi, 'de')
+                                                     .replace(/para\s+de/gi, 'de')
+                                                     .replace(/,\s*,/g, ',')
+                                                     .replace(/\s*,\s*(1-1\/2|1-1\/4|1\/2|3\/4|1\/4|3\/8|1|2)("|\b)/g, ' de $1$2')
+                                                     .replace(/para\s+de/gi, 'de')
+                                                     .replace(/para\s+(1-1\/2|1-1\/4|1\/2|3\/4|1\/4|3\/8|1|2)("|\b)/g, ' de $1$2')
+                                                     .replace(/,\s*$/g, '')
+                                                     .replace(/\s*,\s*de\s+/gi, ' de ')
+                                                     .replace(/\bpara\s*$/gi, '')
+                                                     .trim();
+
+                        // Capitalizar palabras y poner conectores en minúscula
+                        formattedName = formattedName.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})
+                                                     .replace(/\bDe\b/g, 'de')
+                                                     .replace(/\bCon\b/g, 'con')
+                                                     .replace(/\bA\b/g, 'a')
+                                                     .replace(/\bPara\b/g, 'para');
+
+                        // Garantizar que siglas queden en mayúsculas si se mantuvieran por alguna razón
+                        formattedName = formattedName.replace(/\bPvc\b/g, 'PVC')
+                                                     .replace(/\bCpvc\b/g, 'CPVC')
+                                                     .replace(/\bPpr\b/g, 'PPR')
+                                                     .replace(/\bCobre\b/g, 'Cobre')
+                                                     .trim();
+
+                        // Cambiado a 26 caracteres para permitir que nombres como "Válvula de Esfera de 2\"" salgan en una sola línea
+                        let isLong = formattedName.length > 26;
+                        if (formattedName.includes('Rosca') || formattedName.includes('Reducción') || formattedName.includes('Reducido')) {
+                            isLong = true;
+                        }
+
+                        if (isLong) {
+                            let line1 = '';
+                            let line2 = '';
+                            
+                            if (formattedName.includes('Rosca Interior')) {
+                                line1 = formattedName.substring(0, formattedName.indexOf('Rosca Interior')).trim();
+                                line2 = formattedName.substring(formattedName.indexOf('Rosca Interior')).trim();
+                            } else if (formattedName.includes('Rosca Exterior')) {
+                                line1 = formattedName.substring(0, formattedName.indexOf('Rosca Exterior')).trim();
+                                line2 = formattedName.substring(formattedName.indexOf('Rosca Exterior')).trim();
+                            } else if (formattedName.includes('Reducción Bushing')) {
+                                line1 = 'Reducción Bushing';
+                                line2 = formattedName.replace('Reducción Bushing', '').trim();
+                            } else if (formattedName.includes('Reducción Campana')) {
+                                line1 = 'Reducción Campana';
+                                line2 = formattedName.replace('Reducción Campana', '').trim();
+                            } else if (formattedName.includes('Conector Reducido')) {
+                                line1 = 'Conector Reducido';
+                                line2 = formattedName.replace('Conector Reducido', '').trim();
+                            } else if (formattedName.includes('Codo 90° Reducción')) {
+                                line1 = 'Codo 90° Reducción';
+                                line2 = formattedName.replace('Codo 90° Reducción', '').trim();
+                            } else if (formattedName.includes('Tee Reducción')) {
+                                line1 = 'Tee Reducción';
+                                line2 = formattedName.replace('Tee Reducción', '').trim();
+                            } else {
+                                const mid = Math.floor(formattedName.length / 2);
+                                const spaceIdx = formattedName.lastIndexOf(' ', mid);
+                                if (spaceIdx > 0) {
+                                    line1 = formattedName.substring(0, spaceIdx).trim();
+                                    line2 = formattedName.substring(spaceIdx).trim();
+                                } else {
+                                    line1 = formattedName;
+                                    line2 = '';
+                                }
+                            }
+
+                            // Tamaño de fuente estático para dos líneas
+                            dispNameHTML = `<div class="conex-xlg-title line1" style="font-size: 26px;">${esc(line1)}</div>
+                                            <div class="conex-xlg-title line2" style="font-size: 21px;">${esc(line2)}</div>`;
+                        } else {
+                            // Tamaño de fuente dinámico para línea única
+                            let fontSize = '29px';
+                            if (formattedName.length <= 15) {
+                                fontSize = '34px'; // Texto muy corto -> más grande para llenar el espacio
+                            }
+                            dispNameHTML = `<div class="conex-xlg-title-single" style="font-size: ${fontSize};">${esc(formattedName)}</div>`;
+                        }
+
+                        // Colocar mm abajo del texto centrado (si solo hay una medida)
+                        if (finalSizes.length === 1) {
+                            mmHTML = `<div class="conex-xlg-mm-center" style="color:${primaryColor}">${mmText}</div>`;
+                        }
+
+                        let badgeHTML = '';
+                        if (badgeText) {
+                            badgeHTML = `<span class="conex-xlg-badge" style="background:${badgeColor}; color:${badgeTextColor}">${badgeText}</span>`;
+                        }
+
+                        let blueBarMmHTML = '';
+                        if (finalSizes.length > 1) {
+                            blueBarMmHTML = `<div class="conex-xlg-blue-mm">${mmText}</div>`;
+                        }
+
+                        return `
+                        <div class="conex-xlg-bktag">
+                            <div class="conex-xlg-top-black"></div>
+                            <div class="conex-xlg-blue-header">
+                                <div class="conex-xlg-brand-title">FOSET</div>
+                                ${badgeHTML}
+                                ${blueBarMmHTML}
+                            </div>
+                            <div class="conex-xlg-mid-text">
+                                ${dispNameHTML}
+                                ${mmHTML}
+                            </div>
+                            <div class="conex-xlg-bot-bar">
+                                <div class="conex-xlg-bot-code" style="background:${primaryColor}">${item.p.codigo}</div>
+                                <div class="conex-xlg-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            <div class="conex-xlg-img-area">
+                                <img src="${imgSrc}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="this.style.display='none'">
+                                ${diagramSvg ? `<div class="conex-xlg-diag-box">${diagramSvg}</div>` : ''}
+                            </div>
+                        </div>`;
+                    }
                 }
             ],
             
@@ -9048,8 +9391,11 @@ function renderCarouselGroup(mainContainer, items, options) {
                     const canvas = document.getElementById('bktplLiveCanvas');
                     canvas.innerHTML = '<style>' + tpl.css + '</style>' + tpl.render(sample, ean, imgSrc, idBarcode);
                     
-                    const bk = canvas.querySelector('.bktag'); if(bk) bk.style.boxShadow = "0 10px 25px rgba(0,0,0,0.25)";
-                    if(bk) bk.style.margin = "0 auto";
+                    const bk = canvas.querySelector('[class*="bktag"]') || canvas.children[1];
+                    if(bk) {
+                        bk.style.boxShadow = "0 10px 25px rgba(0,0,0,0.25)";
+                        bk.style.margin = "0 auto";
+                    }
                     
                     setTimeout(() => {
                         this.renderBarcodeOrQR(idBarcode, ean, sample);
@@ -9091,7 +9437,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                       printArea.style.setProperty('justify-content', 'center', 'important');
                       printArea.style.setProperty('gap', '2mm', 'important');
                       
-                      printArea.innerHTML = '<style>@media print { .bt-print-container > div { flex: 0 0 ' + tpl.width + ' !important; min-width: 0 !important; max-width: ' + tpl.width + ' !important; overflow: hidden !important; } .bt-print-container svg { max-width: 100% !important; height: auto !important; } } ' + tpl.css + '</style>';
+                      printArea.innerHTML = '<style>@media print { .bt-print-container > div, .bt-print-area > div, #btPrintArea > div { flex: 0 0 ' + tpl.width + ' !important; min-width: 0 !important; max-width: ' + tpl.width + ' !important; overflow: hidden !important; } .bt-print-container svg, .bt-print-area svg, #btPrintArea svg { max-width: 100% !important; height: auto !important; } } ' + tpl.css + '</style>';
                       this.applyColorOverrides();
 
                 
