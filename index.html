@@ -2374,7 +2374,7 @@
         .bktag {
             width: 5cm;
             height: 8cm;
-            border: 2px solid #000;
+            border: 3px solid #000;
             box-sizing: border-box;
             position: relative;
             background: #fff;
@@ -2483,9 +2483,9 @@
                 display: grid !important;
                 grid-template-columns: repeat(4, 5cm);
                 grid-auto-rows: 8cm;
-                gap: 0;
-                row-gap: 0.2cm;
-                column-gap: 0.3cm;
+                gap: 0 !important;
+                row-gap: 0 !important;
+                column-gap: 0 !important;
                 position: absolute;
                 left: 0;
                 top: 0;
@@ -6855,7 +6855,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                     height: '8cm',
                     css: `
                         .bktag {
-                            width: 5cm; height: 8cm; border: 2px solid #000; box-sizing: border-box;
+                            width: 5cm; height: 8cm; border: 3px solid #000; box-sizing: border-box;
                             position: relative; background: #fff; overflow: hidden;
                             font-family: 'Inter', sans-serif; color: #000;
                         }
@@ -9435,7 +9435,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                       printArea.style.setProperty('display', 'flex', 'important');
                       printArea.style.setProperty('flex-wrap', 'wrap', 'important');
                       printArea.style.setProperty('justify-content', 'center', 'important');
-                      printArea.style.setProperty('gap', '2mm', 'important');
+                      printArea.style.setProperty('gap', '0', 'important');
                       
                       printArea.innerHTML = '<style>@media print { .bt-print-container > div, .bt-print-area > div, #btPrintArea > div { flex: 0 0 ' + tpl.width + ' !important; min-width: 0 !important; max-width: ' + tpl.width + ' !important; overflow: hidden !important; } .bt-print-container svg, .bt-print-area svg, #btPrintArea svg { max-width: 100% !important; height: auto !important; } } ' + tpl.css + '</style>';
                       this.applyColorOverrides();
