@@ -8379,15 +8379,15 @@ function renderCarouselGroup(mainContainer, items, options) {
                         }
 
                         // Limpiar espacios dobles, preposiciones duplicadas, comas colgantes y conectores sobrantes
-                        formattedName = formattedName.replace(/\s+/g, ' ')
+                        formattedName = formattedName.replace(/,\s*(1-1\/2|1-1\/4|1\/2|3\/4|1\/4|3\/8|1|2)(["'\b]|$)/gi, ' $1$2')
+                                                     .replace(/(\bde\b|\bpara\b|\bx\b|\bcon\b|\by\b)?\s+(1-1\/2|1-1\/4|1\/2|3\/4|1\/4|3\/8|1|2)(["'\b]|$)/gi, function(match, prep, size, suffix) {
+                                                         return prep ? match : ' de ' + size + (suffix || '');
+                                                     })
+                                                     .replace(/\s+/g, ' ')
                                                      .replace(/de\s+de/gi, 'de')
                                                      .replace(/para\s+de/gi, 'de')
                                                      .replace(/,\s*,/g, ',')
-                                                     .replace(/\s*,\s*(1-1\/2|1-1\/4|1\/2|3\/4|1\/4|3\/8|1|2)("|\b)/g, ' de $1$2')
-                                                     .replace(/para\s+de/gi, 'de')
-                                                     .replace(/para\s+(1-1\/2|1-1\/4|1\/2|3\/4|1\/4|3\/8|1|2)("|\b)/g, ' de $1$2')
                                                      .replace(/,\s*$/g, '')
-                                                     .replace(/\s*,\s*de\s+/gi, ' de ')
                                                      .replace(/\bpara\s*$/gi, '')
                                                      .trim();
 
@@ -8819,15 +8819,15 @@ function renderCarouselGroup(mainContainer, items, options) {
                         }
 
                         // Limpiar espacios dobles, preposiciones duplicadas, comas colgantes y conectores sobrantes
-                        formattedName = formattedName.replace(/\s+/g, ' ')
+                        formattedName = formattedName.replace(/,\s*(1-1\/2|1-1\/4|1\/2|3\/4|1\/4|3\/8|1|2)(["'\b]|$)/gi, ' $1$2')
+                                                     .replace(/(\bde\b|\bpara\b|\bx\b|\bcon\b|\by\b)?\s+(1-1\/2|1-1\/4|1\/2|3\/4|1\/4|3\/8|1|2)(["'\b]|$)/gi, function(match, prep, size, suffix) {
+                                                         return prep ? match : ' de ' + size + (suffix || '');
+                                                     })
+                                                     .replace(/\s+/g, ' ')
                                                      .replace(/de\s+de/gi, 'de')
                                                      .replace(/para\s+de/gi, 'de')
                                                      .replace(/,\s*,/g, ',')
-                                                     .replace(/\s*,\s*(1-1\/2|1-1\/4|1\/2|3\/4|1\/4|3\/8|1|2)("|\b)/g, ' de $1$2')
-                                                     .replace(/para\s+de/gi, 'de')
-                                                     .replace(/para\s+(1-1\/2|1-1\/4|1\/2|3\/4|1\/4|3\/8|1|2)("|\b)/g, ' de $1$2')
                                                      .replace(/,\s*$/g, '')
-                                                     .replace(/\s*,\s*de\s+/gi, ' de ')
                                                      .replace(/\bpara\s*$/gi, '')
                                                      .trim();
 
@@ -9162,15 +9162,15 @@ function renderCarouselGroup(mainContainer, items, options) {
                         }
 
                         // Limpiar espacios dobles, preposiciones duplicadas, comas colgantes y conectores sobrantes
-                        formattedName = formattedName.replace(/\s+/g, ' ')
+                        formattedName = formattedName.replace(/,\s*(1-1\/2|1-1\/4|1\/2|3\/4|1\/4|3\/8|1|2)(["'\b]|$)/gi, ' $1$2')
+                                                     .replace(/(\bde\b|\bpara\b|\bx\b|\bcon\b|\by\b)?\s+(1-1\/2|1-1\/4|1\/2|3\/4|1\/4|3\/8|1|2)(["'\b]|$)/gi, function(match, prep, size, suffix) {
+                                                         return prep ? match : ' de ' + size + (suffix || '');
+                                                     })
+                                                     .replace(/\s+/g, ' ')
                                                      .replace(/de\s+de/gi, 'de')
                                                      .replace(/para\s+de/gi, 'de')
                                                      .replace(/,\s*,/g, ',')
-                                                     .replace(/\s*,\s*(1-1\/2|1-1\/4|1\/2|3\/4|1\/4|3\/8|1|2)("|\b)/g, ' de $1$2')
-                                                     .replace(/para\s+de/gi, 'de')
-                                                     .replace(/para\s+(1-1\/2|1-1\/4|1\/2|3\/4|1\/4|3\/8|1|2)("|\b)/g, ' de $1$2')
                                                      .replace(/,\s*$/g, '')
-                                                     .replace(/\s*,\s*de\s+/gi, ' de ')
                                                      .replace(/\bpara\s*$/gi, '')
                                                      .trim();
 
