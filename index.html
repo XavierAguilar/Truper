@@ -9231,21 +9231,26 @@ function renderCarouselGroup(mainContainer, items, options) {
                                 }
                             }
 
-                            // Tamaño de fuente estático para dos líneas
-                            dispNameHTML = `<div class="conex-xlg-title line1" style="font-size: 20px;">${esc(line1)}</div>
-                                            <div class="conex-xlg-title line2" style="font-size: 16px;">${esc(line2)}</div>`;
-                        } else {
-                            // Tamaño de fuente dinámico para línea única
-                            let fontSize = '21px';
-                            if (formattedName.length <= 15) {
-                                fontSize = '24px'; // Texto muy corto -> más grande para llenar el espacio
+                            // Tamaño de fuente estático para dos líneas (adaptado al espacio de 2cm)
+                            dispNameHTML = `<div class="conex-xlg-title line1" style="font-size: 23px; line-height: 1.1;">${esc(line1)}</div>
+                                            <div class="conex-xlg-title line2" style="font-size: 18px; line-height: 1.1; opacity: 0.9; margin-top: 1px;">${esc(line2)}</div>`;
+                            
+                            // Colocar mm abajo del texto centrado (si solo hay una medida)
+                            if (finalSizes.length === 1) {
+                                mmHTML = `<div class="conex-xlg-mm-center" style="font-size: 16px; margin-top: 3px; color:${primaryColor}">${mmText}</div>`;
                             }
-                            dispNameHTML = `<div class="conex-xlg-title-single" style="font-size: ${fontSize};">${esc(formattedName)}</div>`;
-                        }
-
-                        // Colocar mm abajo del texto centrado (si solo hay una medida)
-                        if (finalSizes.length === 1) {
-                            mmHTML = `<div class="conex-xlg-mm-center" style="color:${primaryColor}">${mmText}</div>`;
+                        } else {
+                            // Tamaño de fuente dinámico para línea única (aprovechando al máximo el espacio vertical libre)
+                            let fontSize = '29px';
+                            if (formattedName.length <= 15) {
+                                fontSize = '34px'; // Texto muy corto -> más grande para llenar el espacio
+                            }
+                            dispNameHTML = `<div class="conex-xlg-title-single" style="font-size: ${fontSize}; line-height: 1.1;">${esc(formattedName)}</div>`;
+                            
+                            // Colocar mm abajo del texto centrado (si solo hay una medida)
+                            if (finalSizes.length === 1) {
+                                mmHTML = `<div class="conex-xlg-mm-center" style="font-size: 20px; margin-top: 5px; color:${primaryColor}">${mmText}</div>`;
+                            }
                         }
 
                         let badgeHTML = '';
