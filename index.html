@@ -2854,30 +2854,74 @@
             }
         }
 
-        // Pre-procesar índice de búsqueda para rendimiento
+        // Pre-procesar índice de búsqueda para rendimiento ultra rápido
         var vocabIndex = {}; // Vocabulario indexado por prefix de 2 letras
+        var searchCache = {};
+        var predictiveCache = {};
+
+        var SEP_CODES = new Uint8Array(256);
+        (function() {
+            var sepStr = ' ,./\\-_()[]"\'!?;:=+*#\t\n0123456789';
+            for (var i = 0; i < sepStr.length; i++) SEP_CODES[sepStr.charCodeAt(i)] = 1;
+        })();
+
+        function isWholeWord(text, pos, len) {
+            var bOk = pos === 0 || SEP_CODES[text.charCodeAt(pos - 1)] === 1;
+            var aOk = (pos + len) >= text.length || SEP_CODES[text.charCodeAt(pos + len)] === 1;
+            return bOk && aOk;
+        }
+
         function buildSearchIndex() {
             searchIndex = productos.map(function (p, i) {
-                var charText = (p.caracteristicas || []).join(' ');
-                var specText = Object.keys(p.especificaciones || {}).concat(Object.values(p.especificaciones || {})).join(' ');
+                var charText = normalize((p.caracteristicas || []).join(' '));
+                var specText = normalize(Object.keys(p.especificaciones || {}).concat(Object.values(p.especificaciones || {})).join(' '));
+                var codigo = normalize(p.codigo || '');
+                var clave = normalize(p.clave || '');
+                var ean = normalize(p.ean || '');
+                var nombre = normalize(p.nombre || '');
+                var descripcion = normalize(p.descripcion_csv || '');
+                var marca = normalize(p.marca || '');
+                var aliases = normalize((p.alias_busqueda || []).join(' '));
+
+                var nombreFon = phoneticES(nombre);
+                var descripcionFon = phoneticES(descripcion);
+
+                var fullText = [codigo, clave, ean, nombre, descripcion, marca, charText, specText, aliases].join(' ').replace(/\s+/g, ' ').trim();
+                var fullPhonetic = phoneticES(fullText);
+
+                var rawWords = fullText.split(/[\s,\-()\/.]+/);
+                var uniqueWords = [];
+                var wordSet = {};
+                for (var w = 0; w < rawWords.length; w++) {
+                    var wd = rawWords[w];
+                    if (wd.length >= 2 && !wordSet[wd]) {
+                        wordSet[wd] = true;
+                        uniqueWords.push(wd);
+                    }
+                }
+                var textWordsPhonetic = uniqueWords.map(phoneticES);
+
                 return {
                     index: i,
-                    codigo: normalize(p.codigo || ''),
-                    clave: normalize(p.clave || ''),
-                    nombre: normalize(p.nombre || ''),
-                    descripcion: normalize(p.descripcion_csv || ''),
-                    marca: normalize(p.marca || ''),
-                    caracteristicas: normalize(charText),
-                    especificaciones: normalize(specText),
-                    aliases: normalize((p.alias_busqueda || []).join(' ')),
-                    // Texto completo para búsqueda general
-                    fullText: normalize([
-                        p.codigo, p.clave, p.nombre, p.descripcion_csv,
-                        p.marca, charText, specText,
-                        (p.alias_busqueda || []).join(' ')
-                    ].join(' '))
+                    codigo: codigo,
+                    clave: clave,
+                    ean: ean,
+                    nombre: nombre,
+                    descripcion: descripcion,
+                    marca: marca,
+                    caracteristicas: charText,
+                    especificaciones: specText,
+                    aliases: aliases,
+                    nombreFon: nombreFon,
+                    descripcionFon: descripcionFon,
+                    fullText: fullText,
+                    fullPhonetic: fullPhonetic,
+                    textWords: uniqueWords,
+                    textWordsPhonetic: textWordsPhonetic,
+                    fields: [codigo, ean, clave, nombre, marca, descripcion, charText, specText, aliases]
                 };
             });
+
             // Construir vocabulario para corrección ortográfica
             var wordFreq = {};
             for (var i = 0; i < searchIndex.length; i++) {
@@ -2902,6 +2946,8 @@
                     vocabIndex[p2].push(vocab[v]);
                 }
             }
+            searchCache = {};
+            predictiveCache = {};
             console.log('Vocabulario: ' + vocab.length + ' palabras únicas');
         }
 
@@ -3341,47 +3387,7 @@ function renderCarouselGroup(mainContainer, items, options) {
 
 
         function searchFromHint(query) {
-            document.getElementById('searchInput').value = query;
-            document.getElementById('searchResults').classList.remove('show');
-            doSearch();
-        }
-
-        // ===== PRE-PROCESAR ÍNDICE DE BÚSQUEDA =====
-        var searchCache = {};
-
-        function buildSearchIndex() {
-            searchIndex = productos.map(function (p, i) {
-                var charText = (p.caracteristicas || []).join(' ');
-                var specText = Object.keys(p.especificaciones || {}).concat(Object.values(p.especificaciones || {})).join(' ');
-                return {
-                    index: i,
-                    codigo: normalize(p.codigo || ''),
-                    clave: normalize(p.clave || ''),
-                    ean: normalize(p.ean || ''),
-                    nombre: normalize(p.nombre || ''),
-                    descripcion: normalize(p.descripcion_csv || ''),
-                    marca: normalize(p.marca || ''),
-                    caracteristicas: normalize(charText),
-                    especificaciones: normalize(specText),
-                    aliases: normalize((p.alias_busqueda || []).join(' ')),
-                    nombreFon: phoneticES(normalize(p.nombre || '')),
-                    descripcionFon: phoneticES(normalize(p.descripcion_csv || ''))
-                };
-            });
-            searchCache = {};
-        }
-
-        // ===== WORD BOUNDARY HELPER =====
-        function isWholeWord(text, pos, len) {
-            var before = pos > 0 ? text.charAt(pos - 1) : ' ';
-            var after = (pos + len) < text.length ? text.charAt(pos + len) : ' ';
-            var separators = ' ,./\\-_()[]"\'!?;:=+*#\t\n0123456789';
-            var bOk = separators.indexOf(before) !== -1;
-            var aOk = separators.indexOf(after) !== -1;
-            return bOk && aOk;
-        }
-
-        // ===== DICCIONARIO DE ABREVIATURAS TRUPER =====
+            document.getElementById('sea        // ===== DICCIONARIO DE ABREVIATURAS TRUPER =====
         var ABBR_MAP = {
             'para': 'p/', 'p/': 'para',
             'con': 'c/', 'c/': 'con',
@@ -3400,8 +3406,9 @@ function renderCarouselGroup(mainContainer, items, options) {
             return expanded;
         }
 
-        // ===== MOTOR DE BÚSQUEDA CON SCORING + CACHÉ =====
+        // ===== MOTOR DE BÚSQUEDA CON SCORING + CACHÉ _____
         var SEARCH_LIMIT = 2000;
+        var FIELD_PTS = [100, 95, 80, 60, 40, 30, 20, 10, 15];
 
         function searchNuevos() {
             document.getElementById('searchInput').value = ':nuevos:';
@@ -3432,76 +3439,82 @@ function renderCarouselGroup(mainContainer, items, options) {
             var normalizedQuery = normalize(rawQuery);
             var words = normalizedQuery.split(/\s+/).filter(function (w) { return w.length > 0; });
             if (words.length === 0) return [];
-            var expandedWords = expandAbbreviations(words);
+
+            // Pre-computar transformaciones para palabras de la consulta (evita re-calcular por producto)
+            var queryInfo = words.map(function (w) {
+                var alt = ABBR_MAP[w] || null;
+                var phon = phoneticES(w);
+                return {
+                    word: w,
+                    altWord: alt,
+                    stems: getStemVariants(w),
+                    phon: phon,
+                    phonStems: getStemVariants(phon)
+                };
+            });
+
             var scored = [];
 
             for (var i = 0; i < searchIndex.length; i++) {
                 var entry = searchIndex[i];
                 var totalScore = 0;
                 var allWordsMatch = true;
+                var flds = entry.fields;
 
-                for (var w = 0; w < words.length; w++) {
-                    var word = words[w];
-                    var altWord = ABBR_MAP[word] || null;
+                for (var w = 0; w < queryInfo.length; w++) {
+                    var qInfo = queryInfo[w];
+                    var word = qInfo.word;
+                    var altWord = qInfo.altWord;
                     var wordScore = 0;
-                    var fields = [
-                        { text: entry.codigo, fullPts: 100 },
-                        { text: entry.ean, fullPts: 95 },
-                        { text: entry.clave, fullPts: 80 },
-                        { text: entry.nombre, fullPts: 60 },
-                        { text: entry.marca, fullPts: 40 },
-                        { text: entry.descripcion, fullPts: 30 },
-                        { text: entry.caracteristicas, fullPts: 20 },
-                        { text: entry.especificaciones, fullPts: 10 },
-                        { text: entry.aliases, fullPts: 15 }
-                    ];
-                    for (var f = 0; f < fields.length; f++) {
-                        var fld = fields[f];
+
+                    for (var f = 0; f < flds.length; f++) {
+                        var fldText = flds[f];
+                        var fullPts = FIELD_PTS[f];
                         var bestPts = 0;
-                        var pos = fld.text.indexOf(word);
+                        var pos = fldText.indexOf(word);
                         if (pos !== -1) {
-                            bestPts = isWholeWord(fld.text, pos, word.length) ? fld.fullPts : Math.ceil(fld.fullPts * 0.15);
+                            bestPts = isWholeWord(fldText, pos, word.length) ? fullPts : Math.ceil(fullPts * 0.15);
                         }
                         if (altWord) {
-                            var apos = fld.text.indexOf(altWord);
+                            var apos = fldText.indexOf(altWord);
                             if (apos !== -1) {
-                                var aPts = isWholeWord(fld.text, apos, altWord.length) ? Math.ceil(fld.fullPts * 0.9) : Math.ceil(fld.fullPts * 0.12);
+                                var aPts = isWholeWord(fldText, apos, altWord.length) ? Math.ceil(fullPts * 0.9) : Math.ceil(fullPts * 0.12);
                                 if (aPts > bestPts) bestPts = aPts;
                             }
                         }
                         wordScore += bestPts;
                     }
-                    // Si no hubo match, buscar variantes singular/plural como fallback
+
+                    // Si no hubo match, probar variantes singular/plural
                     if (wordScore === 0) {
-                        var stemVars = getStemVariants(word);
+                        var stemVars = qInfo.stems;
                         for (var sv = 0; sv < stemVars.length; sv++) {
-                            for (var f2 = 0; f2 < fields.length; f2++) {
-                                var fld2 = fields[f2];
-                                var spos = fld2.text.indexOf(stemVars[sv]);
+                            var st = stemVars[sv];
+                            for (var f2 = 0; f2 < flds.length; f2++) {
+                                var fldText2 = flds[f2];
+                                var spos = fldText2.indexOf(st);
                                 if (spos !== -1) {
-                                    var sPts = isWholeWord(fld2.text, spos, stemVars[sv].length) ? Math.ceil(fld2.fullPts * 0.85) : Math.ceil(fld2.fullPts * 0.1);
-                                    wordScore += sPts;
+                                    wordScore += isWholeWord(fldText2, spos, st.length) ? Math.ceil(FIELD_PTS[f2] * 0.85) : Math.ceil(FIELD_PTS[f2] * 0.1);
                                 }
                             }
                             if (wordScore > 0) break;
                         }
                     }
-                    // Si aún no hay match, intentar matching fonético español
+
+                    // Si aún no hay match, intentar fonética
                     if (wordScore === 0) {
-                        var wordPhon = phoneticES(word);
-                        var phonFields = [
-                            { text: entry.nombreFon, fullPts: 50 },
-                            { text: entry.descripcionFon, fullPts: 25 }
-                        ];
-                        for (var fp = 0; fp < phonFields.length; fp++) {
-                            var ppos = phonFields[fp].text.indexOf(wordPhon);
-                            if (ppos !== -1) {
-                                wordScore += isWholeWord(phonFields[fp].text, ppos, wordPhon.length) ? Math.ceil(phonFields[fp].fullPts * 0.8) : Math.ceil(phonFields[fp].fullPts * 0.1);
-                            }
+                        var wordPhon = qInfo.phon;
+                        var ppos1 = entry.nombreFon.indexOf(wordPhon);
+                        if (ppos1 !== -1) {
+                            wordScore += isWholeWord(entry.nombreFon, ppos1, wordPhon.length) ? 40 : 5;
                         }
-                        // También probar variantes singular/plural de la forma fonética
+                        var ppos2 = entry.descripcionFon.indexOf(wordPhon);
+                        if (ppos2 !== -1) {
+                            wordScore += isWholeWord(entry.descripcionFon, ppos2, wordPhon.length) ? 20 : 3;
+                        }
+
                         if (wordScore === 0) {
-                            var phonVars = getStemVariants(wordPhon);
+                            var phonVars = qInfo.phonStems;
                             for (var pv = 0; pv < phonVars.length; pv++) {
                                 var pvpos = entry.nombreFon.indexOf(phonVars[pv]);
                                 if (pvpos !== -1) {
@@ -3511,48 +3524,49 @@ function renderCarouselGroup(mainContainer, items, options) {
                             }
                         }
                     }
+
                     if (entry.codigo === word || entry.clave === word) wordScore += 50;
                     if (entry.codigo.indexOf(word) === 0) wordScore += 30;
                     if (entry.clave.indexOf(word) === 0) wordScore += 25;
                     var npos = entry.nombre.indexOf(word);
                     if (npos !== -1 && npos < 15 && isWholeWord(entry.nombre, npos, word.length)) wordScore += 40;
+
                     if (wordScore === 0) { allWordsMatch = false; }
                     totalScore += wordScore;
                 }
 
-                // Matching parcial: si 2/3+ palabras coinciden, incluir con penalización
-                var matchedWords = 0;
-                for (var mw = 0; mw < words.length; mw++) {
-                    // Contar cuántas palabras tuvieron score > 0
-                    // (ya sumadas en totalScore, estimamos por el promedio)
-                }
                 if (!allWordsMatch && words.length >= 3 && totalScore > 0) {
-                    // Al menos algunas palabras coincidieron, penalizar pero incluir
                     totalScore = Math.ceil(totalScore * 0.35);
-                    allWordsMatch = true; // Permitir entrada con score reducido
+                    allWordsMatch = true;
                 }
 
                 if (allWordsMatch && totalScore > 0) {
                     var nameWhole = false;
-                    var w0 = words[0];
+                    var q0Info = queryInfo[0];
+                    var w0Vars = q0Info.stems;
                     
-                    // Permitir que variaciones singulares/plurales cuenten como "palabra completa" exacta 
-                    // para evitar que el filtro de limpieza borre plurales válidos.
-                    var w0Vars = getStemVariants(w0);
-                    w0Vars.push(w0);
-                    
-                    for (var vIdx = 0; vIdx < w0Vars.length; vIdx++) {
-                        var vWord = w0Vars[vIdx];
-                        var np = entry.nombre.indexOf(vWord);
-                        if (np !== -1 && isWholeWord(entry.nombre, np, vWord.length)) {
-                            nameWhole = true; break;
-                        }
-                        var cp = entry.clave.indexOf(vWord);
-                        if (cp !== -1 && isWholeWord(entry.clave, cp, vWord.length)) {
-                            nameWhole = true; break;
+                    var posN = entry.nombre.indexOf(q0Info.word);
+                    if (posN !== -1 && isWholeWord(entry.nombre, posN, q0Info.word.length)) {
+                        nameWhole = true;
+                    } else {
+                        var posC = entry.clave.indexOf(q0Info.word);
+                        if (posC !== -1 && isWholeWord(entry.clave, posC, q0Info.word.length)) {
+                            nameWhole = true;
+                        } else {
+                            for (var vIdx = 0; vIdx < w0Vars.length; vIdx++) {
+                                var vWord = w0Vars[vIdx];
+                                var np = entry.nombre.indexOf(vWord);
+                                if (np !== -1 && isWholeWord(entry.nombre, np, vWord.length)) {
+                                    nameWhole = true; break;
+                                }
+                                var cp = entry.clave.indexOf(vWord);
+                                if (cp !== -1 && isWholeWord(entry.clave, cp, vWord.length)) {
+                                    nameWhole = true; break;
+                                }
+                            }
                         }
                     }
-                    
+
                     scored.push({ product: productos[i], index: i, score: totalScore, wholeWord: nameWhole });
                     if (scored.length >= SEARCH_LIMIT) break;
                 }
@@ -3793,7 +3807,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                         var results = searchProducts(q);
                         renderResults(results, q);
                     });
-                }, 250);
+                }, 150);
             });
 
             input.addEventListener('focus', function () {
@@ -5768,23 +5782,14 @@ function renderCarouselGroup(mainContainer, items, options) {
                                   showBtToast('&#9989; Lote: ' + added + ' agregados masivamente', '#10b981');
                               } else {
                                   window.playBeep('error');
-                                  showBtToast('Í¢ÂÅ’ Ninguno encontrado en lote', '#ef4444');
-                              }
-                              this.value = '';
-                          } else {
-                              this.value = paste; // comportamiento normal
-                          }
-                      }
-                  });
-              }
-          });
-
+          var _btDebounceTimer = null;
           window.handleBtScannerInput = function(e) {
             const input = e.target;
             const val = input.value.trim();
             const suggBox = document.getElementById('btSuggestions');
 
             if (!val) {
+                clearTimeout(_btDebounceTimer);
                 suggBox.classList.remove('show');
                 return;
             }
@@ -5802,6 +5807,7 @@ function renderCarouselGroup(mainContainer, items, options) {
             }
 
             if (e.key === 'Enter') {
+                  clearTimeout(_btDebounceTimer);
                   if(e.preventDefault) e.preventDefault();
                   
                   // Extractor Automático por Módulo / Página
@@ -5818,7 +5824,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                           input.value = '';
                       } else {
                           window.playBeep('error');
-                          showBtToast('Í¢ÂÅ’ Vacío: Ningún artículo en Página ' + pageNum, '#ef4444');
+                          showBtToast('â Œ Vacío: Ningún artículo en Página ' + pageNum, '#ef4444');
                       }
                       return;
                   }
@@ -5838,7 +5844,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                           showBtToast('&#9989; Lote manual: ' + added + ' agregados', '#10b981');
                       } else {
                           window.playBeep('error');
-                          showBtToast('Í¢ÂÅ’ Textos no encontrados', '#ef4444');
+                          showBtToast('â Œ Textos no encontrados', '#ef4444');
                       }
                       return;
                   }
@@ -5857,47 +5863,50 @@ function renderCarouselGroup(mainContainer, items, options) {
                     suggBox.classList.remove('show');
                 } else {
                     window.playBeep('error');
-                    showBtToast('âŒ Código no encontrado', '#ef4444');
+                    showBtToast('â Œ Código no encontrado', '#ef4444');
                     input.value = '';
                     input.focus();
                 }
                 return;
             }
 
-            // Hacer búsqueda asíncrona limpia
-            const results = searchProductsPredictive(val);
-            btSuggestions = results.slice(0, 10);
-            btSugActiveIdx = -1;
+            // Para tipeo normal: debuncear 150ms para fluidez impecable
+            clearTimeout(_btDebounceTimer);
+            _btDebounceTimer = setTimeout(function() {
+                const results = searchProductsPredictive(val);
+                btSuggestions = results.slice(0, 10);
+                btSugActiveIdx = -1;
 
-            if (btSuggestions.length > 0) {
-                suggBox.innerHTML = '';
-                btSuggestions.forEach((p, i) => {
-                    var isLocalEnv = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-                    let img = '';
-                    if (!isLocalEnv && p.imagenes && p.imagenes.length) {
-                        img = p.imagenes[0].startsWith('http') ? p.imagenes[0] : 'https://www.truper.com' + (p.imagenes[0].startsWith('/') ? p.imagenes[0] : '/' + p.imagenes[0]);
-                    } else if (isLocalEnv && p.imagenes_local && p.imagenes_local.length) {
-                        img = p.imagenes_local[0];
-                    } else if (p.imagenes && p.imagenes.length) {
-                        img = p.imagenes[0].startsWith('http') ? p.imagenes[0] : 'https://www.truper.com' + (p.imagenes[0].startsWith('/') ? p.imagenes[0] : '/' + p.imagenes[0]);
-                    }
-                    var flb = "https://www.truper.com/media/import/imagenes/" + p.clave + ".jpg";
-                    suggBox.insertAdjacentHTML('beforeend', `
-                        <div class="result-item bt-sug-item" id="btsug-${i}" onmousedown="addMatchedBtByIdx(${i})">
-                            <div class="result-thumb"><img src="${img}" onerror="this.src='${flb}'"></div>
-                            <div class="result-info">
-                                <div class="result-list-name" style="font-size:13px; font-weight:700; color: #fff; max-width:100%; white-space:normal;">${esc(p.nombre)}</div>
-                                <div class="result-list-code">Código: <span style="font-weight:900;color:#dc2626;">${p.codigo}</span> | Clave: <b>${p.clave}</b></div>
+                if (btSuggestions.length > 0) {
+                    suggBox.innerHTML = '';
+                    btSuggestions.forEach((p, i) => {
+                        var isLocalEnv = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                        let img = '';
+                        if (!isLocalEnv && p.imagenes && p.imagenes.length) {
+                            img = p.imagenes[0].startsWith('http') ? p.imagenes[0] : 'https://www.truper.com' + (p.imagenes[0].startsWith('/') ? p.imagenes[0] : '/' + p.imagenes[0]);
+                        } else if (isLocalEnv && p.imagenes_local && p.imagenes_local.length) {
+                            img = p.imagenes_local[0];
+                        } else if (p.imagenes && p.imagenes.length) {
+                            img = p.imagenes[0].startsWith('http') ? p.imagenes[0] : 'https://www.truper.com' + (p.imagenes[0].startsWith('/') ? p.imagenes[0] : '/' + p.imagenes[0]);
+                        }
+                        var flb = "https://www.truper.com/media/import/imagenes/" + p.clave + ".jpg";
+                        suggBox.insertAdjacentHTML('beforeend', `
+                            <div class="result-item bt-sug-item" id="btsug-${i}" onmousedown="addMatchedBtByIdx(${i})">
+                                <div class="result-thumb"><img src="${img}" onerror="this.src='${flb}'"></div>
+                                <div class="result-info">
+                                    <div class="result-list-name" style="font-size:13px; font-weight:700; color: #fff; max-width:100%; white-space:normal;">${esc(p.nombre)}</div>
+                                    <div class="result-list-code">Código: <span style="font-weight:900;color:#dc2626;">${p.codigo}</span> | Clave: <b>${p.clave}</b></div>
+                                </div>
                             </div>
-                        </div>
-                    `);
-                });
-                suggBox.classList.add('show');
-            } else {
-                suggBox.classList.remove('show');
-                suggBox.innerHTML = '<div style="padding:15px; color:#666; text-align:center;">No hay coincidencias...</div>';
-                suggBox.classList.add('show');
-            }
+                        `);
+                    });
+                    suggBox.classList.add('show');
+                } else {
+                    suggBox.classList.remove('show');
+                    suggBox.innerHTML = '<div style="padding:15px; color:#666; text-align:center;">No hay coincidencias...</div>';
+                    suggBox.classList.add('show');
+                }
+            }, 150);
         };
 
         function highlightBtSug() {
@@ -5924,6 +5933,8 @@ function renderCarouselGroup(mainContainer, items, options) {
         function searchProductsPredictive(val) {
             var v = String(val).trim();
             if(!v || v.length < 2) return [];
+            if (predictiveCache[v]) return predictiveCache[v];
+
             var vLow = v.toLowerCase();
             var vNorm = normalize(v);
             var prods = window.productos || [];
@@ -5939,9 +5950,12 @@ function renderCarouselGroup(mainContainer, items, options) {
                     exactly.push(p);
                 }
             }
-            if(exactly.length > 0) return exactly;
+            if(exactly.length > 0) {
+                predictiveCache[v] = exactly;
+                return exactly;
+            }
             
-            // === FASE 2: Match parcial por código/clave/EAN/nombre ===
+            // === FASE 2: Match parcial por código/clave/EAN ===
             var partial = [];
             for(var i=0; i<prods.length; i++) {
                 var p = prods[i];
@@ -5952,24 +5966,24 @@ function renderCarouselGroup(mainContainer, items, options) {
                     partial.push(p);
                 }
             }
-            if(partial.length > 0) return partial.slice(0, 30);
+            if(partial.length > 0) {
+                var res = partial.slice(0, 30);
+                predictiveCache[v] = res;
+                return res;
+            }
             
-            // === FASE 3: Búsqueda fuzzy inteligente por nombre/descripción ===
+            // === FASE 3: Búsqueda ultra rápida por nombre/descripción pre-procesada ===
             var queryWords = vNorm.split(/[\s,\-()\/.]+/).filter(function(w) { return w.length >= 2; });
             if(queryWords.length === 0) return [];
             
             var queryPhonetics = queryWords.map(function(w) { return phoneticES(w); });
             
             var scored = [];
-            for(var i=0; i<prods.length; i++) {
-                var p = prods[i];
-                var nombre = normalize(p.nombre || '');
-                var clave = normalize(p.clave || '');
-                var codigo = normalize(String(p.codigo || ''));
-                var desc = normalize(p.descripcion_csv || '');
-                var fullText = nombre + ' ' + clave + ' ' + codigo + ' ' + desc;
-                var fullPhonetic = phoneticES(fullText);
-                var textWords = fullText.split(/[\s,\-()\/.]+/).filter(function(w) { return w.length >= 2; });
+            for(var i=0; i<searchIndex.length; i++) {
+                var entry = searchIndex[i];
+                var fullText = entry.fullText;
+                var fullPhonetic = entry.fullPhonetic;
+                var textWords = entry.textWords;
                 
                 var totalScore = 0;
                 var matchedWords = 0;
@@ -5979,59 +5993,27 @@ function renderCarouselGroup(mainContainer, items, options) {
                     var qwPhon = queryPhonetics[q];
                     var bestWordScore = 0;
                     
-                    // Substring directo en texto completo
                     if(fullText.includes(qw)) {
                         bestWordScore = Math.max(bestWordScore, 0.95);
-                    }
-                    // Substring fonético
-                    if(fullPhonetic.includes(qwPhon)) {
+                    } else if(fullPhonetic.includes(qwPhon)) {
                         bestWordScore = Math.max(bestWordScore, 0.85);
-                    }
-                    
-                    // Comparar contra cada palabra del producto
-                    if(bestWordScore < 0.9) {
+                    } else if(qw.length >= 3) {
                         for(var tw=0; tw<textWords.length; tw++) {
                             var cand = textWords[tw];
                             if(cand.length < 2) continue;
-                            
-                            // Prefijo match
                             if(cand.indexOf(qw) === 0 || qw.indexOf(cand) === 0) {
                                 bestWordScore = Math.max(bestWordScore, 0.9);
-                                continue;
+                                break;
                             }
-                            
-                            // Solo fuzzy si longitudes similares
-                            if(Math.abs(qw.length - cand.length) > 3) continue;
-                            
-                            var candPhon = phoneticES(cand);
-                            var dl = levenshtein(qw, cand);
-                            var dlNorm = 1 - (dl / Math.max(qw.length, cand.length, 1));
-                            var tgScore = trigramSimilarity(qw, cand);
-                            var phScore = 1 - (levenshtein(qwPhon, candPhon) / Math.max(qwPhon.length, candPhon.length, 1));
-                            var qwkScore = qwertyScore(qw, cand);
-                            
-                            // Score combinado (mismos pesos que motor principal)
-                            var combined = (dlNorm * 0.25) + (tgScore * 0.10) + (phScore * 0.20) + (qwkScore * 0.10);
-                            
-                            // Jaro-Winkler simplificado (prefijo común)
-                            var prefixLen = 0;
-                            for(var k=0; k<Math.min(qw.length, cand.length, 4); k++) {
-                                if(qw[k] === cand[k]) prefixLen++; else break;
-                            }
-                            combined += (prefixLen / 4) * 0.20;
-                            
-                            // Ratcliff/Obershelp (longest common substring)
-                            var lcs = 0;
-                            for(var len=Math.min(qw.length, cand.length); len>=2; len--) {
-                                var found = false;
-                                for(var start=0; start<=qw.length-len; start++) {
-                                    if(cand.includes(qw.substring(start, start+len))) { lcs = len; found = true; break; }
+                            if(Math.abs(qw.length - cand.length) <= 2 && qw.charCodeAt(0) === cand.charCodeAt(0)) {
+                                var dl = levenshtein(qw, cand);
+                                var maxAllowed = qw.length <= 4 ? 1 : 2;
+                                if(dl <= maxAllowed) {
+                                    var dlNorm = 1 - (dl / Math.max(qw.length, cand.length, 1));
+                                    bestWordScore = Math.max(bestWordScore, dlNorm * 0.8);
+                                    if(bestWordScore >= 0.7) break;
                                 }
-                                if(found) break;
                             }
-                            combined += (lcs / Math.max(qw.length, cand.length, 1)) * 0.15;
-                            
-                            bestWordScore = Math.max(bestWordScore, combined);
                         }
                     }
                     
@@ -6041,7 +6023,19 @@ function renderCarouselGroup(mainContainer, items, options) {
                 
                 if(matchedWords === queryWords.length && totalScore > 0) {
                     var avgScore = totalScore / queryWords.length;
-                    if(nombre.includes(vNorm)) avgScore += 0.3;
+                    if(entry.nombre.includes(vNorm)) avgScore += 0.3;
+                    scored.push({ p: productos[i], score: avgScore });
+                }
+            }
+            
+            scored.sort(function(a, b) { return b.score - a.score; });
+            var results = [];
+            for(var i=0; i<scored.length && i<30; i++) {
+                if(scored[i].score >= 0.50) results.push(scored[i].p);
+            }
+            predictiveCache[v] = results;
+            return results;
+        } if(nombre.includes(vNorm)) avgScore += 0.3;
                     scored.push({ p: p, score: avgScore });
                 }
             }
