@@ -3387,7 +3387,12 @@ function renderCarouselGroup(mainContainer, items, options) {
 
 
         function searchFromHint(query) {
-            document.getElementById('sea        // ===== DICCIONARIO DE ABREVIATURAS TRUPER =====
+            document.getElementById('searchInput').value = query;
+            document.getElementById('searchResults').classList.remove('show');
+            doSearch();
+        }
+
+        // ===== DICCIONARIO DE ABREVIATURAS TRUPER =====
         var ABBR_MAP = {
             'para': 'p/', 'p/': 'para',
             'con': 'c/', 'c/': 'con',
@@ -3861,7 +3866,22 @@ function renderCarouselGroup(mainContainer, items, options) {
         var lastCorrectionBanner = null;
         var currentViewMode = 'grid';
 
+        function ensureMainCatalogView() {
+            const btView = document.getElementById('backtagsView');
+            const mainView = document.getElementById('mainContent');
+            if (btView && btView.style.display === 'block') {
+                btView.style.display = 'none';
+                if (mainView) mainView.style.display = 'block';
+                sessionStorage.setItem('truper_currentView', 'main');
+            }
+            const doverlay = document.getElementById('dashOverlay');
+            const dpanel = document.getElementById('dashPanel');
+            if (doverlay) doverlay.classList.remove('show');
+            if (dpanel) dpanel.classList.remove('show');
+        }
+
         function selectResult(idx) {
+            ensureMainCatalogView();
             document.getElementById('searchResults').classList.remove('show');
             var grid = document.querySelector('.results-grid-container');
             if (grid) grid.style.display = 'none';
@@ -3871,6 +3891,7 @@ function renderCarouselGroup(mainContainer, items, options) {
         function doSearch() {
             var q = document.getElementById('searchInput').value.trim();
             if (q.length < 1) return;
+            ensureMainCatalogView();
             document.getElementById('searchResults').classList.remove('show');
             var results = searchProducts(q);
 
@@ -4446,6 +4467,7 @@ function renderCarouselGroup(mainContainer, items, options) {
         }
 
         function renderResultsGrid(results, query) {
+            ensureMainCatalogView();
             var welcome = document.getElementById('welcomeState');
             if (welcome) welcome.style.display = 'none';
             var existing = document.querySelector('.product-card');
@@ -4794,6 +4816,7 @@ function renderCarouselGroup(mainContainer, items, options) {
 
         // ===== PRODUCTO =====
         function showProduct(idx, noPushState) {
+            ensureMainCatalogView();
             selectedIdx = idx;
             var p = productos[idx];
             
@@ -5782,6 +5805,17 @@ function renderCarouselGroup(mainContainer, items, options) {
                                   showBtToast('&#9989; Lote: ' + added + ' agregados masivamente', '#10b981');
                               } else {
                                   window.playBeep('error');
+                                  showBtToast('❌ Ninguno encontrado en lote', '#ef4444');
+                              }
+                              this.value = '';
+                          } else {
+                              this.value = paste; // comportamiento normal
+                          }
+                      }
+                  });
+              }
+          });
+
           var _btDebounceTimer = null;
           window.handleBtScannerInput = function(e) {
             const input = e.target;
@@ -6035,17 +6069,6 @@ function renderCarouselGroup(mainContainer, items, options) {
             }
             predictiveCache[v] = results;
             return results;
-        } if(nombre.includes(vNorm)) avgScore += 0.3;
-                    scored.push({ p: p, score: avgScore });
-                }
-            }
-            
-            scored.sort(function(a, b) { return b.score - a.score; });
-            var results = [];
-            for(var i=0; i<scored.length && i<30; i++) {
-                if(scored[i].score >= 0.50) results.push(scored[i].p);
-            }
-            return results;
         }
 
         function addMatchedBt(p) {
@@ -6231,11 +6254,93 @@ function renderCarouselGroup(mainContainer, items, options) {
               }, 600); // 600ms de spinner animado
           };
 
-          window.printBackTags = function() {
+          window.ensureAllPrintImagesLoaded = function(container, btnEl) {
+            return new Promise((resolve) => {
+                const imgs = Array.from(container.querySelectorAll('img'));
+                if (imgs.length === 0) return resolve();
+
+                let pending = imgs.length;
+                let loadedSuccess = 0;
+                let loadedFail = 0;
+                const total = imgs.length;
+
+                const updateBtnText = () => {
+                    if (btnEl) {
+                        btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando imágenes (' + (loadedSuccess + loadedFail) + '/' + total + ')...';
+                    }
+                };
+                updateBtnText();
+
+                const onImgDone = () => {
+                    pending--;
+                    updateBtnText();
+                    if (pending <= 0) {
+                        setTimeout(resolve, 250);
+                    }
+                };
+
+                imgs.forEach(img => {
+                    const fallbackUrl = img.dataset.fallback || '';
+
+                    const handleLoaded = () => {
+                        if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+                            loadedSuccess++;
+                            if (window.autoCrop && img.getAttribute('onload') && img.getAttribute('onload').includes('autoCrop')) {
+                                try { autoCrop(img); } catch(e){}
+                            }
+                            onImgDone();
+                        } else {
+                            handleFailed();
+                        }
+                    };
+
+                    const handleFailed = () => {
+                        if (fallbackUrl && img.src !== fallbackUrl && img.dataset.triedFallback !== 'true') {
+                            img.dataset.triedFallback = 'true';
+                            img.onload = handleLoaded;
+                            img.onerror = () => {
+                                img.style.display = 'none';
+                                loadedFail++;
+                                onImgDone();
+                            };
+                            img.src = fallbackUrl;
+                        } else {
+                            img.style.display = 'none';
+                            loadedFail++;
+                            onImgDone();
+                        }
+                    };
+
+                    if (img.complete) {
+                        if (img.naturalWidth > 0) {
+                            handleLoaded();
+                        } else {
+                            handleFailed();
+                        }
+                    } else {
+                        img.onload = handleLoaded;
+                        img.onerror = handleFailed;
+                    }
+
+                    // Seguro por si alguna imagen no responde en 4.5 segundos
+                    setTimeout(() => {
+                        if (!img.complete || img.naturalWidth === 0) {
+                            handleFailed();
+                        }
+                    }, 4500);
+                });
+            });
+          };
+
+          window.printBackTags = async function() {
             if(!btList.length) {
                 alert("Agrega productos primero.");
                 return;
             }
+            const printBtn = document.querySelector('.bt-btn-print');
+            const oldText = printBtn ? printBtn.innerHTML : 'Imprimir PDF';
+            if(printBtn) printBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando...';
+
             const printArea = document.getElementById('btPrintArea');
             printArea.innerHTML = '';
             
@@ -6272,7 +6377,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                     <div class="bktag">
                         <div class="bktag-redhead"><span>${esc(headerText)}</span></div>
                         <div class="bktag-clave">${item.p.clave}</div>
-                        <div class="bktag-img"><img src="${imgSrc}" style="transform: scale(1.05);" onerror="this.src='${flb}'"></div>
+                        <div class="bktag-img"><img src="${imgSrc}" data-fallback="${flb}" data-clave="${item.p.clave}" style="transform: scale(1.05);" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='${flb}';}else{this.style.display='none';}"></div>
                         <div class="bktag-codigo">Código: <span>${item.p.codigo}</span></div>
                         <div class="bktag-barcode"><svg id="${idBarcode}"></svg></div>
                         <img class="bktag-tigre" src="${tigreSrc}" onerror="this.src='imagenes/tigre3.png'">
@@ -6299,37 +6404,30 @@ function renderCarouselGroup(mainContainer, items, options) {
                 }
             });
 
-            const printBtn = document.querySelector('.bt-btn-print');
-            const oldText = printBtn ? printBtn.innerHTML : 'Imprimir PDF';
-            if(printBtn) printBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando...';
+            await ensureAllPrintImagesLoaded(printArea, printBtn);
+
+            if(printBtn) printBtn.innerHTML = oldText;
+            window.print();
             
-            // Asignamos 3.5 segundos de render para que la red alcance a descargar las 20-30 fotos wsrv compiladas
-            // Recordar Sweet Alert Post Impresión
             setTimeout(() => {
-                if(printBtn) printBtn.innerHTML = oldText;
-                window.print();
-                
-                // Mostrar alerta después de cerrar la cola de impresión
-                setTimeout(() => {
-                    if (window.Swal) {
-                        Swal.fire({
-                            title: '¿Impresión procesada?',
-                            text: "¿Deseas vaciar la mesa de trabajo para escanear nuevos productos?",
-                            icon: 'question',
-                            showCancelButton: true,
-                            confirmButtonColor: '#10b981',
-                            cancelButtonColor: '#475569',
-                            confirmButtonText: 'Sí, vaciar mesa',
-                            cancelButtonText: 'No, conservarlos'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                clearAllBt();
-                            }
-                        });
-                    }
-                }, 1000);
-            }, 3500);
-        };
+                if (window.Swal) {
+                    Swal.fire({
+                        title: '¿Impresión procesada?',
+                        text: "¿Deseas vaciar la mesa de trabajo para escanear nuevos productos?",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#10b981',
+                        cancelButtonColor: '#475569',
+                        confirmButtonText: 'Sí, vaciar mesa',
+                        cancelButtonText: 'No, conservarlos'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            clearAllBt();
+                        }
+                    });
+                }
+            }, 1000);
+          };
 
         init();
     </script>
@@ -7008,7 +7106,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             
                             <div class="pija-img-area">
                                 ${cruzSvg}
-                                <img src="${imgSrc}" onerror="this.style.display='none'">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -7114,7 +7212,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             
                             <div class="pija-ab-img-area">
                                 ${cruzSvg}
-                                <img src="${imgSrc}" onerror="this.style.display='none'">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -7214,7 +7312,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             
                             <div class="pija-lg-img-area">
                                 ${cruzSvg}
-                                <img src="${imgSrc}" onerror="this.style.display='none'">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -7314,7 +7412,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             
                             <div class="pija-ab-lg-img-area">
                                 ${cruzSvg}
-                                <img src="${imgSrc}" onerror="this.style.display='none'">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -7414,7 +7512,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             
                             <div class="pija-lam-img-area">
                                 ${slotSvg}
-                                <img src="${imgSrc}" onerror="this.style.display='none'">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -7514,7 +7612,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             
                             <div class="pija-lam-lg-img-area">
                                 ${slotSvg}
-                                <img src="${imgSrc}" onerror="this.style.display='none'">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -7614,7 +7712,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             
                             <div class="pija-hex-img-area">
                                 ${hexSvg}
-                                <img src="${imgSrc}" onerror="this.style.display=\'none\'">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -7714,7 +7812,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             
                             <div class="pija-hex-lg-img-area">
                                 ${hexSvg}
-                                <img src="${imgSrc}" onerror="this.style.display=\'none\'">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -7797,7 +7895,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             </div>
                             <div class="pija-broca-img-area">
                                 ${brocaSvg}
-                                <img src="${imgSrc}" onerror="this.style.display=\'none\'">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -7880,7 +7978,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             </div>
                             <div class="pija-broca-lg-img-area">
                                 ${brocaSvg}
-                                <img src="${imgSrc}" onerror="this.style.display=\'none\'">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -7963,7 +8061,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             </div>
                             <div class="pija-b8-img-area">
                                 ${pSvg}
-                                <img src="${imgSrc}" onerror="this.style.display=\'none\'">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -8046,7 +8144,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             </div>
                             <div class="pija-b8-lg-img-area">
                                 ${pSvg}
-                                <img src="${imgSrc}" onerror="this.style.display=\'none\'">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -8486,7 +8584,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                                 <div class="conex-bot-br"><svg id="${idBarcode}"></svg></div>
                             </div>
                             <div class="conex-img-area">
-                                <img src="${imgSrc}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="this.style.display='none'">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                                 ${diagramSvg ? `<div class="conex-diag-box">${diagramSvg}</div>` : ''}
                             </div>
                         </div>`;
@@ -8926,7 +9024,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                                 <div class="conex-lg-bot-br"><svg id="${idBarcode}"></svg></div>
                             </div>
                             <div class="conex-lg-img-area">
-                                <img src="${imgSrc}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="this.style.display='none'">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                                 ${diagramSvg ? `<div class="conex-lg-diag-box">${diagramSvg}</div>` : ''}
                             </div>
                         </div>`;
@@ -9274,7 +9372,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                                 <div class="conex-xlg-bot-br"><svg id="${idBarcode}"></svg></div>
                             </div>
                             <div class="conex-xlg-img-area">
-                                <img src="${imgSrc}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="this.style.display='none'">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                                 ${diagramSvg ? `<div class="conex-xlg-diag-box">${diagramSvg}</div>` : ''}
                             </div>
                         </div>`;
@@ -9418,28 +9516,24 @@ function renderCarouselGroup(mainContainer, items, options) {
                 document.getElementById('bktplModalWrap').style.display = 'none';
             },
 
-            triggerPrint() {
+            async triggerPrint() {
                 const tpl = this.templates.find(t => t.id === this.activeTemplateId);
                 if(!tpl || typeof btList === 'undefined') return;
                 
                 const btn = document.getElementById('bktplPrintBtn');
-                const oldText = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando...';
+                const oldText = btn ? btn.innerHTML : 'Imprimir';
+                if(btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando...';
                 
                 const printArea = document.getElementById('btPrintArea');
                 
-                    // Calculate columns perfectly based on 20cm usable A4 width
-                    
-                      // Override CSS Grid safely with Flexbox Wrapper to avoid Chrome multi-page grid stretching 
-                      printArea.style.setProperty('display', 'flex', 'important');
-                      printArea.style.setProperty('flex-wrap', 'wrap', 'important');
-                      printArea.style.setProperty('justify-content', 'center', 'important');
-                      printArea.style.setProperty('gap', '0', 'important');
-                      
-                      printArea.innerHTML = '<style>@media print { .bt-print-container > div, .bt-print-area > div, #btPrintArea > div { flex: 0 0 ' + tpl.width + ' !important; min-width: 0 !important; max-width: ' + tpl.width + ' !important; overflow: hidden !important; } .bt-print-container svg, .bt-print-area svg, #btPrintArea svg { max-width: 100% !important; height: auto !important; } } ' + tpl.css + '</style>';
-                      this.applyColorOverrides();
-
+                printArea.style.setProperty('display', 'flex', 'important');
+                printArea.style.setProperty('flex-wrap', 'wrap', 'important');
+                printArea.style.setProperty('justify-content', 'center', 'important');
+                printArea.style.setProperty('gap', '0', 'important');
                 
+                printArea.innerHTML = '<style>@media print { .bt-print-container > div, .bt-print-area > div, #btPrintArea > div { flex: 0 0 ' + tpl.width + ' !important; min-width: 0 !important; max-width: ' + tpl.width + ' !important; overflow: hidden !important; } .bt-print-container svg, .bt-print-area svg, #btPrintArea svg { max-width: 100% !important; height: auto !important; } } ' + tpl.css + '</style>';
+                this.applyColorOverrides();
+
                 btList.forEach(item => {
                     for(let i=0; i<item.qty; i++) {
                         var isLocalEnv = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -9469,24 +9563,24 @@ function renderCarouselGroup(mainContainer, items, options) {
                     }
                 });
 
-                setTimeout(() => {
-                    btn.innerHTML = oldText;
-                    this.closeModal();
-                    window.print();
+                await ensureAllPrintImagesLoaded(printArea, btn);
 
-                    setTimeout(() => {
-                        if (window.Swal) {
-                            Swal.fire({
-                                title: '¿Impresión procesada?',
-                                text: "¿Deseas vaciar la mesa de trabajo para escanear nuevos productos?",
-                                icon: 'question', showCancelButton: true, confirmButtonColor: '#10b981', cancelButtonColor: '#475569',
-                                confirmButtonText: 'Sí, vaciar mesa', cancelButtonText: 'No, conservarlos'
-                            }).then((result) => {
-                                if (result.isConfirmed && typeof window.clearAllBt === 'function') window.clearAllBt();
-                            });
-                        }
-                    }, 1000);
-                }, 3000);
+                if(btn) btn.innerHTML = oldText;
+                this.closeModal();
+                window.print();
+
+                setTimeout(() => {
+                    if (window.Swal) {
+                        Swal.fire({
+                            title: '¿Impresión procesada?',
+                            text: "¿Deseas vaciar la mesa de trabajo para escanear nuevos productos?",
+                            icon: 'question', showCancelButton: true, confirmButtonColor: '#10b981', cancelButtonColor: '#475569',
+                            confirmButtonText: 'Sí, vaciar mesa', cancelButtonText: 'No, conservarlos'
+                        }).then((result) => {
+                            if (result.isConfirmed && typeof window.clearAllBt === 'function') window.clearAllBt();
+                        });
+                    }
+                }, 1000);
             }
         };
 
