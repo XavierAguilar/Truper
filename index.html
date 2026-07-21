@@ -6705,6 +6705,36 @@ function renderCarouselGroup(mainContainer, items, options) {
                     { label: 'Fondo Código', target: '.pija-b8-lg-bot-code', prop: 'background-color', def: '#C8A500' },
                     { label: 'Top Header', target: '.pija-b8-lg-top', prop: 'background-color', def: '#000000' }
                 ],
+                'tuerca-10x4': [
+                    { label: 'Fondo Medio', target: '.tuerca-mid', prop: 'background-color', def: '#F26522' },
+                    { label: 'Fondo Código', target: '.tuerca-bot-code', prop: 'background-color', def: '#C84B00' },
+                    { label: 'Top Header', target: '.tuerca-top', prop: 'background-color', def: '#000000' }
+                ],
+                'tuerca-12x6': [
+                    { label: 'Fondo Medio', target: '.tuerca-lg-mid', prop: 'background-color', def: '#F26522' },
+                    { label: 'Fondo Código', target: '.tuerca-lg-bot-code', prop: 'background-color', def: '#C84B00' },
+                    { label: 'Top Header', target: '.tuerca-lg-top', prop: 'background-color', def: '#000000' }
+                ],
+                'arandela-10x4': [
+                    { label: 'Fondo Medio', target: '.arandela-mid', prop: 'background-color', def: '#DC2626' },
+                    { label: 'Fondo Código', target: '.arandela-bot-code', prop: 'background-color', def: '#991B1B' },
+                    { label: 'Top Header', target: '.arandela-top', prop: 'background-color', def: '#000000' }
+                ],
+                'arandela-12x6': [
+                    { label: 'Fondo Medio', target: '.arandela-lg-mid', prop: 'background-color', def: '#DC2626' },
+                    { label: 'Fondo Código', target: '.arandela-lg-bot-code', prop: 'background-color', def: '#991B1B' },
+                    { label: 'Top Header', target: '.arandela-lg-top', prop: 'background-color', def: '#000000' }
+                ],
+                'arandela-presion-10x4': [
+                    { label: 'Fondo Medio', target: '.ar-presion-mid', prop: 'background-color', def: '#2D2D2D' },
+                    { label: 'Fondo Código', target: '.ar-presion-bot-code', prop: 'background-color', def: '#000000' },
+                    { label: 'Top Header', target: '.ar-presion-top', prop: 'background-color', def: '#000000' }
+                ],
+                'arandela-presion-12x6': [
+                    { label: 'Fondo Medio', target: '.ar-presion-lg-mid', prop: 'background-color', def: '#2D2D2D' },
+                    { label: 'Fondo Código', target: '.ar-presion-lg-bot-code', prop: 'background-color', def: '#000000' },
+                    { label: 'Top Header', target: '.ar-presion-lg-top', prop: 'background-color', def: '#000000' }
+                ],
                 'std-5x8': [
                     { label: 'Encabezado', target: '.bktag-redhead', prop: 'background-color', def: '#ff0000' }
                 ]
@@ -8144,6 +8174,498 @@ function renderCarouselGroup(mainContainer, items, options) {
                             </div>
                             <div class="pija-b8-lg-img-area">
                                 ${pSvg}
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'tuerca-10x4',
+                    group: 'tuerca',
+                    name: 'Tuerca (10x4 cm)',
+                    description: 'Formato apaisado, extracción automática de medida. Icono de tuerca hexagonal.',
+                    width: '10cm',
+                    height: '4cm',
+                    css: `
+                        .tuerca-bktag {
+                            width: 10cm; height: 4cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000; page-break-inside: avoid; break-inside: avoid;
+                        }
+                        .tuerca-top { position: absolute; top:0; left:0; width: 10cm; height: 1cm; background: #000; z-index: 10; }
+                        .tuerca-mid {
+                            position: absolute; top: 1cm; left: 0; width: 7cm; height: 2cm; background: #F26522;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .tuerca-screw-box { width: 1.8cm; height: 2cm; display: flex; align-items: center; justify-content: center; padding-left: 4px; }
+                        .tuerca-text-col { width: 5.2cm; height: 2cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        .tuerca-subtitle-box {
+                            width: 100%; height: 0.6cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            font-size: 21px; font-weight: 900; color: #fff; letter-spacing: 1px; text-transform: uppercase;
+                        }
+                        .tuerca-title-box {
+                            width: 100%; height: 1.3cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1.5px;
+                        }
+                        .tuerca-title-box.normal { font-size: 54px; }
+                        .tuerca-title-box.small { font-size: 38px; letter-spacing: -1px; }
+                        .tuerca-bot { position: absolute; top: 3cm; left: 0; width: 7cm; height: 1cm; display: flex; z-index: 5; }
+                        .tuerca-bot-code {
+                            width: 3.5cm; background: #C84B00; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 36px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .tuerca-bot-br {
+                            width: 3.5cm; background: #fff; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            overflow: hidden; padding: 0; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+                        .tuerca-bot-br svg { max-height: 0.92cm; max-width: 98%; }
+                        .tuerca-img-area {
+                            position: absolute; top: 1cm; right: 0; width: 3cm; height: 3cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                        }
+                        .tuerca-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let tuercaSize = '';
+                        let matchS = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN)|\bM\d+\b)/i);
+                        if(matchS) {
+                            tuercaSize = matchS[1].replace(/''/g, '"').replace(/\s+/g,'');
+                            if(!tuercaSize.includes('"') && !tuercaSize.startsWith('M')) tuercaSize += '"';
+                        } else {
+                            tuercaSize = '---';
+                        }
+                        
+                        let sizeClass = tuercaSize.length > 7 ? 'small' : 'normal';
+                        let nutSvg = `<svg viewBox="0 0 100 100" style="width:1.45cm; height:1.45cm;"><path d="M 25,8 L 75,8 L 97,50 L 75,92 L 25,92 L 3,50 Z M 50,24 A 26 26 0 1 0 50,76 A 26 26 0 1 0 50,24 Z" fill="#ffffff" fill-rule="evenodd"/></svg>`;
+
+                        return `
+                        <div class="tuerca-bktag">
+                            <div class="tuerca-top"></div>
+                            <div class="tuerca-mid">
+                                <div class="tuerca-screw-box">
+                                    ${nutSvg}
+                                </div>
+                                <div class="tuerca-text-col">
+                                    <div class="tuerca-subtitle-box">TUERCA</div>
+                                    <div class="tuerca-title-box ${sizeClass}">${tuercaSize}</div>
+                                </div>
+                            </div>
+                            <div class="tuerca-bot">
+                                <div class="tuerca-bot-code">${item.p.codigo}</div>
+                                <div class="tuerca-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            <div class="tuerca-img-area">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'tuerca-12x6',
+                    group: 'tuerca',
+                    name: 'Tuerca (12x6 cm)',
+                    description: 'Formato apaisado GRANDE. Extracción automática de medida. Icono de tuerca hexagonal. Escala 120%.',
+                    width: '12cm',
+                    height: '6cm',
+                    css: `
+                        .tuerca-lg-bktag {
+                            width: 12cm; height: 6cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000; page-break-inside: avoid; break-inside: avoid;
+                        }
+                        .tuerca-lg-top { position: absolute; top:0; left:0; width: 12cm; height: 1.5cm; background: #000; z-index: 10; }
+                        .tuerca-lg-mid {
+                            position: absolute; top: 1.5cm; left: 0; width: 8.4cm; height: 3cm; background: #F26522;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .tuerca-lg-screw-box { width: 2.2cm; height: 3cm; display: flex; align-items: center; justify-content: center; padding-left: 6px; }
+                        .tuerca-lg-text-col { width: 6.2cm; height: 3cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        .tuerca-lg-subtitle-box {
+                            width: 100%; height: 0.9cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            font-size: 27px; font-weight: 900; color: #fff; letter-spacing: 1px; text-transform: uppercase;
+                        }
+                        .tuerca-lg-title-box {
+                            width: 100%; height: 1.95cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1.5px;
+                        }
+                        .tuerca-lg-title-box.normal { font-size: 68px; }
+                        .tuerca-lg-title-box.small { font-size: 48px; letter-spacing: -1px; }
+                        .tuerca-lg-bot { position: absolute; top: 4.5cm; left: 0; width: 8.4cm; height: 1.5cm; display: flex; z-index: 5; }
+                        .tuerca-lg-bot-code {
+                            width: 4.2cm; background: #C84B00; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 43px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .tuerca-lg-bot-br {
+                            width: 4.2cm; background: #fff; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            overflow: hidden; padding: 0; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+                        .tuerca-lg-bot-br svg { max-height: 1.38cm; max-width: 98%; }
+                        .tuerca-lg-img-area {
+                            position: absolute; top: 1.5cm; right: 0; width: 3.6cm; height: 4.5cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                        }
+                        .tuerca-lg-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let tuercaSize = '';
+                        let matchS = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN)|\bM\d+\b)/i);
+                        if(matchS) {
+                            tuercaSize = matchS[1].replace(/''/g, '"').replace(/\s+/g,'');
+                            if(!tuercaSize.includes('"') && !tuercaSize.startsWith('M')) tuercaSize += '"';
+                        } else {
+                            tuercaSize = '---';
+                        }
+                        
+                        let sizeClass = tuercaSize.length > 7 ? 'small' : 'normal';
+                        let nutSvg = `<svg viewBox="0 0 100 100" style="width:1.85cm; height:1.85cm;"><path d="M 25,8 L 75,8 L 97,50 L 75,92 L 25,92 L 3,50 Z M 50,24 A 26 26 0 1 0 50,76 A 26 26 0 1 0 50,24 Z" fill="#ffffff" fill-rule="evenodd"/></svg>`;
+
+                        return `
+                        <div class="tuerca-lg-bktag">
+                            <div class="tuerca-lg-top"></div>
+                            <div class="tuerca-lg-mid">
+                                <div class="tuerca-lg-screw-box">
+                                    ${nutSvg}
+                                </div>
+                                <div class="tuerca-lg-text-col">
+                                    <div class="tuerca-lg-subtitle-box">TUERCA</div>
+                                    <div class="tuerca-lg-title-box ${sizeClass}">${tuercaSize}</div>
+                                </div>
+                            </div>
+                            <div class="tuerca-lg-bot">
+                                <div class="tuerca-lg-bot-code">${item.p.codigo}</div>
+                                <div class="tuerca-lg-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            <div class="tuerca-lg-img-area">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'arandela-10x4',
+                    group: 'arandela',
+                    name: 'Arandela Plana (10x4 cm)',
+                    description: 'Formato apaisado, extracción automática de medida. Icono de arandela plana.',
+                    width: '10cm',
+                    height: '4cm',
+                    css: `
+                        .arandela-bktag {
+                            width: 10cm; height: 4cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000; page-break-inside: avoid; break-inside: avoid;
+                        }
+                        .arandela-top { position: absolute; top:0; left:0; width: 10cm; height: 1cm; background: #000; z-index: 10; }
+                        .arandela-mid {
+                            position: absolute; top: 1cm; left: 0; width: 7cm; height: 2cm; background: #DC2626;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .arandela-screw-box { width: 1.8cm; height: 2cm; display: flex; align-items: center; justify-content: center; padding-left: 4px; }
+                        .arandela-text-col { width: 5.2cm; height: 2cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        .arandela-subtitle-box {
+                            width: 100%; height: 0.5cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            font-size: 14.5px; font-weight: 900; color: #fff; letter-spacing: 0px; text-transform: uppercase; white-space: nowrap;
+                        }
+                        .arandela-title-box {
+                            width: 100%; height: 1.4cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1.5px;
+                        }
+                        .arandela-title-box.normal { font-size: 52px; }
+                        .arandela-title-box.small { font-size: 36px; letter-spacing: -1px; }
+                        .arandela-bot { position: absolute; top: 3cm; left: 0; width: 7cm; height: 1cm; display: flex; z-index: 5; }
+                        .arandela-bot-code {
+                            width: 3.5cm; background: #991B1B; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 36px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .arandela-bot-br {
+                            width: 3.5cm; background: #fff; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            overflow: hidden; padding: 0; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+                        .arandela-bot-br svg { max-height: 0.92cm; max-width: 98%; }
+                        .arandela-img-area {
+                            position: absolute; top: 1cm; right: 0; width: 3cm; height: 3cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                        }
+                        .arandela-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let arandelaSize = '';
+                        let matchS = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN)|\bM\d+\b)/i);
+                        if(matchS) {
+                            arandelaSize = matchS[1].replace(/''/g, '"').replace(/\s+/g,'');
+                            if(!arandelaSize.includes('"') && !arandelaSize.startsWith('M')) arandelaSize += '"';
+                        } else {
+                            arandelaSize = '---';
+                        }
+                        
+                        let sizeClass = arandelaSize.length > 7 ? 'small' : 'normal';
+                        let ringSvg = `<svg viewBox="0 0 100 100" style="width:1.45cm; height:1.45cm;"><path d="M 50,2 A 48 48 0 1 0 50,98 A 48 48 0 1 0 50,2 Z M 50,26 A 24 24 0 1 0 50,74 A 24 24 0 1 0 50,26 Z" fill="#ffffff" fill-rule="evenodd"/></svg>`;
+
+                        return `
+                        <div class="arandela-bktag">
+                            <div class="arandela-top"></div>
+                            <div class="arandela-mid">
+                                <div class="arandela-screw-box">
+                                    ${ringSvg}
+                                </div>
+                                <div class="arandela-text-col">
+                                    <div class="arandela-subtitle-box">ARANDELA PLANA</div>
+                                    <div class="arandela-title-box ${sizeClass}">${arandelaSize}</div>
+                                </div>
+                            </div>
+                            <div class="arandela-bot">
+                                <div class="arandela-bot-code">${item.p.codigo}</div>
+                                <div class="arandela-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            <div class="arandela-img-area">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'arandela-12x6',
+                    group: 'arandela',
+                    name: 'Arandela Plana (12x6 cm)',
+                    description: 'Formato apaisado GRANDE. Extracción automática de medida. Icono de arandela plana. Escala 120%.',
+                    width: '12cm',
+                    height: '6cm',
+                    css: `
+                        .arandela-lg-bktag {
+                            width: 12cm; height: 6cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000; page-break-inside: avoid; break-inside: avoid;
+                        }
+                        .arandela-lg-top { position: absolute; top:0; left:0; width: 12cm; height: 1.5cm; background: #000; z-index: 10; }
+                        .arandela-lg-mid {
+                            position: absolute; top: 1.5cm; left: 0; width: 8.4cm; height: 3cm; background: #DC2626;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .arandela-lg-screw-box { width: 2.2cm; height: 3cm; display: flex; align-items: center; justify-content: center; padding-left: 6px; }
+                        .arandela-lg-text-col { width: 6.2cm; height: 3cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        .arandela-lg-subtitle-box {
+                            width: 100%; height: 0.75cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            font-size: 20px; font-weight: 900; color: #fff; letter-spacing: 0px; text-transform: uppercase; white-space: nowrap;
+                        }
+                        .arandela-lg-title-box {
+                            width: 100%; height: 1.95cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1.5px;
+                        }
+                        .arandela-lg-title-box.normal { font-size: 68px; }
+                        .arandela-lg-title-box.small { font-size: 48px; letter-spacing: -1px; }
+                        .arandela-lg-bot { position: absolute; top: 4.5cm; left: 0; width: 8.4cm; height: 1.5cm; display: flex; z-index: 5; }
+                        .arandela-lg-bot-code {
+                            width: 4.2cm; background: #991B1B; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 43px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .arandela-lg-bot-br {
+                            width: 4.2cm; background: #fff; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            overflow: hidden; padding: 0; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+                        .arandela-lg-bot-br svg { max-height: 1.38cm; max-width: 98%; }
+                        .arandela-lg-img-area {
+                            position: absolute; top: 1.5cm; right: 0; width: 3.6cm; height: 4.5cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                        }
+                        .arandela-lg-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let arandelaSize = '';
+                        let matchS = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN)|\bM\d+\b)/i);
+                        if(matchS) {
+                            arandelaSize = matchS[1].replace(/''/g, '"').replace(/\s+/g,'');
+                            if(!arandelaSize.includes('"') && !arandelaSize.startsWith('M')) arandelaSize += '"';
+                        } else {
+                            arandelaSize = '---';
+                        }
+                        
+                        let sizeClass = arandelaSize.length > 7 ? 'small' : 'normal';
+                        let ringSvg = `<svg viewBox="0 0 100 100" style="width:1.85cm; height:1.85cm;"><path d="M 50,2 A 48 48 0 1 0 50,98 A 48 48 0 1 0 50,2 Z M 50,26 A 24 24 0 1 0 50,74 A 24 24 0 1 0 50,26 Z" fill="#ffffff" fill-rule="evenodd"/></svg>`;
+
+                        return `
+                        <div class="arandela-lg-bktag">
+                            <div class="arandela-lg-top"></div>
+                            <div class="arandela-lg-mid">
+                                <div class="arandela-lg-screw-box">
+                                    ${ringSvg}
+                                </div>
+                                <div class="arandela-lg-text-col">
+                                    <div class="arandela-lg-subtitle-box">ARANDELA PLANA</div>
+                                    <div class="arandela-lg-title-box ${sizeClass}">${arandelaSize}</div>
+                                </div>
+                            </div>
+                            <div class="arandela-lg-bot">
+                                <div class="arandela-lg-bot-code">${item.p.codigo}</div>
+                                <div class="arandela-lg-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            <div class="arandela-lg-img-area">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'arandela-presion-10x4',
+                    group: 'arandela-presion',
+                    name: 'Arandela de Presión (10x4 cm)',
+                    description: 'Formato apaisado, extracción automática de medida. Icono de arandela de presión (Split lock washer).',
+                    width: '10cm',
+                    height: '4cm',
+                    css: `
+                        .ar-presion-bktag {
+                            width: 10cm; height: 4cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000; page-break-inside: avoid; break-inside: avoid;
+                        }
+                        .ar-presion-top { position: absolute; top:0; left:0; width: 10cm; height: 1cm; background: #000; z-index: 10; }
+                        .ar-presion-mid {
+                            position: absolute; top: 1cm; left: 0; width: 7cm; height: 2cm; background: #2D2D2D;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .ar-presion-screw-box { width: 1.8cm; height: 2cm; display: flex; align-items: center; justify-content: center; padding-left: 4px; }
+                        .ar-presion-text-col { width: 5.2cm; height: 2cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        .ar-presion-subtitle-box {
+                            width: 100%; height: 0.5cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            font-size: 13px; font-weight: 900; color: #fff; letter-spacing: 0px; text-transform: uppercase; white-space: nowrap;
+                        }
+                        .ar-presion-title-box {
+                            width: 100%; height: 1.4cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1.5px;
+                        }
+                        .ar-presion-title-box.normal { font-size: 52px; }
+                        .ar-presion-title-box.small { font-size: 36px; letter-spacing: -1px; }
+                        .ar-presion-bot { position: absolute; top: 3cm; left: 0; width: 7cm; height: 1cm; display: flex; z-index: 5; }
+                        .ar-presion-bot-code {
+                            width: 3.5cm; background: #000000; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 36px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .ar-presion-bot-br {
+                            width: 3.5cm; background: #fff; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            overflow: hidden; padding: 0; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+                        .ar-presion-bot-br svg { max-height: 0.92cm; max-width: 98%; }
+                        .ar-presion-img-area {
+                            position: absolute; top: 1cm; right: 0; width: 3cm; height: 3cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                        }
+                        .ar-presion-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let sizeText = '';
+                        let matchS = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN)|\bM\d+\b)/i);
+                        if(matchS) {
+                            sizeText = matchS[1].replace(/''/g, '"').replace(/\s+/g,'');
+                            if(!sizeText.includes('"') && !sizeText.startsWith('M')) sizeText += '"';
+                        } else {
+                            sizeText = '---';
+                        }
+                        
+                        let sizeClass = sizeText.length > 7 ? 'small' : 'normal';
+                        let lockRingSvg = `<svg viewBox="0 0 100 100" style="width:1.45cm; height:1.45cm;"><path d="M 97,42 A 48 48 0 1 0 97,58 L 73,58 A 24 24 0 1 1 73,42 Z" fill="#ffffff"/></svg>`;
+
+                        return `
+                        <div class="ar-presion-bktag">
+                            <div class="ar-presion-top"></div>
+                            <div class="ar-presion-mid">
+                                <div class="ar-presion-screw-box">
+                                    ${lockRingSvg}
+                                </div>
+                                <div class="ar-presion-text-col">
+                                    <div class="ar-presion-subtitle-box">ARANDELA DE PRESIÓN</div>
+                                    <div class="ar-presion-title-box ${sizeClass}">${sizeText}</div>
+                                </div>
+                            </div>
+                            <div class="ar-presion-bot">
+                                <div class="ar-presion-bot-code">${item.p.codigo}</div>
+                                <div class="ar-presion-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            <div class="ar-presion-img-area">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'arandela-presion-12x6',
+                    group: 'arandela-presion',
+                    name: 'Arandela de Presión (12x6 cm)',
+                    description: 'Formato apaisado GRANDE. Extracción automática de medida. Icono de arandela de presión. Escala 120%.',
+                    width: '12cm',
+                    height: '6cm',
+                    css: `
+                        .ar-presion-lg-bktag {
+                            width: 12cm; height: 6cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000; page-break-inside: avoid; break-inside: avoid;
+                        }
+                        .ar-presion-lg-top { position: absolute; top:0; left:0; width: 12cm; height: 1.5cm; background: #000; z-index: 10; }
+                        .ar-presion-lg-mid {
+                            position: absolute; top: 1.5cm; left: 0; width: 8.4cm; height: 3cm; background: #2D2D2D;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .ar-presion-lg-screw-box { width: 2.2cm; height: 3cm; display: flex; align-items: center; justify-content: center; padding-left: 6px; }
+                        .ar-presion-lg-text-col { width: 6.2cm; height: 3cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        .ar-presion-lg-subtitle-box {
+                            width: 100%; height: 0.75cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            font-size: 18px; font-weight: 900; color: #fff; letter-spacing: 0px; text-transform: uppercase; white-space: nowrap;
+                        }
+                        .ar-presion-lg-title-box {
+                            width: 100%; height: 1.95cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1.5px;
+                        }
+                        .ar-presion-lg-title-box.normal { font-size: 68px; }
+                        .ar-presion-lg-title-box.small { font-size: 48px; letter-spacing: -1px; }
+                        .ar-presion-lg-bot { position: absolute; top: 4.5cm; left: 0; width: 8.4cm; height: 1.5cm; display: flex; z-index: 5; }
+                        .ar-presion-lg-bot-code {
+                            width: 4.2cm; background: #000000; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 43px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .ar-presion-lg-bot-br {
+                            width: 4.2cm; background: #fff; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            overflow: hidden; padding: 0; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+                        .ar-presion-lg-bot-br svg { max-height: 1.38cm; max-width: 98%; }
+                        .ar-presion-lg-img-area {
+                            position: absolute; top: 1.5cm; right: 0; width: 3.6cm; height: 4.5cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                        }
+                        .ar-presion-lg-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let sizeText = '';
+                        let matchS = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN)|\bM\d+\b)/i);
+                        if(matchS) {
+                            sizeText = matchS[1].replace(/''/g, '"').replace(/\s+/g,'');
+                            if(!sizeText.includes('"') && !sizeText.startsWith('M')) sizeText += '"';
+                        } else {
+                            sizeText = '---';
+                        }
+                        
+                        let sizeClass = sizeText.length > 7 ? 'small' : 'normal';
+                        let lockRingSvg = `<svg viewBox="0 0 100 100" style="width:1.85cm; height:1.85cm;"><path d="M 97,42 A 48 48 0 1 0 97,58 L 73,58 A 24 24 0 1 1 73,42 Z" fill="#ffffff"/></svg>`;
+
+                        return `
+                        <div class="ar-presion-lg-bktag">
+                            <div class="ar-presion-lg-top"></div>
+                            <div class="ar-presion-lg-mid">
+                                <div class="ar-presion-lg-screw-box">
+                                    ${lockRingSvg}
+                                </div>
+                                <div class="ar-presion-lg-text-col">
+                                    <div class="ar-presion-lg-subtitle-box">ARANDELA DE PRESIÓN</div>
+                                    <div class="ar-presion-lg-title-box ${sizeClass}">${sizeText}</div>
+                                </div>
+                            </div>
+                            <div class="ar-presion-lg-bot">
+                                <div class="ar-presion-lg-bot-code">${item.p.codigo}</div>
+                                <div class="ar-presion-lg-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            <div class="ar-presion-lg-img-area">
                                 <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
