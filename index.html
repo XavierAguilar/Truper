@@ -2337,6 +2337,8 @@
         .bt-item:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.1); }
         .bt-badge-qty { position: absolute; top: 12px; right: 12px; background: #10b981; color: #fff; font-size: 13px; font-weight: 800; padding: 2px 8px; border-radius: 12px; box-shadow: 0 2px 8px rgba(16,185,129,0.3); z-index: 2; pointer-events: none; }
         .bt-item-header { display: flex; gap: 14px; align-items: center; width: 100%; transition: opacity 0.2s; }
+        .bt-item-header-img-box { width: 50px; height: 50px; min-width: 50px; flex-shrink: 0; position: relative; overflow: hidden; background: #fff; border-radius: 8px; padding: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
+        .bt-item-header-img-box img { max-width: 100% !important; max-height: 100% !important; width: auto !important; height: auto !important; object-fit: contain; transform: none !important; }
         .bt-item-header img { width: 50px; height: 50px; object-fit: contain; background: #fff; border-radius: 8px; padding: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .bt-item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
         .bt-item-title { font-size: 14px; font-weight: 700; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px; line-height: 1.3; }
@@ -5177,14 +5179,15 @@ function renderCarouselGroup(mainContainer, items, options) {
         // Algoritmo Smart Crop (Con soporte para Nube/Vercel mediante Shadow Proxy de alto rendimiento)
         window.autoCrop = function (img) {
             if (img.dataset.cropped === "true" || !img.complete) return;
-            if (img.src.includes('logo-truper.svg')) return;
+            if (img.src.includes('logo-truper.svg') || img.src.includes('imagenes/')) return;
+            if (img.closest('.bt-item') || img.closest('.bt-item-header') || img.closest('.bt-scanner-box') || img.closest('[class*="-screw-box"]') || img.classList.contains('bktag-tigre')) return;
             img.dataset.cropped = "true";
             
             var isCarouselImg = !!img.closest('.welcome-carousel-container');
             var isProductSheet = !!img.closest('.images-panel');
             var isResultCard = !!img.closest('.result-card-img') || !!img.closest('.result-list-thumb');
-            var isBackTag = !!img.closest('.bktag') || !!img.closest('.conex-bktag') || !!img.closest('.conex-lg-bktag') || !!img.closest('.conex-xlg-bktag');
-            var fillFactor = isBackTag ? 0.96 : (isProductSheet ? 0.95 : (isCarouselImg ? 0.875 : 1.025));
+            var isBackTag = !!img.closest('[class*="bktag"]');
+            var fillFactor = isBackTag ? 0.95 : (isProductSheet ? 0.95 : (isCarouselImg ? 0.875 : 1.025));
             
             // Inyectar pre-escala inicial sin delay para que no espere al proxy
             img.style.opacity = '1';
@@ -5204,6 +5207,27 @@ function renderCarouselGroup(mainContainer, items, options) {
                 processCropShadow('https://wsrv.nl/?url=' + encodeURIComponent(baseSrc) + '&w=400', img, fillFactor);
             }
         };
+
+        window.triggerAllAutoCrop = function () {
+            if (!window.autoCrop) return;
+            var selector = '.result-card-img img, .result-list-thumb img, .images-panel img, .img-area img, [class*="-img-area"] img, .bktag-img img';
+            document.querySelectorAll(selector).forEach(function (img) {
+                if (!img.src || img.src.includes('logo-truper') || img.src.includes('imagenes/') || img.closest('[class*="-screw-box"]') || img.dataset.cropped === "true") return;
+                if (img.complete && img.naturalWidth > 0) {
+                    try { autoCrop(img); } catch(e){}
+                } else if (!img.dataset.cropBound) {
+                    img.dataset.cropBound = "true";
+                    img.addEventListener('load', function() {
+                        try { autoCrop(this); } catch(e){}
+                    });
+                }
+            });
+        };
+
+        // Escaneo continuo cada 800ms para asegurar que cualquier etiqueta o vista previa aplique Smart Crop
+        setInterval(function() {
+            if (window.triggerAllAutoCrop) window.triggerAllAutoCrop();
+        }, 800);
 
         function processCropDirect(img, fillFactor) {
             try {
@@ -5240,25 +5264,19 @@ function renderCarouselGroup(mainContainer, items, options) {
             var data = imgData.data;
             var minX = canvas.width, minY = canvas.height, maxX = 0, maxY = 0;
             
-            // Zonas Muertas Avanzadas: Truper Tags & Legal Texts
-            var ignoreTopZone = canvas.height * 0.14; // Ignorar el 14% superior por completo
-            var ignoreBottomZone = canvas.height * 0.14; // Ignorar el 14% inferior por textos gigantes
+            var isBackTag = !!realImg.closest('[class*="bktag"]') || !!realImg.closest('[class*="-img-area"]') || !!realImg.closest('.img-area');
+            // Zonas Muertas Avanzadas: Solo para tarjetas de búsqueda general con headers de marca quemados
+            var ignoreTopZone = isBackTag ? 0 : (canvas.height * 0.14);
+            var ignoreBottomZone = isBackTag ? 0 : (canvas.height * 0.14);
 
             for (var y = 0; y < canvas.height; y += 4) {
                 for (var x = 0; x < canvas.width; x += 4) {
                     
-                    // 1. Ignorar franja superior incondicional (Atrapa "Producto mejorado" cruzado)
-                    if (y < ignoreTopZone) {
-                        continue;
-                    }
-                    
-                    // 2. Ignorar franja inferior horizontal completa (Textos Legales / Fechas dobles)
-                    if (y > canvas.height - ignoreBottomZone) {
-                        continue;
-                    }
+                    if (ignoreTopZone > 0 && y < ignoreTopZone) continue;
+                    if (ignoreBottomZone > 0 && y > canvas.height - ignoreBottomZone) continue;
 
                     var index = (y * canvas.width + x) * 4;
-                    if (data[index] < 240 || data[index+1] < 240 || data[index+2] < 240) {
+                    if (data[index] < 242 || data[index+1] < 242 || data[index+2] < 242) {
                         if (data[index+3] > 20) {
                             if (x < minX) minX = x;
                             if (x > maxX) maxX = x;
@@ -5288,6 +5306,10 @@ function renderCarouselGroup(mainContainer, items, options) {
             
             if (scale < 1) scale = 1; 
             if (scale > 4.5) scale = 4.5;
+            
+            if (realImg.parentElement) {
+                realImg.parentElement.style.overflow = 'hidden';
+            }
             
             realImg.style.transform = 'scale(' + scale.toFixed(3) + ') translate(' + (dx_screen/scale).toFixed(1) + 'px,' + (dy_screen/scale).toFixed(1) + 'px)';
         }
@@ -6162,7 +6184,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                     <div class="bt-item" oncontextmenu="importRelatedBt(${i}, event)" title="Clic Derecho para Importar Relacionados">
                         <div class="bt-badge-qty">x${item.qty}</div>
                         <div class="bt-item-header">
-                            <img src="${img}" onerror="this.src='${flb}'">
+                            <div class="bt-item-header-img-box"><img src="${img}" onerror="this.src='${flb}'"></div>
                             <div class="bt-item-info">
                                 <div class="bt-item-title" title="${esc(item.p.nombre)}">${esc(item.p.nombre)}</div>
                                 <div class="bt-item-code">Cód: <strong>${item.p.codigo}</strong> | Clv: <strong>${item.p.clave}</strong></div>
@@ -6285,7 +6307,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                     const handleLoaded = () => {
                         if (img.naturalWidth > 0 && img.naturalHeight > 0) {
                             loadedSuccess++;
-                            if (window.autoCrop && img.getAttribute('onload') && img.getAttribute('onload').includes('autoCrop')) {
+                            if (window.autoCrop && img.src && !img.src.includes('logo-truper')) {
                                 try { autoCrop(img); } catch(e){}
                             }
                             onImgDone();
@@ -6734,6 +6756,16 @@ function renderCarouselGroup(mainContainer, items, options) {
                     { label: 'Fondo Medio', target: '.ar-presion-lg-mid', prop: 'background-color', def: '#2D2D2D' },
                     { label: 'Fondo Código', target: '.ar-presion-lg-bot-code', prop: 'background-color', def: '#000000' },
                     { label: 'Top Header', target: '.ar-presion-lg-top', prop: 'background-color', def: '#000000' }
+                ],
+                'armella-cerrada-10x4': [
+                    { label: 'Fondo Medio', target: '.armella-c-mid', prop: 'background-color', def: '#F26522' },
+                    { label: 'Fondo Código', target: '.armella-c-bot-code', prop: 'background-color', def: '#C84B00' },
+                    { label: 'Top Header', target: '.armella-c-top', prop: 'background-color', def: '#000000' }
+                ],
+                'armella-cerrada-12x6': [
+                    { label: 'Fondo Medio', target: '.armella-c-lg-mid', prop: 'background-color', def: '#F26522' },
+                    { label: 'Fondo Código', target: '.armella-c-lg-bot-code', prop: 'background-color', def: '#C84B00' },
+                    { label: 'Top Header', target: '.armella-c-lg-top', prop: 'background-color', def: '#000000' }
                 ],
                 'std-5x8': [
                     { label: 'Encabezado', target: '.bktag-redhead', prop: 'background-color', def: '#ff0000' }
@@ -8194,36 +8226,37 @@ function renderCarouselGroup(mainContainer, items, options) {
                         }
                         .tuerca-top { position: absolute; top:0; left:0; width: 10cm; height: 1cm; background: #000; z-index: 10; }
                         .tuerca-mid {
-                            position: absolute; top: 1cm; left: 0; width: 7cm; height: 2cm; background: #F26522;
+                            position: absolute; top: 1cm; left: 0; width: 7.6cm; height: 2cm; background: #F26522;
                             display: flex; overflow: hidden; z-index: 5;
                         }
-                        .tuerca-screw-box { width: 1.8cm; height: 2cm; display: flex; align-items: center; justify-content: center; padding-left: 4px; }
-                        .tuerca-text-col { width: 5.2cm; height: 2cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        .tuerca-screw-box { width: 2.1cm; height: 2cm; display: flex; align-items: center; justify-content: center; padding-left: 2px; }
+                        .tuerca-text-col { width: 5.5cm; height: 2cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
                         .tuerca-subtitle-box {
-                            width: 100%; height: 0.6cm; display: flex; align-items: center; justify-content: center; text-align: center;
-                            font-size: 21px; font-weight: 900; color: #fff; letter-spacing: 1px; text-transform: uppercase;
+                            width: 100%; height: 0.5cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            font-size: 14.5px; font-weight: 900; color: #fff; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap;
                         }
                         .tuerca-title-box {
-                            width: 100%; height: 1.3cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            width: 100%; height: 1.4cm; display: flex; align-items: center; justify-content: center; text-align: center;
                             color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1.5px;
                         }
-                        .tuerca-title-box.normal { font-size: 54px; }
-                        .tuerca-title-box.small { font-size: 38px; letter-spacing: -1px; }
-                        .tuerca-bot { position: absolute; top: 3cm; left: 0; width: 7cm; height: 1cm; display: flex; z-index: 5; }
+                        .tuerca-title-box.normal { font-size: 52px; }
+                        .tuerca-title-box.small { font-size: 36px; letter-spacing: -1px; }
+                        .tuerca-bot { position: absolute; top: 3cm; left: 0; width: 7.6cm; height: 1cm; display: flex; z-index: 5; }
                         .tuerca-bot-code {
-                            width: 3.5cm; background: #C84B00; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            width: 3.8cm; background: #C84B00; height: 1cm; display: flex; align-items: center; justify-content: center;
                             font-size: 36px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
                         }
                         .tuerca-bot-br {
-                            width: 3.5cm; background: #fff; height: 1cm; display: flex; align-items: center; justify-content: center;
-                            overflow: hidden; padding: 0; box-sizing: border-box; border-top: 1px solid #fff;
+                            width: 3.8cm; background: #fff; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            overflow: hidden; padding: 0 2px; box-sizing: border-box; border-top: 1px solid #fff;
                         }
-                        .tuerca-bot-br svg { max-height: 0.92cm; max-width: 98%; }
+                        .tuerca-bot-br svg { max-height: 0.94cm; max-width: 98%; }
                         .tuerca-img-area {
-                            position: absolute; top: 1cm; right: 0; width: 3cm; height: 3cm; background: #fff;
+                            position: absolute; top: 1cm; right: 0; width: 2.4cm; height: 3cm; background: #fff;
                             display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
                         }
-                        .tuerca-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                        .tuerca-img-area img { max-width: 90%; max-height: 90%; object-fit: contain; }
                     `,
                     render: function(item, ean, imgSrc, idBarcode) {
                         let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
@@ -8256,7 +8289,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                                 <div class="tuerca-bot-br"><svg id="${idBarcode}"></svg></div>
                             </div>
                             <div class="tuerca-img-area">
-                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -8276,11 +8309,11 @@ function renderCarouselGroup(mainContainer, items, options) {
                         }
                         .tuerca-lg-top { position: absolute; top:0; left:0; width: 12cm; height: 1.5cm; background: #000; z-index: 10; }
                         .tuerca-lg-mid {
-                            position: absolute; top: 1.5cm; left: 0; width: 8.4cm; height: 3cm; background: #F26522;
+                            position: absolute; top: 1.5cm; left: 0; width: 9.12cm; height: 3cm; background: #F26522;
                             display: flex; overflow: hidden; z-index: 5;
                         }
-                        .tuerca-lg-screw-box { width: 2.2cm; height: 3cm; display: flex; align-items: center; justify-content: center; padding-left: 6px; }
-                        .tuerca-lg-text-col { width: 6.2cm; height: 3cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        .tuerca-lg-screw-box { width: 2.5cm; height: 3cm; display: flex; align-items: center; justify-content: center; padding-left: 4px; }
+                        .tuerca-lg-text-col { width: 6.62cm; height: 3cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
                         .tuerca-lg-subtitle-box {
                             width: 100%; height: 0.9cm; display: flex; align-items: center; justify-content: center; text-align: center;
                             font-size: 27px; font-weight: 900; color: #fff; letter-spacing: 1px; text-transform: uppercase;
@@ -8291,21 +8324,22 @@ function renderCarouselGroup(mainContainer, items, options) {
                         }
                         .tuerca-lg-title-box.normal { font-size: 68px; }
                         .tuerca-lg-title-box.small { font-size: 48px; letter-spacing: -1px; }
-                        .tuerca-lg-bot { position: absolute; top: 4.5cm; left: 0; width: 8.4cm; height: 1.5cm; display: flex; z-index: 5; }
+                        .tuerca-lg-bot { position: absolute; top: 4.5cm; left: 0; width: 9.12cm; height: 1.5cm; display: flex; z-index: 5; }
                         .tuerca-lg-bot-code {
-                            width: 4.2cm; background: #C84B00; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            width: 4.56cm; background: #C84B00; height: 1.5cm; display: flex; align-items: center; justify-content: center;
                             font-size: 43px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
                         }
                         .tuerca-lg-bot-br {
-                            width: 4.2cm; background: #fff; height: 1.5cm; display: flex; align-items: center; justify-content: center;
-                            overflow: hidden; padding: 0; box-sizing: border-box; border-top: 1px solid #fff;
+                            width: 4.56cm; background: #fff; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            overflow: hidden; padding: 0 2px; box-sizing: border-box; border-top: 1px solid #fff;
                         }
                         .tuerca-lg-bot-br svg { max-height: 1.38cm; max-width: 98%; }
                         .tuerca-lg-img-area {
-                            position: absolute; top: 1.5cm; right: 0; width: 3.6cm; height: 4.5cm; background: #fff;
+                            position: absolute; top: 1.5cm; right: 0; width: 2.88cm; height: 4.5cm; background: #fff;
                             display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
                         }
-                        .tuerca-lg-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                        .tuerca-lg-img-area img { max-width: 90%; max-height: 90%; object-fit: contain; }
                     `,
                     render: function(item, ean, imgSrc, idBarcode) {
                         let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
@@ -8338,7 +8372,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                                 <div class="tuerca-lg-bot-br"><svg id="${idBarcode}"></svg></div>
                             </div>
                             <div class="tuerca-lg-img-area">
-                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -8358,11 +8392,11 @@ function renderCarouselGroup(mainContainer, items, options) {
                         }
                         .arandela-top { position: absolute; top:0; left:0; width: 10cm; height: 1cm; background: #000; z-index: 10; }
                         .arandela-mid {
-                            position: absolute; top: 1cm; left: 0; width: 7cm; height: 2cm; background: #DC2626;
+                            position: absolute; top: 1cm; left: 0; width: 7.6cm; height: 2cm; background: #DC2626;
                             display: flex; overflow: hidden; z-index: 5;
                         }
-                        .arandela-screw-box { width: 1.8cm; height: 2cm; display: flex; align-items: center; justify-content: center; padding-left: 4px; }
-                        .arandela-text-col { width: 5.2cm; height: 2cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        .arandela-screw-box { width: 2.1cm; height: 2cm; display: flex; align-items: center; justify-content: center; padding-left: 2px; }
+                        .arandela-text-col { width: 5.5cm; height: 2cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
                         .arandela-subtitle-box {
                             width: 100%; height: 0.5cm; display: flex; align-items: center; justify-content: center; text-align: center;
                             font-size: 14.5px; font-weight: 900; color: #fff; letter-spacing: 0px; text-transform: uppercase; white-space: nowrap;
@@ -8373,21 +8407,22 @@ function renderCarouselGroup(mainContainer, items, options) {
                         }
                         .arandela-title-box.normal { font-size: 52px; }
                         .arandela-title-box.small { font-size: 36px; letter-spacing: -1px; }
-                        .arandela-bot { position: absolute; top: 3cm; left: 0; width: 7cm; height: 1cm; display: flex; z-index: 5; }
+                        .arandela-bot { position: absolute; top: 3cm; left: 0; width: 7.6cm; height: 1cm; display: flex; z-index: 5; }
                         .arandela-bot-code {
-                            width: 3.5cm; background: #991B1B; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            width: 3.8cm; background: #991B1B; height: 1cm; display: flex; align-items: center; justify-content: center;
                             font-size: 36px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
                         }
                         .arandela-bot-br {
-                            width: 3.5cm; background: #fff; height: 1cm; display: flex; align-items: center; justify-content: center;
-                            overflow: hidden; padding: 0; box-sizing: border-box; border-top: 1px solid #fff;
+                            width: 3.8cm; background: #fff; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            overflow: hidden; padding: 0 2px; box-sizing: border-box; border-top: 1px solid #fff;
                         }
-                        .arandela-bot-br svg { max-height: 0.92cm; max-width: 98%; }
+                        .arandela-bot-br svg { max-height: 0.94cm; max-width: 98%; }
                         .arandela-img-area {
-                            position: absolute; top: 1cm; right: 0; width: 3cm; height: 3cm; background: #fff;
+                            position: absolute; top: 1cm; right: 0; width: 2.4cm; height: 3cm; background: #fff;
                             display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
                         }
-                        .arandela-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                        .arandela-img-area img { max-width: 90%; max-height: 90%; object-fit: contain; }
                     `,
                     render: function(item, ean, imgSrc, idBarcode) {
                         let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
@@ -8420,7 +8455,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                                 <div class="arandela-bot-br"><svg id="${idBarcode}"></svg></div>
                             </div>
                             <div class="arandela-img-area">
-                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -8440,11 +8475,11 @@ function renderCarouselGroup(mainContainer, items, options) {
                         }
                         .arandela-lg-top { position: absolute; top:0; left:0; width: 12cm; height: 1.5cm; background: #000; z-index: 10; }
                         .arandela-lg-mid {
-                            position: absolute; top: 1.5cm; left: 0; width: 8.4cm; height: 3cm; background: #DC2626;
+                            position: absolute; top: 1.5cm; left: 0; width: 9.12cm; height: 3cm; background: #DC2626;
                             display: flex; overflow: hidden; z-index: 5;
                         }
-                        .arandela-lg-screw-box { width: 2.2cm; height: 3cm; display: flex; align-items: center; justify-content: center; padding-left: 6px; }
-                        .arandela-lg-text-col { width: 6.2cm; height: 3cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        .arandela-lg-screw-box { width: 2.5cm; height: 3cm; display: flex; align-items: center; justify-content: center; padding-left: 4px; }
+                        .arandela-lg-text-col { width: 6.62cm; height: 3cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
                         .arandela-lg-subtitle-box {
                             width: 100%; height: 0.75cm; display: flex; align-items: center; justify-content: center; text-align: center;
                             font-size: 20px; font-weight: 900; color: #fff; letter-spacing: 0px; text-transform: uppercase; white-space: nowrap;
@@ -8455,21 +8490,22 @@ function renderCarouselGroup(mainContainer, items, options) {
                         }
                         .arandela-lg-title-box.normal { font-size: 68px; }
                         .arandela-lg-title-box.small { font-size: 48px; letter-spacing: -1px; }
-                        .arandela-lg-bot { position: absolute; top: 4.5cm; left: 0; width: 8.4cm; height: 1.5cm; display: flex; z-index: 5; }
+                        .arandela-lg-bot { position: absolute; top: 4.5cm; left: 0; width: 9.12cm; height: 1.5cm; display: flex; z-index: 5; }
                         .arandela-lg-bot-code {
-                            width: 4.2cm; background: #991B1B; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            width: 4.56cm; background: #991B1B; height: 1.5cm; display: flex; align-items: center; justify-content: center;
                             font-size: 43px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
                         }
                         .arandela-lg-bot-br {
-                            width: 4.2cm; background: #fff; height: 1.5cm; display: flex; align-items: center; justify-content: center;
-                            overflow: hidden; padding: 0; box-sizing: border-box; border-top: 1px solid #fff;
+                            width: 4.56cm; background: #fff; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            overflow: hidden; padding: 0 2px; box-sizing: border-box; border-top: 1px solid #fff;
                         }
                         .arandela-lg-bot-br svg { max-height: 1.38cm; max-width: 98%; }
                         .arandela-lg-img-area {
-                            position: absolute; top: 1.5cm; right: 0; width: 3.6cm; height: 4.5cm; background: #fff;
+                            position: absolute; top: 1.5cm; right: 0; width: 2.88cm; height: 4.5cm; background: #fff;
                             display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
                         }
-                        .arandela-lg-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                        .arandela-lg-img-area img { max-width: 90%; max-height: 90%; object-fit: contain; }
                     `,
                     render: function(item, ean, imgSrc, idBarcode) {
                         let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
@@ -8502,7 +8538,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                                 <div class="arandela-lg-bot-br"><svg id="${idBarcode}"></svg></div>
                             </div>
                             <div class="arandela-lg-img-area">
-                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -8522,11 +8558,11 @@ function renderCarouselGroup(mainContainer, items, options) {
                         }
                         .ar-presion-top { position: absolute; top:0; left:0; width: 10cm; height: 1cm; background: #000; z-index: 10; }
                         .ar-presion-mid {
-                            position: absolute; top: 1cm; left: 0; width: 7cm; height: 2cm; background: #2D2D2D;
+                            position: absolute; top: 1cm; left: 0; width: 7.6cm; height: 2cm; background: #2D2D2D;
                             display: flex; overflow: hidden; z-index: 5;
                         }
-                        .ar-presion-screw-box { width: 1.8cm; height: 2cm; display: flex; align-items: center; justify-content: center; padding-left: 4px; }
-                        .ar-presion-text-col { width: 5.2cm; height: 2cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        .ar-presion-screw-box { width: 2.1cm; height: 2cm; display: flex; align-items: center; justify-content: center; padding-left: 2px; }
+                        .ar-presion-text-col { width: 5.5cm; height: 2cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
                         .ar-presion-subtitle-box {
                             width: 100%; height: 0.5cm; display: flex; align-items: center; justify-content: center; text-align: center;
                             font-size: 13px; font-weight: 900; color: #fff; letter-spacing: 0px; text-transform: uppercase; white-space: nowrap;
@@ -8537,21 +8573,22 @@ function renderCarouselGroup(mainContainer, items, options) {
                         }
                         .ar-presion-title-box.normal { font-size: 52px; }
                         .ar-presion-title-box.small { font-size: 36px; letter-spacing: -1px; }
-                        .ar-presion-bot { position: absolute; top: 3cm; left: 0; width: 7cm; height: 1cm; display: flex; z-index: 5; }
+                        .ar-presion-bot { position: absolute; top: 3cm; left: 0; width: 7.6cm; height: 1cm; display: flex; z-index: 5; }
                         .ar-presion-bot-code {
-                            width: 3.5cm; background: #000000; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            width: 3.8cm; background: #000000; height: 1cm; display: flex; align-items: center; justify-content: center;
                             font-size: 36px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
                         }
                         .ar-presion-bot-br {
-                            width: 3.5cm; background: #fff; height: 1cm; display: flex; align-items: center; justify-content: center;
-                            overflow: hidden; padding: 0; box-sizing: border-box; border-top: 1px solid #fff;
+                            width: 3.8cm; background: #fff; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            overflow: hidden; padding: 0 2px; box-sizing: border-box; border-top: 1px solid #fff;
                         }
-                        .ar-presion-bot-br svg { max-height: 0.92cm; max-width: 98%; }
+                        .ar-presion-bot-br svg { max-height: 0.94cm; max-width: 98%; }
                         .ar-presion-img-area {
-                            position: absolute; top: 1cm; right: 0; width: 3cm; height: 3cm; background: #fff;
+                            position: absolute; top: 1cm; right: 0; width: 2.4cm; height: 3cm; background: #fff;
                             display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
                         }
-                        .ar-presion-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                        .ar-presion-img-area img { max-width: 90%; max-height: 90%; object-fit: contain; }
                     `,
                     render: function(item, ean, imgSrc, idBarcode) {
                         let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
@@ -8584,7 +8621,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                                 <div class="ar-presion-bot-br"><svg id="${idBarcode}"></svg></div>
                             </div>
                             <div class="ar-presion-img-area">
-                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -8604,11 +8641,11 @@ function renderCarouselGroup(mainContainer, items, options) {
                         }
                         .ar-presion-lg-top { position: absolute; top:0; left:0; width: 12cm; height: 1.5cm; background: #000; z-index: 10; }
                         .ar-presion-lg-mid {
-                            position: absolute; top: 1.5cm; left: 0; width: 8.4cm; height: 3cm; background: #2D2D2D;
+                            position: absolute; top: 1.5cm; left: 0; width: 9.12cm; height: 3cm; background: #2D2D2D;
                             display: flex; overflow: hidden; z-index: 5;
                         }
-                        .ar-presion-lg-screw-box { width: 2.2cm; height: 3cm; display: flex; align-items: center; justify-content: center; padding-left: 6px; }
-                        .ar-presion-lg-text-col { width: 6.2cm; height: 3cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        .ar-presion-lg-screw-box { width: 2.5cm; height: 3cm; display: flex; align-items: center; justify-content: center; padding-left: 4px; }
+                        .ar-presion-lg-text-col { width: 6.62cm; height: 3cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
                         .ar-presion-lg-subtitle-box {
                             width: 100%; height: 0.75cm; display: flex; align-items: center; justify-content: center; text-align: center;
                             font-size: 18px; font-weight: 900; color: #fff; letter-spacing: 0px; text-transform: uppercase; white-space: nowrap;
@@ -8619,21 +8656,22 @@ function renderCarouselGroup(mainContainer, items, options) {
                         }
                         .ar-presion-lg-title-box.normal { font-size: 68px; }
                         .ar-presion-lg-title-box.small { font-size: 48px; letter-spacing: -1px; }
-                        .ar-presion-lg-bot { position: absolute; top: 4.5cm; left: 0; width: 8.4cm; height: 1.5cm; display: flex; z-index: 5; }
+                        .ar-presion-lg-bot { position: absolute; top: 4.5cm; left: 0; width: 9.12cm; height: 1.5cm; display: flex; z-index: 5; }
                         .ar-presion-lg-bot-code {
-                            width: 4.2cm; background: #000000; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            width: 4.56cm; background: #000000; height: 1.5cm; display: flex; align-items: center; justify-content: center;
                             font-size: 43px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
                         }
                         .ar-presion-lg-bot-br {
-                            width: 4.2cm; background: #fff; height: 1.5cm; display: flex; align-items: center; justify-content: center;
-                            overflow: hidden; padding: 0; box-sizing: border-box; border-top: 1px solid #fff;
+                            width: 4.56cm; background: #fff; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            overflow: hidden; padding: 0 2px; box-sizing: border-box; border-top: 1px solid #fff;
                         }
                         .ar-presion-lg-bot-br svg { max-height: 1.38cm; max-width: 98%; }
                         .ar-presion-lg-img-area {
-                            position: absolute; top: 1.5cm; right: 0; width: 3.6cm; height: 4.5cm; background: #fff;
+                            position: absolute; top: 1.5cm; right: 0; width: 2.88cm; height: 4.5cm; background: #fff;
                             display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
                         }
-                        .ar-presion-lg-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
+                        .ar-presion-lg-img-area img { max-width: 90%; max-height: 90%; object-fit: contain; }
                     `,
                     render: function(item, ean, imgSrc, idBarcode) {
                         let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
@@ -8666,7 +8704,535 @@ function renderCarouselGroup(mainContainer, items, options) {
                                 <div class="ar-presion-lg-bot-br"><svg id="${idBarcode}"></svg></div>
                             </div>
                             <div class="ar-presion-lg-img-area">
-                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'armella-cerrada-10x4',
+                    group: 'armella-cerrada',
+                    name: 'Armella Cerrada (10x4 cm)',
+                    description: 'Formato apaisado, extracción automática de medida (ej: 17 X 40). Sección naranja ampliada al 76%.',
+                    width: '10cm',
+                    height: '4cm',
+                    css: `
+                        .armella-c-bktag {
+                            width: 10cm; height: 4cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000; page-break-inside: avoid; break-inside: avoid;
+                        }
+                        .armella-c-top { position: absolute; top:0; left:0; width: 10cm; height: 1cm; background: #000; z-index: 10; }
+                        .armella-c-mid {
+                            position: absolute; top: 1cm; left: 0; width: 7.6cm; height: 2cm; background: #F26522;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .armella-c-screw-box { width: 2.1cm; height: 2cm; display: flex; align-items: center; justify-content: center; padding-left: 2px; }
+                        .armella-c-text-col { width: 5.5cm; height: 2cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        .armella-c-subtitle-box {
+                            width: 100%; height: 0.5cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            font-size: 14.5px; font-weight: 900; color: #fff; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap;
+                        }
+                        .armella-c-title-box {
+                            width: 100%; height: 1.4cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1px;
+                        }
+                        .armella-c-title-box.normal { font-size: 50px; }
+                        .armella-c-title-box.small { font-size: 36px; letter-spacing: -0.5px; }
+                        .armella-c-bot { position: absolute; top: 3cm; left: 0; width: 7.6cm; height: 1cm; display: flex; z-index: 5; }
+                        .armella-c-bot-code {
+                            width: 3.8cm; background: #C84B00; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 36px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .armella-c-bot-br {
+                            width: 3.8cm; background: #fff; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            overflow: hidden; padding: 0 2px; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+                        .armella-c-bot-br svg { max-height: 0.94cm; max-width: 98%; height: auto; }
+                        .armella-c-img-area {
+                            position: absolute; top: 1cm; right: 0; width: 2.4cm; height: 3cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
+                        }
+                        .armella-c-img-area img { max-width: 90%; max-height: 90%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let armellaSize = '';
+                        let matchM = combined.match(/(\d+(?:\/\d+)?(?:"|''|PULG|IN)?\s*[xX]\s*\d+(?:\/\d+)?(?:"|''|PULG|IN)?)/i);
+                        if (matchM) {
+                            armellaSize = matchM[1].replace(/''/g, '"').replace(/\s+/g, ' ').trim();
+                        } else {
+                            let matchSingle = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN)|\bM\d+\b)/i);
+                            if (matchSingle) {
+                                armellaSize = matchSingle[1].replace(/''/g, '"').replace(/\s+/g, '');
+                                if (!armellaSize.includes('"') && !armellaSize.startsWith('M')) armellaSize += '"';
+                            } else {
+                                armellaSize = '---';
+                            }
+                        }
+                        
+                        let sizeClass = armellaSize.length >= 6 ? 'small' : 'normal';
+                        let eyeSvg = `<svg viewBox="0 0 160 80" style="width:1.9cm; height:0.95cm;"><g fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="36" cy="40" r="28" /><circle cx="36" cy="40" r="16" /><path d="M 64,32 L 80,32 M 64,48 L 80,48" /><path d="M 80,32 L 86,24 L 92,40 L 98,24 L 104,40 L 110,24 L 116,40 L 122,24 L 128,40 L 134,24 L 140,40 L 152,40 L 140,40 L 134,56 L 128,40 L 122,56 L 116,40 L 110,56 L 104,40 L 98,56 L 92,40 L 86,56 L 80,48" /></g></svg>`;
+
+                        return `
+                        <div class="armella-c-bktag">
+                            <div class="armella-c-top"></div>
+                            <div class="armella-c-mid">
+                                <div class="armella-c-screw-box">
+                                    ${eyeSvg}
+                                </div>
+                                <div class="armella-c-text-col">
+                                    <div class="armella-c-subtitle-box">ARMELLA CERRADA</div>
+                                    <div class="armella-c-title-box ${sizeClass}">${armellaSize}</div>
+                                </div>
+                            </div>
+                            <div class="armella-c-bot">
+                                <div class="armella-c-bot-code">${item.p.codigo}</div>
+                                <div class="armella-c-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            <div class="armella-c-img-area">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'armella-cerrada-12x6',
+                    group: 'armella-cerrada',
+                    name: 'Armella Cerrada (12x6 cm)',
+                    description: 'Formato apaisado GRANDE. Extracción automática de medida (ej: 17 X 40). Sección naranja ampliada al 76%. Escala 120%.',
+                    width: '12cm',
+                    height: '6cm',
+                    css: `
+                        .armella-c-lg-bktag {
+                            width: 12cm; height: 6cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000; page-break-inside: avoid; break-inside: avoid;
+                        }
+                        .armella-c-lg-top { position: absolute; top:0; left:0; width: 12cm; height: 1.5cm; background: #000; z-index: 10; }
+                        .armella-c-lg-mid {
+                            position: absolute; top: 1.5cm; left: 0; width: 9.12cm; height: 3cm; background: #F26522;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .armella-c-lg-screw-box { width: 2.5cm; height: 3cm; display: flex; align-items: center; justify-content: center; padding-left: 4px; }
+                        .armella-c-lg-text-col { width: 6.62cm; height: 3cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        .armella-c-lg-subtitle-box {
+                            width: 100%; height: 0.75cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            font-size: 19px; font-weight: 900; color: #fff; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap;
+                        }
+                        .armella-c-lg-title-box {
+                            width: 100%; height: 1.95cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1px;
+                        }
+                        .armella-c-lg-title-box.normal { font-size: 65px; }
+                        .armella-c-lg-title-box.small { font-size: 46px; letter-spacing: -0.5px; }
+                        .armella-c-lg-bot { position: absolute; top: 4.5cm; left: 0; width: 9.12cm; height: 1.5cm; display: flex; z-index: 5; }
+                        .armella-c-lg-bot-code {
+                            width: 4.56cm; background: #C84B00; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 43px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .armella-c-lg-bot-br {
+                            width: 4.56cm; background: #fff; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            overflow: hidden; padding: 0 2px; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+                        .armella-c-lg-bot-br svg { max-height: 1.4cm; max-width: 98%; height: auto; }
+                        .armella-c-lg-img-area {
+                            position: absolute; top: 1.5cm; right: 0; width: 2.88cm; height: 4.5cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
+                        }
+                        .armella-c-lg-img-area img { max-width: 90%; max-height: 90%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let armellaSize = '';
+                        let matchM = combined.match(/(\d+(?:\/\d+)?(?:"|''|PULG|IN)?\s*[xX]\s*\d+(?:\/\d+)?(?:"|''|PULG|IN)?)/i);
+                        if (matchM) {
+                            armellaSize = matchM[1].replace(/''/g, '"').replace(/\s+/g, ' ').trim();
+                        } else {
+                            let matchSingle = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN)|\bM\d+\b)/i);
+                            if (matchSingle) {
+                                armellaSize = matchSingle[1].replace(/''/g, '"').replace(/\s+/g, '');
+                                if (!armellaSize.includes('"') && !armellaSize.startsWith('M')) armellaSize += '"';
+                            } else {
+                                armellaSize = '---';
+                            }
+                        }
+                        
+                        let sizeClass = armellaSize.length >= 6 ? 'small' : 'normal';
+                        let eyeSvg = `<svg viewBox="0 0 160 80" style="width:2.4cm; height:1.2cm;"><g fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="36" cy="40" r="28" /><circle cx="36" cy="40" r="16" /><path d="M 64,32 L 80,32 M 64,48 L 80,48" /><path d="M 80,32 L 86,24 L 92,40 L 98,24 L 104,40 L 110,24 L 116,40 L 122,24 L 128,40 L 134,24 L 140,40 L 152,40 L 140,40 L 134,56 L 128,40 L 122,56 L 116,40 L 110,56 L 104,40 L 98,56 L 92,40 L 86,56 L 80,48" /></g></svg>`;
+
+                        return `
+                        <div class="armella-c-lg-bktag">
+                            <div class="armella-c-lg-top"></div>
+                            <div class="armella-c-lg-mid">
+                                <div class="armella-c-lg-screw-box">
+                                    ${eyeSvg}
+                                </div>
+                                <div class="armella-c-lg-text-col">
+                                    <div class="armella-c-lg-subtitle-box">ARMELLA CERRADA</div>
+                                    <div class="armella-c-lg-title-box ${sizeClass}">${armellaSize}</div>
+                                </div>
+                            </div>
+                            <div class="armella-c-lg-bot">
+                                <div class="armella-c-lg-bot-code">${item.p.codigo}</div>
+                                <div class="armella-c-lg-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            <div class="armella-c-lg-img-area">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'armella-abierta-10x4',
+                    group: 'armella-abierta',
+                    name: 'Armella Abierta (10x4 cm)',
+                    description: 'Formato apaisado, extracción automática de medida (ej: 17 X 40). Icono de armella abierta (hook).',
+                    width: '10cm',
+                    height: '4cm',
+                    css: `
+                        .armella-a-bktag {
+                            width: 10cm; height: 4cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000; page-break-inside: avoid; break-inside: avoid;
+                        }
+                        .armella-a-top { position: absolute; top:0; left:0; width: 10cm; height: 1cm; background: #000; z-index: 10; }
+                        .armella-a-mid {
+                            position: absolute; top: 1cm; left: 0; width: 7.6cm; height: 2cm; background: #F26522;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .armella-a-screw-box { width: 2.1cm; height: 2cm; display: flex; align-items: center; justify-content: center; padding-left: 2px; }
+                        .armella-a-text-col { width: 5.5cm; height: 2cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        .armella-a-subtitle-box {
+                            width: 100%; height: 0.5cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            font-size: 14.5px; font-weight: 900; color: #fff; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap;
+                        }
+                        .armella-a-title-box {
+                            width: 100%; height: 1.4cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1px;
+                        }
+                        .armella-a-title-box.normal { font-size: 50px; }
+                        .armella-a-title-box.small { font-size: 36px; letter-spacing: -0.5px; }
+                        .armella-a-bot { position: absolute; top: 3cm; left: 0; width: 7.6cm; height: 1cm; display: flex; z-index: 5; }
+                        .armella-a-bot-code {
+                            width: 3.8cm; background: #C84B00; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 36px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .armella-a-bot-br {
+                            width: 3.8cm; background: #fff; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            overflow: hidden; padding: 0 2px; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+                        .armella-a-bot-br svg { max-height: 0.94cm; max-width: 98%; height: auto; }
+                        .armella-a-img-area {
+                            position: absolute; top: 1cm; right: 0; width: 2.4cm; height: 3cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
+                        }
+                        .armella-a-img-area img { max-width: 90%; max-height: 90%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let armellaSize = '';
+                        let matchM = combined.match(/(\d+(?:\/\d+)?(?:"|''|PULG|IN)?\s*[xX]\s*\d+(?:\/\d+)?(?:"|''|PULG|IN)?)/i);
+                        if (matchM) {
+                            armellaSize = matchM[1].replace(/''/g, '"').replace(/\s+/g, ' ').trim();
+                        } else {
+                            let matchSingle = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN)|\bM\d+\b)/i);
+                            if (matchSingle) {
+                                armellaSize = matchSingle[1].replace(/''/g, '"').replace(/\s+/g, '');
+                                if (!armellaSize.includes('"') && !armellaSize.startsWith('M')) armellaSize += '"';
+                            } else {
+                                armellaSize = '---';
+                            }
+                        }
+                        
+                        let sizeClass = armellaSize.length >= 6 ? 'small' : 'normal';
+                        let openEyeSvg = `<svg viewBox="0 0 160 80" style="width:1.9cm; height:0.95cm;"><g fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"><path d="M 24,60 C 14,50 14,26 26,16 C 40,6 58,10 66,22 C 72,30 68,40 76,40 L 86,40" /><path d="M 86,32 L 92,24 L 98,40 L 104,24 L 110,40 L 116,24 L 122,40 L 128,24 L 134,40 L 140,24 L 146,40 L 154,40 L 146,40 L 140,56 L 134,40 L 128,56 L 122,40 L 116,56 L 110,40 L 104,56 L 98,40 L 92,56 L 86,48 L 86,32" /></g></svg>`;
+
+                        return `
+                        <div class="armella-a-bktag">
+                            <div class="armella-a-top"></div>
+                            <div class="armella-a-mid">
+                                <div class="armella-a-screw-box">
+                                    ${openEyeSvg}
+                                </div>
+                                <div class="armella-a-text-col">
+                                    <div class="armella-a-subtitle-box">ARMELLA ABIERTA</div>
+                                    <div class="armella-a-title-box ${sizeClass}">${armellaSize}</div>
+                                </div>
+                            </div>
+                            <div class="armella-a-bot">
+                                <div class="armella-a-bot-code">${item.p.codigo}</div>
+                                <div class="armella-a-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            <div class="armella-a-img-area">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'armella-abierta-12x6',
+                    group: 'armella-abierta',
+                    name: 'Armella Abierta (12x6 cm)',
+                    description: 'Formato apaisado GRANDE. Extracción automática de medida (ej: 17 X 40). Escala 120%.',
+                    width: '12cm',
+                    height: '6cm',
+                    css: `
+                        .armella-a-lg-bktag {
+                            width: 12cm; height: 6cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000; page-break-inside: avoid; break-inside: avoid;
+                        }
+                        .armella-a-lg-top { position: absolute; top:0; left:0; width: 12cm; height: 1.5cm; background: #000; z-index: 10; }
+                        .armella-a-lg-mid {
+                            position: absolute; top: 1.5cm; left: 0; width: 9.12cm; height: 3cm; background: #F26522;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .armella-a-lg-screw-box { width: 2.5cm; height: 3cm; display: flex; align-items: center; justify-content: center; padding-left: 4px; }
+                        .armella-a-lg-text-col { width: 6.62cm; height: 3cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        .armella-a-lg-subtitle-box {
+                            width: 100%; height: 0.75cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            font-size: 19px; font-weight: 900; color: #fff; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap;
+                        }
+                        .armella-a-lg-title-box {
+                            width: 100%; height: 1.95cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1px;
+                        }
+                        .armella-a-lg-title-box.normal { font-size: 65px; }
+                        .armella-a-lg-title-box.small { font-size: 46px; letter-spacing: -0.5px; }
+                        .armella-a-lg-bot { position: absolute; top: 4.5cm; left: 0; width: 9.12cm; height: 1.5cm; display: flex; z-index: 5; }
+                        .armella-a-lg-bot-code {
+                            width: 4.56cm; background: #C84B00; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 43px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .armella-a-lg-bot-br {
+                            width: 4.56cm; background: #fff; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            overflow: hidden; padding: 0 2px; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+                        .armella-a-lg-bot-br svg { max-height: 1.4cm; max-width: 98%; height: auto; }
+                        .armella-a-lg-img-area {
+                            position: absolute; top: 1.5cm; right: 0; width: 2.88cm; height: 4.5cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
+                        }
+                        .armella-a-lg-img-area img { max-width: 90%; max-height: 90%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let armellaSize = '';
+                        let matchM = combined.match(/(\d+(?:\/\d+)?(?:"|''|PULG|IN)?\s*[xX]\s*\d+(?:\/\d+)?(?:"|''|PULG|IN)?)/i);
+                        if (matchM) {
+                            armellaSize = matchM[1].replace(/''/g, '"').replace(/\s+/g, ' ').trim();
+                        } else {
+                            let matchSingle = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN)|\bM\d+\b)/i);
+                            if (matchSingle) {
+                                armellaSize = matchSingle[1].replace(/''/g, '"').replace(/\s+/g, '');
+                                if (!armellaSize.includes('"') && !armellaSize.startsWith('M')) armellaSize += '"';
+                            } else {
+                                armellaSize = '---';
+                            }
+                        }
+                        
+                        let sizeClass = armellaSize.length >= 6 ? 'small' : 'normal';
+                        let openEyeSvg = `<svg viewBox="0 0 160 80" style="width:2.4cm; height:1.2cm;"><g fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"><path d="M 24,60 C 14,50 14,26 26,16 C 40,6 58,10 66,22 C 72,30 68,40 76,40 L 86,40" /><path d="M 86,32 L 92,24 L 98,40 L 104,24 L 110,40 L 116,24 L 122,40 L 128,24 L 134,40 L 140,24 L 146,40 L 154,40 L 146,40 L 140,56 L 134,40 L 128,56 L 122,40 L 116,56 L 110,40 L 104,56 L 98,40 L 92,56 L 86,48 L 86,32" /></g></svg>`;
+
+                        return `
+                        <div class="armella-a-lg-bktag">
+                            <div class="armella-a-lg-top"></div>
+                            <div class="armella-a-lg-mid">
+                                <div class="armella-a-lg-screw-box">
+                                    ${openEyeSvg}
+                                </div>
+                                <div class="armella-a-lg-text-col">
+                                    <div class="armella-a-lg-subtitle-box">ARMELLA ABIERTA</div>
+                                    <div class="armella-a-lg-title-box ${sizeClass}">${armellaSize}</div>
+                                </div>
+                            </div>
+                            <div class="armella-a-lg-bot">
+                                <div class="armella-a-lg-bot-code">${item.p.codigo}</div>
+                                <div class="armella-a-lg-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            <div class="armella-a-lg-img-area">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'alcayata-10x4',
+                    group: 'alcayata',
+                    name: 'Alcayata (10x4 cm)',
+                    description: 'Formato apaisado morado, extracción automática de medida (ej: 17 X 40). Icono de alcayata (L-hook).',
+                    width: '10cm',
+                    height: '4cm',
+                    css: `
+                        .alcayata-bktag {
+                            width: 10cm; height: 4cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000; page-break-inside: avoid; break-inside: avoid;
+                        }
+                        .alcayata-top { position: absolute; top:0; left:0; width: 10cm; height: 1cm; background: #000; z-index: 10; }
+                        .alcayata-mid {
+                            position: absolute; top: 1cm; left: 0; width: 7.6cm; height: 2cm; background: #8B5CF6;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .alcayata-screw-box { width: 2.1cm; height: 2cm; display: flex; align-items: center; justify-content: center; padding-left: 2px; }
+                        .alcayata-text-col { width: 5.5cm; height: 2cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        .alcayata-subtitle-box {
+                            width: 100%; height: 0.5cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            font-size: 15px; font-weight: 900; color: #fff; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap;
+                        }
+                        .alcayata-title-box {
+                            width: 100%; height: 1.4cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1px;
+                        }
+                        .alcayata-title-box.normal { font-size: 50px; }
+                        .alcayata-title-box.small { font-size: 36px; letter-spacing: -0.5px; }
+                        .alcayata-bot { position: absolute; top: 3cm; left: 0; width: 7.6cm; height: 1cm; display: flex; z-index: 5; }
+                        .alcayata-bot-code {
+                            width: 3.8cm; background: #5B21B6; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 36px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .alcayata-bot-br {
+                            width: 3.8cm; background: #fff; height: 1cm; display: flex; align-items: center; justify-content: center;
+                            overflow: hidden; padding: 0 2px; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+                        .alcayata-bot-br svg { max-height: 0.94cm; max-width: 98%; height: auto; }
+                        .alcayata-img-area {
+                            position: absolute; top: 1cm; right: 0; width: 2.4cm; height: 3cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
+                        }
+                        .alcayata-img-area img { max-width: 90%; max-height: 90%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let sizeText = '';
+                        let matchM = combined.match(/(\d+(?:\/\d+)?(?:"|''|PULG|IN)?\s*[xX]\s*\d+(?:\/\d+)?(?:"|''|PULG|IN)?)/i);
+                        if (matchM) {
+                            sizeText = matchM[1].replace(/''/g, '"').replace(/\s+/g, ' ').trim();
+                        } else {
+                            let matchSingle = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN)|\bM\d+\b)/i);
+                            if (matchSingle) {
+                                sizeText = matchSingle[1].replace(/''/g, '"').replace(/\s+/g, '');
+                                if (!sizeText.includes('"') && !sizeText.startsWith('M')) sizeText += '"';
+                            } else {
+                                sizeText = '---';
+                            }
+                        }
+                        
+                        let sizeClass = sizeText.length >= 6 ? 'small' : 'normal';
+                        let alcayataSvg = `<svg viewBox="0 0 160 80" style="width:1.9cm; height:0.95cm;"><g fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"><path d="M 24,70 L 24,32 A 6 6 0 0 1 30,26 L 86,26" /><path d="M 34,70 L 34,42 A 6 6 0 0 1 40,36 L 86,36" /><path d="M 24,70 L 34,70" /><path d="M 86,26 L 92,18 L 98,36 L 104,18 L 110,36 L 116,18 L 122,36 L 128,18 L 134,36 L 140,18 L 146,36 L 154,31 L 146,36 L 140,52 L 134,36 L 128,52 L 122,36 L 116,52 L 110,36 L 104,52 L 98,36 L 92,52 L 86,44 L 86,26" /></g></svg>`;
+
+                        return `
+                        <div class="alcayata-bktag">
+                            <div class="alcayata-top"></div>
+                            <div class="alcayata-mid">
+                                <div class="alcayata-screw-box">
+                                    ${alcayataSvg}
+                                </div>
+                                <div class="alcayata-text-col">
+                                    <div class="alcayata-subtitle-box">ALCAYATA</div>
+                                    <div class="alcayata-title-box ${sizeClass}">${sizeText}</div>
+                                </div>
+                            </div>
+                            <div class="alcayata-bot">
+                                <div class="alcayata-bot-code">${item.p.codigo}</div>
+                                <div class="alcayata-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            <div class="alcayata-img-area">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    id: 'alcayata-12x6',
+                    group: 'alcayata',
+                    name: 'Alcayata (12x6 cm)',
+                    description: 'Formato apaisado GRANDE morado. Extracción automática de medida (ej: 17 X 40). Escala 120%.',
+                    width: '12cm',
+                    height: '6cm',
+                    css: `
+                        .alcayata-lg-bktag {
+                            width: 12cm; height: 6cm; box-sizing: border-box; background: #fff;
+                            position: relative; overflow: hidden; font-family: 'Helvetica', Arial, sans-serif;
+                            border: 1px dashed #000; page-break-inside: avoid; break-inside: avoid;
+                        }
+                        .alcayata-lg-top { position: absolute; top:0; left:0; width: 12cm; height: 1.5cm; background: #000; z-index: 10; }
+                        .alcayata-lg-mid {
+                            position: absolute; top: 1.5cm; left: 0; width: 9.12cm; height: 3cm; background: #8B5CF6;
+                            display: flex; overflow: hidden; z-index: 5;
+                        }
+                        .alcayata-lg-screw-box { width: 2.5cm; height: 3cm; display: flex; align-items: center; justify-content: center; padding-left: 4px; }
+                        .alcayata-lg-text-col { width: 6.62cm; height: 3cm; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+                        .alcayata-lg-subtitle-box {
+                            width: 100%; height: 0.75cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            font-size: 20px; font-weight: 900; color: #fff; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap;
+                        }
+                        .alcayata-lg-title-box {
+                            width: 100%; height: 1.95cm; display: flex; align-items: center; justify-content: center; text-align: center;
+                            color: #fff; white-space: nowrap; font-weight: 900; letter-spacing: -1px;
+                        }
+                        .alcayata-lg-title-box.normal { font-size: 65px; }
+                        .alcayata-lg-title-box.small { font-size: 46px; letter-spacing: -0.5px; }
+                        .alcayata-lg-bot { position: absolute; top: 4.5cm; left: 0; width: 9.12cm; height: 1.5cm; display: flex; z-index: 5; }
+                        .alcayata-lg-bot-code {
+                            width: 4.56cm; background: #5B21B6; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            font-size: 43px; font-weight: 900; color: #fff; padding-bottom: 2px; box-sizing: border-box;
+                        }
+                        .alcayata-lg-bot-br {
+                            width: 4.56cm; background: #fff; height: 1.5cm; display: flex; align-items: center; justify-content: center;
+                            overflow: hidden; padding: 0 2px; box-sizing: border-box; border-top: 1px solid #fff;
+                        }
+                        .alcayata-lg-bot-br svg { max-height: 1.4cm; max-width: 98%; height: auto; }
+                        .alcayata-lg-img-area {
+                            position: absolute; top: 1.5cm; right: 0; width: 2.88cm; height: 4.5cm; background: #fff;
+                            display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
+                        }
+                        .alcayata-lg-img-area img { max-width: 90%; max-height: 90%; object-fit: contain; }
+                    `,
+                    render: function(item, ean, imgSrc, idBarcode) {
+                        let combined = ((item.p.nombre||'') + " " + (item.p.especificaciones ? Object.values(item.p.especificaciones).join(' ') : '')).toUpperCase();
+                        let sizeText = '';
+                        let matchM = combined.match(/(\d+(?:\/\d+)?(?:"|''|PULG|IN)?\s*[xX]\s*\d+(?:\/\d+)?(?:"|''|PULG|IN)?)/i);
+                        if (matchM) {
+                            sizeText = matchM[1].replace(/''/g, '"').replace(/\s+/g, ' ').trim();
+                        } else {
+                            let matchSingle = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN)|\bM\d+\b)/i);
+                            if (matchSingle) {
+                                sizeText = matchSingle[1].replace(/''/g, '"').replace(/\s+/g, '');
+                                if (!sizeText.includes('"') && !sizeText.startsWith('M')) sizeText += '"';
+                            } else {
+                                sizeText = '---';
+                            }
+                        }
+                        
+                        let sizeClass = sizeText.length >= 6 ? 'small' : 'normal';
+                        let alcayataSvg = `<svg viewBox="0 0 160 80" style="width:2.4cm; height:1.2cm;"><g fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"><path d="M 24,70 L 24,32 A 6 6 0 0 1 30,26 L 86,26" /><path d="M 34,70 L 34,42 A 6 6 0 0 1 40,36 L 86,36" /><path d="M 24,70 L 34,70" /><path d="M 86,26 L 92,18 L 98,36 L 104,18 L 110,36 L 116,18 L 122,36 L 128,18 L 134,36 L 140,18 L 146,36 L 154,31 L 146,36 L 140,52 L 134,36 L 128,52 L 122,36 L 116,52 L 110,36 L 104,52 L 98,36 L 92,52 L 86,44 L 86,26" /></g></svg>`;
+
+                        return `
+                        <div class="alcayata-lg-bktag">
+                            <div class="alcayata-lg-top"></div>
+                            <div class="alcayata-lg-mid">
+                                <div class="alcayata-lg-screw-box">
+                                    ${alcayataSvg}
+                                </div>
+                                <div class="alcayata-lg-text-col">
+                                    <div class="alcayata-lg-subtitle-box">ALCAYATA</div>
+                                    <div class="alcayata-lg-title-box ${sizeClass}">${sizeText}</div>
+                                </div>
+                            </div>
+                            <div class="alcayata-lg-bot">
+                                <div class="alcayata-lg-bot-code">${item.p.codigo}</div>
+                                <div class="alcayata-lg-bot-br"><svg id="${idBarcode}"></svg></div>
+                            </div>
+                            <div class="alcayata-lg-img-area">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -10001,9 +10567,6 @@ function renderCarouselGroup(mainContainer, items, options) {
                     }
                     let baseSrc = img;
                     let imgSrc = baseSrc;
-                    if(baseSrc && baseSrc.indexOf('http') === 0) {
-                        imgSrc = 'https://wsrv.nl/?url=' + encodeURIComponent(baseSrc) + '&w=400&trim=12';
-                    }
                     let ean = sample.p.ean ? sample.p.ean : ('10' + sample.p.codigo);
                     let idBarcode = 'bktpl-preview-barcode';
                     
@@ -10020,7 +10583,11 @@ function renderCarouselGroup(mainContainer, items, options) {
                         this.renderBarcodeOrQR(idBarcode, ean, sample);
                         this.renderColorPicker();
                         this.applyColorOverrides();
+                        if (window.triggerAllAutoCrop) window.triggerAllAutoCrop();
                     }, 50);
+                    setTimeout(() => {
+                        if (window.triggerAllAutoCrop) window.triggerAllAutoCrop();
+                    }, 250);
                 } else {
                     document.getElementById('bktplLiveCanvas').innerHTML = '<div style="color:#64748b; text-align:center; padding:20px;">Escanea al menos un producto en tu mesa de trabajo para ver la previsualización.</div>';
                 }
@@ -10070,9 +10637,6 @@ function renderCarouselGroup(mainContainer, items, options) {
                         
                         let baseSrc = img;
                         let imgSrc = baseSrc;
-                        if(baseSrc && baseSrc.indexOf('http') === 0) {
-                            imgSrc = 'https://wsrv.nl/?url=' + encodeURIComponent(baseSrc) + '&w=400&trim=12';
-                        }
                         
                         let ean = item.p.ean ? item.p.ean : ('10' + item.p.codigo);
                         let idBarcode = 'barcode-' + Math.random().toString(36).substr(2, 9);
