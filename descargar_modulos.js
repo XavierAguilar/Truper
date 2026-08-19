@@ -64,11 +64,21 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // === EXTRAER MODULE ID ===
 function extractModuleId(html) {
-    // Buscar URLs que contengan /modulos/ seguido de un número
-    const regex = /\/modulos\/\/?\/?(\d+)\.jpg/g;
-    let match;
     const ids = new Set();
-    while ((match = regex.exec(html)) !== null) {
+    // Nueva ruta 2026: GestorCatalogos/img/sections/catalogo-mx/mx-pub/XXXX.jpg
+    const regex2026 = /\/GestorCatalogos\/img\/sections\/catalogo-mx\/mx-pub\/(\d+)\.jpg/g;
+    let match;
+    while ((match = regex2026.exec(html)) !== null) {
+        ids.add(match[1]);
+    }
+    // Ruta histórica: /modulos/XXXX.jpg
+    const regexLegacy = /\/modulos\/\/?\/?(\d+)\.jpg/g;
+    while ((match = regexLegacy.exec(html)) !== null) {
+        ids.add(match[1]);
+    }
+    // Clases HTML: modulo-XXXX o name="XXXX" class="hidden XXXX"
+    const regexClass = /modulo-(\d+)/g;
+    while ((match = regexClass.exec(html)) !== null) {
         ids.add(match[1]);
     }
     return Array.from(ids);
@@ -134,8 +144,8 @@ async function main() {
         if (data.moduleId) codeToModule[code] = data.moduleId;
     });
 
-    // Productos pendientes
-    const pending = products.filter(p => !progress[p.codigo]);
+    // Productos pendientes (aquellos que aún no tienen modulo_id o no fueron procesados)
+    const pending = products.filter(p => !p.modulo_id || !progress[p.codigo] || !progress[p.codigo].moduleId);
     console.log(`⏳ ${pending.length} productos pendientes de procesar\n`);
 
     // Función para guardar progreso
@@ -217,10 +227,12 @@ async function main() {
 
                         // Descargar imagen si no existe
                         if (!existingModules.has(moduleId)) {
-                            const imgUrl = `https://www.truper.com/BibliotecaContenidoDigital/CatVigente/modulos/${moduleId}.jpg`;
+                            const imgUrl2026 = `https://www.truper.com/GestorCatalogos/img/sections/catalogo-mx/mx-pub/${moduleId}.jpg`;
+                            const imgUrlLegacy = `https://www.truper.com/BibliotecaContenidoDigital/CatVigente/modulos/${moduleId}.jpg`;
                             const dest = path.join(OUTPUT_DIR, `${moduleId}.jpg`);
                             try {
-                                const ok = await downloadFile(imgUrl, dest);
+                                let ok = await downloadFile(imgUrl2026, dest);
+                                if (!ok) ok = await downloadFile(imgUrlLegacy, dest);
                                 if (ok) {
                                     existingModules.add(moduleId);
                                     stats.modulesDownloaded++;
@@ -279,7 +291,7 @@ async function main() {
     products.forEach(p => {
         if (codeToModule[p.codigo]) {
             p.modulo_id = codeToModule[p.codigo];
-            p.modulo_imagen_url = `https://www.truper.com/BibliotecaContenidoDigital/CatVigente/modulos/${codeToModule[p.codigo]}.jpg`;
+            p.modulo_imagen_url = `https://www.truper.com/GestorCatalogos/img/sections/catalogo-mx/mx-pub/${codeToModule[p.codigo]}.jpg`;
             p.modulo_imagen_local = `modulos/${codeToModule[p.codigo]}.jpg`;
             updated++;
         }

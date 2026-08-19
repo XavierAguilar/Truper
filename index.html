@@ -4978,27 +4978,27 @@ function renderCarouselGroup(mainContainer, items, options) {
             dl.push('<button class="download-btn" onclick="window.quoteCart.add(\'' + p.codigo + '\', event)" style="background-color:#10b981; border-color:#059669; color:white; font-weight:bold;"><i class="fas fa-cart-plus"></i> Cotizar PTV</button>');
             if (p.promocion) {
                 var urlFolleto = p.es_nuevo
-                    ? 'https://www.truper.com/promo/2026/Julio/Promo%20nacional/a9bdc8adb10d30f7e3d15b9918e463bd.pdf'
-                    : 'https://www.truper.com/promo/2026/Julio/Promo%20nacional/bf694a005b5205cb1be4d0327d5d0f5e.pdf';
+                    ? 'https://www.truper.com/promo/2026/Agosto/Promo%20nacional/446b6f09033a81494d930982f5951aec.pdf'
+                    : 'https://www.truper.com/promo/2026/Agosto/Promo%20nacional/ff9467c6fd2e86711a2f934fa1bea196.pdf';
                 dl.push('<a class="download-btn" href="' + urlFolleto + '" target="_blank" style="background:#ea580c;color:white;border:none;"><i class="fas fa-fire"></i>Ver Folleto Oferta</a>');
             }
             if (p.es_volatil) {
-                var urlVolatiles = 'https://www.truper.com/promo/2026/Julio/Promo%20nacional/1b69dc639524fb96e4656beec624e278.pdf';
+                var urlVolatiles = 'https://www.truper.com/promo/2026/Agosto/Promo%20nacional/253cf19b98d5c105a50fc3f7035e1dd4.pdf';
                 dl.push('<a class="download-btn" href="' + urlVolatiles + '" target="_blank" style="background:#0284c7;color:white;border:none;"><i class="fas fa-chart-line"></i>Ver Folleto Volátiles</a>');
             }
             if (p.ficha_tecnica_pdf) dl.push('<a class="download-btn" href="' + p.ficha_tecnica_pdf + '" target="_blank"><i class="fas fa-file-pdf"></i>Ficha PDF</a>');
             if (p.banco_fotos_url) dl.push('<a class="download-btn" href="' + p.banco_fotos_url + '" target="_blank"><i class="fas fa-images"></i>Banco Fotos</a>');
             if (p.catalogo_url || p.pagina_catalogo) {
                 var pageLabel = p.pagina_catalogo ? '#' + p.pagina_catalogo : '';
-                // Usar imagen local si hay modulo_id, fallback a Truper
+                // Usar imagen local si hay modulo_id, fallback a Truper (nueva ruta 2026 y fallback)
                 var moduloId = p.modulo_id || '';
                 var moduloUrl = moduloId ? 'modulos/' + moduloId + '.jpg' : '';
-                var moduloUrlRemoto = moduloId ? 'https://www.truper.com/BibliotecaContenidoDigital/CatVigente/modulos/' + moduloId + '.jpg' : '';
+                var moduloUrlRemoto = moduloId ? 'https://www.truper.com/GestorCatalogos/img/sections/catalogo-mx/mx-pub/' + moduloId + '.jpg' : '';
                 var catUrl = p.catalogo_url || '';
                 dl.push('<div class="catalog-dropdown-wrap" style="position:relative;display:inline-block;">' +
                     '<button class="download-btn catalog-btn" onclick="event.preventDefault();event.stopPropagation();toggleCatalogDropdown(this)"><i class="fas fa-book-open"></i>Catálogo página <span class="page-num">' + pageLabel + '</span> <i class="fas fa-caret-down" style="margin-left:4px;font-size:10px;"></i></button>' +
                     '<div class="catalog-dropdown" style="display:none;position:absolute;bottom:110%;left:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:4px 0;min-width:180px;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.4);">' +
-                    (moduloUrl ? '<a href="javascript:void(0)" onclick="event.stopPropagation();openModuloModal(\'' + moduloUrl + '\',\'' + moduloUrlRemoto + '\',\'' + pageLabel + '\')" style="display:flex;align-items:center;gap:8px;padding:8px 14px;color:var(--text-light);text-decoration:none;font-size:13px;transition:background 0.15s;" onmouseover="this.style.background=\'rgba(234,88,12,0.15)\'" onmouseout="this.style.background=\'none\'"><i class="fas fa-image" style="color:var(--primary);width:16px;"></i>Ver módulo</a>' : '') +
+                    (moduloUrl ? '<a href="javascript:void(0)" onclick="event.stopPropagation();openModuloModal(\'' + moduloUrl + '\',\'' + moduloUrlRemoto + '\',\'' + pageLabel + '\',\'' + moduloId + '\')" style="display:flex;align-items:center;gap:8px;padding:8px 14px;color:var(--text-light);text-decoration:none;font-size:13px;transition:background 0.15s;" onmouseover="this.style.background=\'rgba(234,88,12,0.15)\'" onmouseout="this.style.background=\'none\'"><i class="fas fa-image" style="color:var(--primary);width:16px;"></i>Ver módulo</a>' : '') +
                     (catUrl ? '<a href="' + catUrl + '" target="_blank" onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:8px;padding:8px 14px;color:var(--text-light);text-decoration:none;font-size:13px;transition:background 0.15s;" onmouseover="this.style.background=\'rgba(234,88,12,0.15)\'" onmouseout="this.style.background=\'none\'"><i class="fas fa-external-link-alt" style="color:#10b981;width:16px;"></i>Ir a página Truper</a>' : '') +
                     '</div></div>');
             }
@@ -5150,17 +5150,24 @@ function renderCarouselGroup(mainContainer, items, options) {
             if (!isOpen) dd.style.display = 'block';
         }
 
-        // Modal del módulo (local con fallback a Truper)
-        function openModuloModal(localUrl, remoteUrl, pageLabel) {
+        // Modal del módulo (local con fallback a Truper 2026 GestorCatalogos y fallback histórico)
+        function openModuloModal(localUrl, remoteUrl, pageLabel, moduloId) {
             // Cerrar dropdown
             document.querySelectorAll('.catalog-dropdown').forEach(function (d) { d.style.display = 'none'; });
             // Usar el lightbox existente con la imagen del módulo
             var lb = document.getElementById('lightbox');
             var lbImg = document.getElementById('lightboxImg');
+            var triedRemote = false;
+            var triedLegacy = false;
+            var legacyUrl = moduloId ? 'https://www.truper.com/BibliotecaContenidoDigital/CatVigente/modulos/' + moduloId + '.jpg' : '';
+
             lbImg.onerror = function () {
-                // Si falla la local, intentar la remota
-                if (remoteUrl && lbImg.src !== remoteUrl) {
+                if (!triedRemote && remoteUrl && lbImg.src !== remoteUrl) {
+                    triedRemote = true;
                     lbImg.src = remoteUrl;
+                } else if (!triedLegacy && legacyUrl && lbImg.src !== legacyUrl) {
+                    triedLegacy = true;
+                    lbImg.src = legacyUrl;
                 }
             };
             lbImg.src = localUrl;

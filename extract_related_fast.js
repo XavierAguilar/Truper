@@ -39,19 +39,55 @@ function fetchPage(url) {
 // Extraer códigos relacionados del HTML del buscador
 function extractRelatedCodes(html, ownCode) {
     const codes = new Set();
-    // Buscar todas las URLs de ficha técnica: codigo=XXXXX
-    const regex = /ficha_tecnica\/controllers\/index\.php\?codigo=(\d+)/g;
+    // 1. Buscar URLs de ficha técnica: codigo=XXXXX
+    const regexFicha = /codigo=(\d+)/g;
     let match;
-    while ((match = regex.exec(html)) !== null) {
+    while ((match = regexFicha.exec(html)) !== null) {
         const code = match[1];
-        if (code !== ownCode) codes.add(code);
+        if (code !== ownCode && code.length >= 5) codes.add(code);
+    }
+    // 2. Buscar spans de código en tablas
+    const regexSpan = /<span class="code">(\d+)<\/span>/g;
+    while ((match = regexSpan.exec(html)) !== null) {
+        const code = match[1];
+        if (code !== ownCode && code.length >= 5) codes.add(code);
+    }
+    // 3. Buscar data-documentid
+    const regexDoc = /data-documentid="(\d+)"/g;
+    while ((match = regexDoc.exec(html)) !== null) {
+        const code = match[1];
+        if (code !== ownCode && code.length >= 5) codes.add(code);
     }
     return Array.from(codes);
 }
 
+// Extraer página y URL de catálogo desde el HTML del buscador Truper 2026
+function extractCatalogInfo(html) {
+    let catalogo_url = '';
+    let pagina_catalogo = null;
+
+    // Buscar data-source o href con .html de sección (ej: mangueras-y-juegos-61.html)
+    const matchCat = html.match(/(?:data-source="|<a href=")([^"]+?-(\d+)\.html)/i);
+    if (matchCat) {
+        let pagePath = matchCat[1];
+        if (!pagePath.startsWith('http')) {
+            catalogo_url = 'https://www.truper.com/CatVigente/' + pagePath;
+        } else {
+            catalogo_url = pagePath;
+        }
+        pagina_catalogo = parseInt(matchCat[2]);
+    } else {
+        // Fallback buscar table_numPag
+        const matchNum = html.match(/class="table_numPag"[^>]*>[\s\S]*?>(\d+)</i);
+        if (matchNum) {
+            pagina_catalogo = parseInt(matchNum[1]);
+        }
+    }
+    return { catalogo_url, pagina_catalogo };
+}
+
 // Extraer nombre/clave del código desde la página
 function extractCodeInfo(html, code) {
-    // Buscar patrón: código\n  CLAVE
     const regex = new RegExp(code + '\\s+([A-Z0-9\\-]+)', 'g');
     const match = regex.exec(html);
     return match ? match[1] : '';
@@ -72,7 +108,7 @@ async function main() {
     }
 
     // Filtrar productos que aún no tienen relacionados
-    const pending = products.filter(p => !p.relacionados || p.relacionados.length === 0);
+    const pending = products.filter(p => !p.productos_relacionados || p.productos_relacionados.length === 0);
     console.log('⏳ ' + pending.length + ' productos sin relacionados');
     console.log('✅ ' + (products.length - pending.length) + ' ya procesados');
     console.log('🔄 Concurrencia: ' + CONCURRENCY + ' | Delay: ' + DELAY_MS + 'ms\n');
@@ -154,6 +190,9 @@ async function main() {
                     const pidx = codeToIdx[p.codigo];
                     if (pidx !== undefined) {
                         products[pidx].productos_relacionados = relObjs;
+                        const catInfo = extractCatalogInfo(html);
+                        if (catInfo.catalogo_url) products[pidx].catalogo_url = catInfo.catalogo_url;
+                        if (catInfo.pagina_catalogo) products[pidx].pagina_catalogo = catInfo.pagina_catalogo;
                     }
 
                     found++;

@@ -1,89 +1,26 @@
 {
   "estado": "completado",
-  "salud": "warning",
-  "total_catalogo": 15443,
+  "salud": "healthy",
+  "total_catalogo": 16034,
   "rango": {
     "start": 0,
-    "end": 15443
+    "end": 16034
   },
-  "procesados": 15454,
+  "procesados": 16061,
   "nuevos_en_lote": 0,
-  "total_lote": 168,
+  "total_lote": 744,
   "pct_lote": 100,
-  "errores": 16,
-  "reintentando": 58,
+  "errores": 0,
+  "reintentando": 2,
   "pendientes": 0,
-  "tiempo_s": "355",
-  "prod_por_min": "28.4",
-  "ultima_actualizacion": "2026-07-03T16:25:54.803Z",
+  "tiempo_s": "527",
+  "prod_por_min": "84.8",
+  "ultima_actualizacion": "2026-08-18T22:50:33.103Z",
   "ultimo_producto": {
-    "codigo": "43564",
-    "clave": "COLET-3/4-F3",
-    "nombre": "Condulet rectangular 3/4\" tipo FS de 3 salidas, VOLTECK"
+    "codigo": "40265",
+    "clave": "GRA-1-1/4NB",
+    "nombre": "Bolsa con 1 kg de grapas 1-1/4' negras p/alambre de púas"
   },
-  "errores_detalle": [
-    {
-      "codigo": "55571",
-      "clave": "EX-H-PRO-CR",
-      "error": "HTTP 429",
-      "tipo": "http"
-    },
-    {
-      "codigo": "55648",
-      "clave": "EX-VAL-FOS2-CR",
-      "error": "HTTP 429",
-      "tipo": "http"
-    },
-    {
-      "codigo": "55617",
-      "clave": "EX-F-317A-CR",
-      "error": "HTTP 429",
-      "tipo": "http"
-    },
-    {
-      "codigo": "55616",
-      "clave": "EX-M-060I-CR",
-      "error": "HTTP 429",
-      "tipo": "http"
-    },
-    {
-      "codigo": "55654",
-      "clave": "EX80-CON3-2-CR",
-      "error": "HTTP 429",
-      "tipo": "http"
-    },
-    {
-      "codigo": "55655",
-      "clave": "EX80-CON1-2",
-      "error": "HTTP 429",
-      "tipo": "http"
-    },
-    {
-      "codigo": "55653",
-      "clave": "EX80-CON3-2",
-      "error": "HTTP 429",
-      "tipo": "http"
-    },
-    {
-      "codigo": "55656",
-      "clave": "EX80-CON1-2-CR",
-      "error": "HTTP 429",
-      "tipo": "http"
-    },
-    {
-      "codigo": "56036",
-      "clave": "EX-HER-GO-CR",
-      "error": "HTTP 429",
-      "tipo": "http"
-    },
-    {
-      "codigo": "55652",
-      "clave": "EX80-CON2-2-CR",
-      "error": "HTTP 429",
-      "tipo": "http"
-    }
-  ],
-  "problemas": [
-    "♻️ 58 productos en cola de reintento"
-  ]
+  "errores_detalle": [],
+  "problemas": []
 }

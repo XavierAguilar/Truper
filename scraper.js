@@ -4,12 +4,17 @@ const { parse } = require('node-html-parser');
 // ============================================================================
 // CONFIGURACIÓN (CLI: node scraper.js [--start N] [--end N] [--resume] [--concurrency N])
 // ============================================================================
-const CSV_PATH = './catalogo.csv';
+let CSV_PATH = './catalogo_Agosto2026.csv';
+if (!fs.existsSync(CSV_PATH) && fs.existsSync('./lista/catalogo_Agosto2026.csv')) {
+  CSV_PATH = './lista/catalogo_Agosto2026.csv';
+} else if (!fs.existsSync(CSV_PATH)) {
+  CSV_PATH = './catalogo.csv';
+}
 const OUTPUT_PATH = './productos_truper.json';
 const BASE_URL = 'https://www.truper.com/ficha_tecnica/controllers/index.php';
 const API_URL = 'https://www.truper.com/ficha_tecnica/findProductsCod';
 const TRUPER_BASE = 'https://www.truper.com';
-const DELAY_MS = 500;
+const DELAY_MS = 600;
 const SAVE_EVERY = 25;
 
 // Args CLI
@@ -73,6 +78,9 @@ async function fetchWithRetry(url, options = {}, retries = 5) {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return response;
     } catch (err) {
+      if (err.message.includes('404') || err.message.includes('400')) {
+        throw err;
+      }
       if (attempt < retries) {
         const wait = Math.min(2000 * Math.pow(1.5, attempt), 15000);
         console.log(`  ⚠ Intento ${attempt}/${retries}: ${err.message} (espera ${(wait / 1000).toFixed(0)}s)`);
@@ -482,9 +490,9 @@ async function main() {
       console.log('🔍 Modo rescate activo: Escaneando toda la base instalada...');
       toProcess = existingResults.filter(p => !p.imagenes || p.imagenes.length === 0);
   } else {
-      // Flujo normal CSV -> JSON
-      const processedCodes = new Set(existingResults.map(r => r.codigo));
-      toProcess = catalogProducts.filter(p => !processedCodes.has(p.codigo));
+      // Flujo normal CSV -> JSON (identificar los que no tienen ficha o fotos)
+      const fullyProcessedCodes = new Set(existingResults.filter(p => (p.caracteristicas && p.caracteristicas.length > 0) || (p.imagenes && p.imagenes.length > 0)).map(r => r.codigo));
+      toProcess = catalogProducts.filter(p => !fullyProcessedCodes.has(p.codigo));
   }
   console.log(`🔄 ${toProcess.length} productos nuevos por procesar\n`);
   if (toProcess.length === 0) { console.log('✅ Todos ya procesados'); return; }
@@ -604,17 +612,23 @@ async function main() {
     }
   }
 
-  // Primera pasada: procesar todos
+  // Primera pasada: procesar por lotes controlados
   console.log('━━━ PASADA 1: Procesamiento principal ━━━\n');
-  const tasks = toProcess.map(product => processOne(product, false));
-  await Promise.all(tasks);
+  for (let i = 0; i < toProcess.length; i += CONCURRENCY) {
+    const batch = toProcess.slice(i, i + CONCURRENCY);
+    await Promise.all(batch.map(product => processOne(product, false)));
+    await sleep(DELAY_MS);
+  }
 
   // Segunda pasada: reintentar fallidos
   if (retryQueue.length > 0) {
     console.log(`\n━━━ PASADA 2: Reintentando ${retryQueue.length} fallidos ━━━\n`);
-    completed = toProcess.length - retryQueue.length; // Reset counter for display
-    const retryTasks = retryQueue.map(product => processOne(product, true));
-    await Promise.all(retryTasks);
+    completed = toProcess.length - retryQueue.length;
+    for (let i = 0; i < retryQueue.length; i += CONCURRENCY) {
+      const batch = retryQueue.slice(i, i + CONCURRENCY);
+      await Promise.all(batch.map(product => processOne(product, true)));
+      await sleep(DELAY_MS);
+    }
   }
 
   // Guardado final
