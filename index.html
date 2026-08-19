@@ -1888,14 +1888,104 @@
 
         .prices-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
             gap: 8px;
+            transition: all 0.25s ease;
         }
 
         @media (max-width: 600px) {
             .prices-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
             }
+        }
+
+        /* Ocultar tarjetas de precios según preferencia del usuario */
+        body.hide-price-dist .price-card.dist { display: none !important; }
+        body.hide-price-mayo .price-card.mayo { display: none !important; }
+        body.hide-price-mmayo .price-card.mmayo { display: none !important; }
+        body.hide-price-pub .price-card.pub { display: none !important; }
+
+        /* Controles de selección de precios visibles en el Footer */
+        .footer-price-toggle-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(15, 23, 42, 0.7);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            margin: 0 4px;
+            flex-wrap: wrap;
+        }
+
+        .footer-toggle-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-dim);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-right: 4px;
+            user-select: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .price-toggle-pill {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+
+        .price-toggle-pill:hover {
+            border-color: var(--text-light);
+            color: var(--text);
+            transform: translateY(-1px);
+        }
+
+        .price-toggle-pill.active.dist {
+            background: rgba(59, 130, 246, 0.18);
+            border-color: #3b82f6;
+            color: #93c5fd;
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.25);
+        }
+
+        .price-toggle-pill.active.mayo {
+            background: rgba(16, 185, 129, 0.18);
+            border-color: #10b981;
+            color: #6ee7b7;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.25);
+        }
+
+        .price-toggle-pill.active.mmayo {
+            background: rgba(245, 158, 11, 0.18);
+            border-color: #f59e0b;
+            color: #fcd34d;
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.25);
+        }
+
+        .price-toggle-pill.active.pub {
+            background: rgba(234, 88, 12, 0.18);
+            border-color: #ea580c;
+            color: #fdba74;
+            box-shadow: 0 0 8px rgba(234, 88, 12, 0.25);
+        }
+
+        .price-toggle-pill.inactive {
+            opacity: 0.38;
+            border-color: rgba(255, 255, 255, 0.1);
+            text-decoration: line-through;
+            filter: grayscale(0.85);
         }
 
         .price-card {
@@ -2662,7 +2752,88 @@
 
     <script>
         var productos = [], selectedIdx = -1, currentMainImg = {};
-        var searchIndex = []; // Índice pre-procesado para búsqueda rápida
+        var searchIndex = []; // Índice pre-procesado para búsqueda rápida
+
+        // ======= GESTIÓN DE VISIBILIDAD DE PRECIOS CON PERSISTENCIA LOCAL =======
+        window.priceVisibility = { dist: true, mayo: true, mmayo: true, pub: true };
+
+        function initPriceVisibility() {
+            try {
+                var saved = localStorage.getItem('casaVazquez_priceVisibility');
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    if (parsed && typeof parsed === 'object') {
+                        if (parsed.dist !== undefined) window.priceVisibility.dist = !!parsed.dist;
+                        if (parsed.mayo !== undefined) window.priceVisibility.mayo = !!parsed.mayo;
+                        if (parsed.mmayo !== undefined) window.priceVisibility.mmayo = !!parsed.mmayo;
+                        if (parsed.pub !== undefined) window.priceVisibility.pub = !!parsed.pub;
+                    }
+                }
+            } catch (e) {
+                console.error('Error cargando preferencias de precios:', e);
+            }
+            applyPriceVisibility();
+        }
+
+        function togglePriceVisibility(type) {
+            var activeCount = 0;
+            for (var k in window.priceVisibility) {
+                if (window.priceVisibility[k]) activeCount++;
+            }
+
+            // Evitar apagar todos los precios a la vez
+            if (window.priceVisibility[type] && activeCount <= 1) {
+                if (window.Swal) {
+                    Swal.fire({
+                        toast: true,
+                        position: 'bottom-end',
+                        icon: 'info',
+                        title: 'Debe haber al menos un precio visible',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        background: '#1e293b',
+                        color: '#f8fafc'
+                    });
+                }
+                return;
+            }
+
+            window.priceVisibility[type] = !window.priceVisibility[type];
+            try {
+                localStorage.setItem('casaVazquez_priceVisibility', JSON.stringify(window.priceVisibility));
+            } catch (e) {}
+            applyPriceVisibility();
+        }
+
+        function applyPriceVisibility() {
+            ['dist', 'mayo', 'mmayo', 'pub'].forEach(function (type) {
+                var isVis = window.priceVisibility[type];
+                var bodyClass = 'hide-price-' + type;
+                if (isVis) {
+                    document.body.classList.remove(bodyClass);
+                } else {
+                    document.body.classList.add(bodyClass);
+                }
+
+                var btn = document.getElementById('priceToggleBtn-' + type);
+                if (btn) {
+                    if (isVis) {
+                        btn.classList.add('active');
+                        btn.classList.remove('inactive');
+                    } else {
+                        btn.classList.remove('active');
+                        btn.classList.add('inactive');
+                    }
+                }
+            });
+        }
+
+        // Ejecutar inmediatamente
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initPriceVisibility);
+        } else {
+            initPriceVisibility();
+        }
 
         // ===== NORMALIZACIÓN: quitar acentos y caracteres especiales =====
         function normalize(str) {
@@ -6461,7 +6632,24 @@ function renderCarouselGroup(mainContainer, items, options) {
         init();
     </script>
     <footer class="app-footer">
-        <div id="catalog-version-badge" class="footer-badge">&#127991;&#65039; Versión: --</div>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <div id="catalog-version-badge" class="footer-badge">&#127991;&#65039; Versión: --</div>
+            <div class="footer-price-toggle-group" id="footerPriceToggleGroup" title="Selecciona qué precios mostrar en las fichas técnicas">
+                <span class="footer-toggle-title"><i class="fas fa-eye"></i> Precios:</span>
+                <button type="button" class="price-toggle-pill dist active" id="priceToggleBtn-dist" onclick="togglePriceVisibility('dist')" title="Mostrar / Ocultar precio Distribuidor">
+                    <i class="fas fa-building"></i> Dist
+                </button>
+                <button type="button" class="price-toggle-pill mayo active" id="priceToggleBtn-mayo" onclick="togglePriceVisibility('mayo')" title="Mostrar / Ocultar precio Mayoreo">
+                    <i class="fas fa-boxes-stacked"></i> Mayoreo
+                </button>
+                <button type="button" class="price-toggle-pill mmayo active" id="priceToggleBtn-mmayo" onclick="togglePriceVisibility('mmayo')" title="Mostrar / Ocultar precio Medio Mayoreo">
+                    <i class="fas fa-box"></i> Med May
+                </button>
+                <button type="button" class="price-toggle-pill pub active" id="priceToggleBtn-pub" onclick="togglePriceVisibility('pub')" title="Mostrar / Ocultar precio Público">
+                    <i class="fas fa-user"></i> Público
+                </button>
+            </div>
+        </div>
         <div class="header-stats" id="headerStats" style="margin: 0;"></div>
         <div style="display: flex; gap: 12px; align-items: center;">
             <button class="dashboard-btn" onclick="toggleBackTagsView()" title="Generar Back Tags" style="background:#dc2626; color:white;">
