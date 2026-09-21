@@ -5404,10 +5404,14 @@ function renderCarouselGroup(mainContainer, items, options) {
             var isCarouselImg = !!img.closest('.welcome-carousel-container');
             var isProductSheet = !!img.closest('.images-panel');
             var isResultCard = !!img.closest('.result-card-img') || !!img.closest('.result-list-thumb');
+            var isHardwareArea = !!img.closest('[class*="-img-area"]') || !!img.closest('.img-area');
             var isBackTag = !!img.closest('[class*="bktag"]');
-            var fillFactor = isBackTag ? 0.95 : (isProductSheet ? 0.95 : (isCarouselImg ? 0.875 : 1.025));
+            var fillFactor = isHardwareArea ? 2.2 : (isBackTag ? 0.95 : (isProductSheet ? 0.95 : (isCarouselImg ? 0.875 : 1.025)));
             
-            // Inyectar pre-escala inicial sin delay para que no espere al proxy
+            // Inyectar pre-escala inicial y asegurar recorte visual para que en Vercel nunca se vean pequeñas
+            if (isHardwareArea && img.parentElement) {
+                img.parentElement.style.overflow = 'hidden';
+            }
             img.style.opacity = '1';
             img.style.transform = 'scale(' + fillFactor + ')';
             
@@ -7404,7 +7408,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             
                             <div class="pija-img-area">
                                 ${cruzSvg}
-                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -7471,6 +7475,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                         .pija-ab-img-area {
                             position: absolute; top: 1cm; right: 0; width: 3cm; height: 3cm; background: #fff;
                             display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
                         }
                         .pija-ab-phillips { position: absolute; right: 0.1cm; top: 0.1cm; width: 0.6cm; height: 0.6cm; z-index:10; }
                         .pija-ab-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
@@ -7511,7 +7516,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             
                             <div class="pija-ab-img-area">
                                 ${cruzSvg}
-                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -7572,6 +7577,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                         .pija-lg-img-area {
                             position: absolute; top: 1.5cm; right: 0; width: 3.6cm; height: 4.5cm; background: #fff;
                             display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
                         }
                         .pija-lg-phillips { position: absolute; right: 0.12cm; top: 0.12cm; width: 0.72cm; height: 0.72cm; z-index:10; }
                         .pija-lg-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
@@ -7612,7 +7618,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             
                             <div class="pija-lg-img-area">
                                 ${cruzSvg}
-                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -7673,6 +7679,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                         .pija-ab-lg-img-area {
                             position: absolute; top: 1.5cm; right: 0; width: 3.6cm; height: 4.5cm; background: #fff;
                             display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
                         }
                         .pija-ab-lg-phillips { position: absolute; right: 0.12cm; top: 0.12cm; width: 0.72cm; height: 0.72cm; z-index:10; }
                         .pija-ab-lg-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
@@ -7713,7 +7720,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             
                             <div class="pija-ab-lg-img-area">
                                 ${cruzSvg}
-                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -7774,6 +7781,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                         .pija-lam-img-area {
                             position: absolute; top: 1cm; right: 0; width: 3cm; height: 3cm; background: #fff;
                             display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
                         }
                         .pija-lam-slothead { position: absolute; right: 0.1cm; top: 0.1cm; width: 0.6cm; height: 0.6cm; z-index:10; }
                         .pija-lam-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
@@ -7814,7 +7822,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             
                             <div class="pija-lam-img-area">
                                 ${slotSvg}
-                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -7875,6 +7883,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                         .pija-lam-lg-img-area {
                             position: absolute; top: 1.5cm; right: 0; width: 3.6cm; height: 4.5cm; background: #fff;
                             display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
                         }
                         .pija-lam-lg-slothead { position: absolute; right: 0.12cm; top: 0.12cm; width: 0.72cm; height: 0.72cm; z-index:10; }
                         .pija-lam-lg-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
@@ -7915,7 +7924,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             
                             <div class="pija-lam-lg-img-area">
                                 ${slotSvg}
-                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -7976,6 +7985,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                         .pija-hex-img-area {
                             position: absolute; top: 1cm; right: 0; width: 3cm; height: 3cm; background: #fff;
                             display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
                         }
                         .pija-hex-symbol { position: absolute; right: 0.1cm; top: 0.1cm; width: 0.6cm; height: 0.6cm; z-index:10; }
                         .pija-hex-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
@@ -8016,7 +8026,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             
                             <div class="pija-hex-img-area">
                                 ${hexSvg}
-                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -8077,6 +8087,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                         .pija-hex-lg-img-area {
                             position: absolute; top: 1.5cm; right: 0; width: 3.6cm; height: 4.5cm; background: #fff;
                             display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
                         }
                         .pija-hex-lg-symbol { position: absolute; right: 0.12cm; top: 0.12cm; width: 0.72cm; height: 0.72cm; z-index:10; }
                         .pija-hex-lg-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
@@ -8117,7 +8128,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             
                             <div class="pija-hex-lg-img-area">
                                 ${hexSvg}
-                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -8165,6 +8176,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                         .pija-broca-img-area {
                             position: absolute; top: 1cm; right: 0; width: 3cm; height: 3cm; background: #fff;
                             display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
                         }
                         .pija-broca-symbol { position: absolute; right: 0.1cm; top: 0.1cm; width: 0.6cm; height: 0.6cm; z-index:10; }
                         .pija-broca-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
@@ -8201,7 +8213,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             </div>
                             <div class="pija-broca-img-area">
                                 ${brocaSvg}
-                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -8249,6 +8261,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                         .pija-broca-lg-img-area {
                             position: absolute; top: 1.5cm; right: 0; width: 3.6cm; height: 4.5cm; background: #fff;
                             display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
                         }
                         .pija-broca-lg-symbol { position: absolute; right: 0.12cm; top: 0.12cm; width: 0.72cm; height: 0.72cm; z-index:10; }
                         .pija-broca-lg-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
@@ -8285,7 +8298,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             </div>
                             <div class="pija-broca-lg-img-area">
                                 ${brocaSvg}
-                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -8333,6 +8346,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                         .pija-b8-img-area {
                             position: absolute; top: 1cm; right: 0; width: 3cm; height: 3cm; background: #fff;
                             display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
                         }
                         .pija-b8-symbol { position: absolute; right: 0.1cm; top: 0.1cm; width: 0.6cm; height: 0.6cm; z-index:10; }
                         .pija-b8-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
@@ -8369,7 +8383,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             </div>
                             <div class="pija-b8-img-area">
                                 ${pSvg}
-                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
@@ -8417,6 +8431,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                         .pija-b8-lg-img-area {
                             position: absolute; top: 1.5cm; right: 0; width: 3.6cm; height: 4.5cm; background: #fff;
                             display: flex; align-items: center; justify-content: center; z-index: 5; border-left: 1px solid rgba(0,0,0,0.1);
+                            overflow: hidden;
                         }
                         .pija-b8-lg-symbol { position: absolute; right: 0.12cm; top: 0.12cm; width: 0.72cm; height: 0.72cm; z-index:10; }
                         .pija-b8-lg-img-area img { max-width: 95%; max-height: 95%; object-fit: contain; }
@@ -8453,7 +8468,7 @@ function renderCarouselGroup(mainContainer, items, options) {
                             </div>
                             <div class="pija-b8-lg-img-area">
                                 ${pSvg}
-                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
+                                <img src="${imgSrc}" data-fallback="https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg" data-clave="${item.p.clave}" onload="window.autoCrop&&autoCrop(this)" onmouseover="window.autoCrop&&autoCrop(this)" onerror="if(this.dataset.triedFallback!='true'){this.dataset.triedFallback='true';this.src='https://www.truper.com/media/import/imagenes/${item.p.clave}.jpg';}else{this.style.display='none';}">
                             </div>
                         </div>`;
                     }
