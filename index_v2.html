@@ -11525,7 +11525,8 @@ function renderCarouselGroup(mainContainer, items, options) {
                         let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
                         if(matchG) grosor = "#" + matchG[1];
                         let largo = '??"';
-                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        let forLength = combined.replace(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)\d+["']?/gi, ' ');
+                        let matchL = forLength.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
                         if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
                         
                         let cruzSvg = '<svg viewBox="0 0 100 100" class="pija-phillips"><circle cx="50" cy="50" r="45" fill="#000"/><path d="M50 20 L50 80 M20 50 L80 50" stroke="#fff" stroke-width="20" stroke-linecap="square"/></svg>';
@@ -11631,7 +11632,8 @@ function renderCarouselGroup(mainContainer, items, options) {
                         let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
                         if(matchG) grosor = "#" + matchG[1];
                         let largo = '??"';
-                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        let forLength = combined.replace(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)\d+["']?/gi, ' ');
+                        let matchL = forLength.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
                         if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
                         
                         let cruzSvg = '<svg viewBox="0 0 100 100" class="pija-ab-phillips"><circle cx="50" cy="50" r="45" fill="#000"/><path d="M50 20 L50 80 M20 50 L80 50" stroke="#fff" stroke-width="20" stroke-linecap="square"/></svg>';
@@ -11731,7 +11733,8 @@ function renderCarouselGroup(mainContainer, items, options) {
                         let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
                         if(matchG) grosor = "#" + matchG[1];
                         let largo = '??"';
-                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        let forLength = combined.replace(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)\d+["']?/gi, ' ');
+                        let matchL = forLength.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
                         if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
                         
                         let cruzSvg = '<svg viewBox="0 0 100 100" class="pija-lg-phillips"><circle cx="50" cy="50" r="45" fill="#000"/><path d="M50 20 L50 80 M20 50 L80 50" stroke="#fff" stroke-width="20" stroke-linecap="square"/></svg>';
@@ -11831,7 +11834,8 @@ function renderCarouselGroup(mainContainer, items, options) {
                         let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
                         if(matchG) grosor = "#" + matchG[1];
                         let largo = '??"';
-                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        let forLength = combined.replace(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)\d+["']?/gi, ' ');
+                        let matchL = forLength.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
                         if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
                         
                         let cruzSvg = '<svg viewBox="0 0 100 100" class="pija-ab-lg-phillips"><circle cx="50" cy="50" r="45" fill="#000"/><path d="M50 20 L50 80 M20 50 L80 50" stroke="#fff" stroke-width="20" stroke-linecap="square"/></svg>';
@@ -11931,7 +11935,8 @@ function renderCarouselGroup(mainContainer, items, options) {
                         let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
                         if(matchG) grosor = "#" + matchG[1];
                         let largo = '??"';
-                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        let forLength = combined.replace(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)\d+["']?/gi, ' ');
+                        let matchL = forLength.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
                         if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
                         
                         let slotSvg = '<svg viewBox="0 0 100 100" class="pija-lam-slothead"><circle cx="50" cy="50" r="45" fill="#000"/><rect x="0" y="35" width="100" height="30" fill="#fff"/><rect x="37" y="18" width="26" height="64" fill="#fff"/></svg>';
@@ -12031,7 +12036,8 @@ function renderCarouselGroup(mainContainer, items, options) {
                         let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
                         if(matchG) grosor = "#" + matchG[1];
                         let largo = '??"';
-                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        let forLength = combined.replace(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)\d+["']?/gi, ' ');
+                        let matchL = forLength.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
                         if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
                         
                         let slotSvg = '<svg viewBox="0 0 100 100" class="pija-lam-lg-slothead"><circle cx="50" cy="50" r="45" fill="#000"/><rect x="0" y="35" width="100" height="30" fill="#fff"/><rect x="37" y="18" width="26" height="64" fill="#fff"/></svg>';
@@ -12131,7 +12137,8 @@ function renderCarouselGroup(mainContainer, items, options) {
                         let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
                         if(matchG) grosor = "#" + matchG[1];
                         let largo = '??"';
-                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        let forLength = combined.replace(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)\d+["']?/gi, ' ');
+                        let matchL = forLength.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
                         if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
                         
                         let hexSvg = '<svg viewBox="0 0 100 100" class="pija-hex-symbol"><polygon points="50,3 97,27 97,73 50,97 3,73 3,27" fill="#000"/><circle cx="50" cy="50" r="35" fill="#fff"/><circle cx="50" cy="50" r="27" fill="#000"/><rect x="5" y="45" width="90" height="10" fill="#fff"/></svg>';
@@ -12231,7 +12238,8 @@ function renderCarouselGroup(mainContainer, items, options) {
                         let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
                         if(matchG) grosor = "#" + matchG[1];
                         let largo = '??"';
-                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        let forLength = combined.replace(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)\d+["']?/gi, ' ');
+                        let matchL = forLength.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
                         if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
                         
                         let hexSvg = '<svg viewBox="0 0 100 100" class="pija-hex-lg-symbol"><polygon points="50,3 97,27 97,73 50,97 3,73 3,27" fill="#000"/><circle cx="50" cy="50" r="35" fill="#fff"/><circle cx="50" cy="50" r="27" fill="#000"/><rect x="5" y="45" width="90" height="10" fill="#fff"/></svg>';
@@ -12318,7 +12326,8 @@ function renderCarouselGroup(mainContainer, items, options) {
                         let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
                         if(matchG) grosor = "#" + matchG[1];
                         let largo = '??"';
-                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        let forLength = combined.replace(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)\d+["']?/gi, ' ');
+                        let matchL = forLength.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
                         if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
                         
                         let brocaSvg = '<svg viewBox="0 0 100 100" class="pija-broca-symbol"><polygon points="50,3 97,27 97,73 50,97 3,73 3,27" fill="#000"/><circle cx="50" cy="50" r="35" fill="#fff"/><circle cx="50" cy="50" r="27" fill="#000"/></svg>';
@@ -12401,7 +12410,8 @@ function renderCarouselGroup(mainContainer, items, options) {
                         let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
                         if(matchG) grosor = "#" + matchG[1];
                         let largo = '??"';
-                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        let forLength = combined.replace(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)\d+["']?/gi, ' ');
+                        let matchL = forLength.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
                         if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
                         
                         let brocaSvg = '<svg viewBox="0 0 100 100" class="pija-broca-lg-symbol"><polygon points="50,3 97,27 97,73 50,97 3,73 3,27" fill="#000"/><circle cx="50" cy="50" r="35" fill="#fff"/><circle cx="50" cy="50" r="27" fill="#000"/></svg>';
@@ -12484,7 +12494,8 @@ function renderCarouselGroup(mainContainer, items, options) {
                         let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
                         if(matchG) grosor = "#" + matchG[1];
                         let largo = '??"';
-                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        let forLength = combined.replace(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)\d+["']?/gi, ' ');
+                        let matchL = forLength.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
                         if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
                         
                         let pSvg = '<svg viewBox="0 0 100 100" class="pija-b8-symbol"><circle cx="50" cy="50" r="45" fill="#000"/><rect x="20" y="38" width="60" height="24" fill="#fff"/><rect x="38" y="15" width="24" height="70" fill="#fff"/></svg>';
@@ -12567,7 +12578,8 @@ function renderCarouselGroup(mainContainer, items, options) {
                         let matchG = combined.match(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)(\d+)/i);
                         if(matchG) grosor = "#" + matchG[1];
                         let largo = '??"';
-                        let matchL = combined.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
+                        let forLength = combined.replace(/(?:#|NÚMERO\s*|NUM\.\s*|NÚM\.\s*)\d+["']?/gi, ' ');
+                        let matchL = forLength.match(/(\d+(?:-\d+\/\d+|\/\d+)?\s*(?:"|''|PULG|IN))/i);
                         if(matchL) largo = matchL[1].replace(/''/g, '"').replace(/\s+/g,'');
                         
                         let pSvg = '<svg viewBox="0 0 100 100" class="pija-b8-lg-symbol"><circle cx="50" cy="50" r="45" fill="#000"/><rect x="20" y="38" width="60" height="24" fill="#fff"/><rect x="38" y="15" width="24" height="70" fill="#fff"/></svg>';
