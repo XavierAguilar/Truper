@@ -4,7 +4,7 @@ const { parse } = require('node-html-parser');
 // ============================================================================
 // CONFIGURACIÓN (CLI: node scraper.js [--start N] [--end N] [--resume] [--concurrency N])
 // ============================================================================
-let CSV_PATH = './catalogo_Agosto2026.csv';
+let CSV_PATH = './catalogo.csv';
 if (!fs.existsSync(CSV_PATH) && fs.existsSync('./lista/catalogo_Agosto2026.csv')) {
   CSV_PATH = './lista/catalogo_Agosto2026.csv';
 } else if (!fs.existsSync(CSV_PATH)) {

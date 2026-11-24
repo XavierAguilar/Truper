@@ -1,25 +1,25 @@
 {
   "estado": "completado",
   "salud": "healthy",
-  "total_catalogo": 16034,
+  "total_catalogo": 15910,
   "rango": {
     "start": 0,
-    "end": 16034
+    "end": 15910
   },
-  "procesados": 16061,
+  "procesados": 16075,
   "nuevos_en_lote": 0,
-  "total_lote": 744,
+  "total_lote": 150,
   "pct_lote": 100,
   "errores": 0,
-  "reintentando": 2,
+  "reintentando": 3,
   "pendientes": 0,
-  "tiempo_s": "527",
-  "prod_por_min": "84.8",
-  "ultima_actualizacion": "2026-08-18T22:50:33.103Z",
+  "tiempo_s": "163",
+  "prod_por_min": "55.2",
+  "ultima_actualizacion": "2026-11-24T18:56:17.105Z",
   "ultimo_producto": {
-    "codigo": "40265",
-    "clave": "GRA-1-1/4NB",
-    "nombre": "Bolsa con 1 kg de grapas 1-1/4' negras p/alambre de púas"
+    "codigo": "104741",
+    "clave": "TALI-20AF",
+    "nombre": "Taladro/destornillador 1/2', 20V, 1 batería 2Ah, PRO, MELI"
   },
   "errores_detalle": [],
   "problemas": []

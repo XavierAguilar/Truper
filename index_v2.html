@@ -8744,12 +8744,12 @@ function renderCarouselGroup(mainContainer, items, options) {
             dl.push('<button class="download-btn" id="cardCompareBtn" onclick="toggleCompareProduct(\'' + p.codigo + '\', event)" style="' + (isCompared ? 'background:#0f172a;color:#fff;border:1px solid #0f172a;' : 'background:#ffffff;color:#0f172a;border:1px solid #cbd5e1;') + ' font-weight:800;"><i class="fas fa-balance-scale" style="color:' + (isCompared ? '#38bdf8' : 'var(--primary)') + ';"></i> ' + (isCompared ? '✓ En Comparador' : '⚖️ Comparar Producto') + '</button>');
             if (p.promocion) {
                 var urlFolleto = p.es_nuevo
-                    ? 'https://www.truper.com/promo/2026/Agosto/Promo%20nacional/446b6f09033a81494d930982f5951aec.pdf'
-                    : 'https://www.truper.com/promo/2026/Agosto/Promo%20nacional/ff9467c6fd2e86711a2f934fa1bea196.pdf';
+                    ? 'https://www.truper.com/promo/2026/Noviembre/Promo%20nacional/4d999247aeae7d8cd6542cbc573ac8bd.pdf'
+                    : 'https://www.truper.com/promo/2026/Noviembre/Promo%20nacional/05df636fd11aafddb7a5bdc80ca2515e.pdf';
                 dl.push('<a class="download-btn" href="' + urlFolleto + '" target="_blank" style="background:#ea580c;color:white;border:none;"><i class="fas fa-fire"></i>Ver Folleto Oferta</a>');
             }
             if (p.es_volatil) {
-                var urlVolatiles = 'https://www.truper.com/promo/2026/Agosto/Promo%20nacional/253cf19b98d5c105a50fc3f7035e1dd4.pdf';
+                var urlVolatiles = 'https://www.truper.com/promo/2026/Noviembre/Promo%20nacional/d94bf1db19b4cad51b7e58f2ba9a8cb3.pdf';
                 dl.push('<a class="download-btn" href="' + urlVolatiles + '" target="_blank" style="background:#0284c7;color:white;border:none;"><i class="fas fa-chart-line"></i>Ver Folleto Volátiles</a>');
             }
             if (p.ficha_tecnica_pdf) dl.push('<a class="download-btn" href="' + p.ficha_tecnica_pdf + '" target="_blank"><i class="fas fa-file-pdf" style="color:#ef4444;"></i>Ficha PDF</a>');

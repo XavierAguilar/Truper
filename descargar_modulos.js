@@ -150,7 +150,7 @@ async function main() {
 
     // Función para guardar progreso
     function saveProgress() {
-        fs.writeFileSync(PROGRESS_FILE, JSON.stringify(progress, null, 2));
+        try { fs.writeFileSync(PROGRESS_FILE, JSON.stringify(progress, null, 2)); } catch (e) {}
         // Guardar stats para el monitor (formato compatible con renderDashboard)
         const procesados = Object.keys(progress).length;
         const pendientes = stats.total - procesados;
@@ -175,7 +175,7 @@ async function main() {
             ultimo_modulo_id: stats.lastModuleId || '',
             problemas: stats.errorList.slice(-20) // Últimos 20 errores para el monitor
         };
-        fs.writeFileSync(path.join(__dirname, 'modulos_stats.json'), JSON.stringify(monitorData, null, 2));
+        try { fs.writeFileSync(path.join(__dirname, 'modulos_stats.json'), JSON.stringify(monitorData, null, 2)); } catch (e) {}
     }
     stats.initialProcessed = Object.keys(progress).length;
 
